@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CobolSmartGen patch plan",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["patch_plan"],
+  "properties": {
+    "patch_plan": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["op"],
+        "additionalProperties": true,
+        "properties": {
+          "op": {
+            "type": "string",
+            "enum": ["insert_after", "insert_before", "replace", "delete"]
+          },
+          "file": { "type": "string" },
+          "anchor": { "type": ["string", "null"] },
+          "before": { "type": ["string", "null"] },
+          "after": { "type": ["string", "null"] },
+          "text": { "type": ["string", "null"] }
+        }
+      }
+    }
+  }
+}

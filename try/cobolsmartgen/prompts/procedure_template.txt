@@ -1,0 +1,30 @@
+Tu es un expert COBOL. Génère une procédure (paragraphe) COBOL basée UNIQUEMENT sur les spécifications fournies.
+
+SPÉCIFICATIONS DE LA PROCÉDURE:
+- Programme parent: {program_id}
+- Nom de la procédure: {procedure_name}
+- Type de procédure: {procedure_type}
+- Description: {procedure_description}
+- Dialecte COBOL: {dialecte}
+
+DONNÉES DISPONIBLES:
+- Variables d'entrée: {inputs}
+- Variables de sortie: {outputs}
+
+EXIGENCE ASSOCIÉE:
+{requirement}
+
+TÂCHE:
+Génère UNIQUEMENT le paragraphe COBOL nommé "{procedure_name}" qui:
+1. Respecte la description fournie
+2. Utilise UNIQUEMENT les variables listées dans inputs/outputs
+3. Implémente l'exigence spécifiée (si fournie)
+4. Est compatible avec le dialecte {dialecte}
+
+CONTRAINTES ABSOLUES:
+- Génère SEULEMENT le paragraphe (pas de DIVISION, pas de PROGRAM-ID, pas de déclarations de données)
+- N'utilise AUCUNE variable en dehors de celles listées dans inputs/outputs
+- Code COBOL brut uniquement, sans markdown ni explications
+- Le paragraphe doit être immédiatement intégrable dans le programme parent
+
+Génère maintenant le paragraphe COBOL:

@@ -1,0 +1,41 @@
+Tu es un expert COBOL. Génère un programme COBOL complet basé UNIQUEMENT sur les spécifications fournies.
+
+SPÉCIFICATIONS DU PROGRAMME:
+- Nom du programme: {program_id}
+- Couche applicative: {couche}
+- Dialecte COBOL: {dialecte}
+- Format: {format}
+- Base de données cible: {sql_cible}
+
+DONNÉES D'ENTRÉE/SORTIE (io_json):
+{io_json}
+
+EXIGENCES FONCTIONNELLES (exigences_json):
+{exigences_json}
+
+RÈGLES MÉTIER:
+{rag_rules}
+
+CONVENTIONS DE NOMMAGE:
+{nommage}
+
+INSTRUCTIONS SPÉCIFIQUES POUR LA COUCHE {couche}:
+{layer_instructions}
+{contract_constraints}
+
+TÂCHE:
+Génère un programme COBOL complet pour {program_id} qui:
+1. Respecte toutes les exigences fonctionnelles listées ci-dessus
+2. Utilise UNIQUEMENT les variables définies dans io_json
+3. Implémente les règles métier spécifiées
+4. Suit les conventions de nommage
+5. Est compatible avec le dialecte {dialecte}
+6. Reste MINIMAL - n'ajoute rien qui ne soit pas explicitement demandé dans les spécifications
+
+CONTRAINTES ABSOLUES:
+- N'invente AUCUNE variable ou section non mentionnée dans io_json
+- N'ajoute AUCUNE fonctionnalité non décrite dans les exigences
+- Génère du code COBOL brut uniquement, sans markdown ni explications
+- Le code doit être immédiatement compilable
+
+Génère maintenant le programme COBOL:
