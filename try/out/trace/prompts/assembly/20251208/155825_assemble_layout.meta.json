@@ -1,0 +1,13 @@
+{
+  "created_utc": "2025-12-08T15:58:25Z",
+  "extra": {
+    "action": "assemble"
+  },
+  "files": {
+    "prompt": "/home/gapial/Bureau/cobol_generator/try/out/trace/prompts/assembly/20251208/155825_assemble_layout.prompt.txt",
+    "response": "/home/gapial/Bureau/cobol_generator/try/out/trace/prompts/assembly/20251208/155825_assemble_layout.response.txt"
+  },
+  "kind": "assembly",
+  "name": "assemble_layout",
+  "slug": "assemble_layout"
+}

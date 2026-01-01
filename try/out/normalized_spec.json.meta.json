@@ -1,0 +1,12 @@
+{
+  "created_utc": "2025-12-08T15:57:23Z",
+  "extra": {
+    "source_file": "/home/gapial/Bureau/cobol_generator/try/salaire_net.yaml"
+  },
+  "kind": "normalized_spec",
+  "mtime_utc": "2025-12-08T15:57:23Z",
+  "name": "normalized_spec.json",
+  "path": "/home/gapial/Bureau/cobol_generator/try/out/normalized_spec.json",
+  "sha256": "ce72b08ef4c63e55b494f467834785fd14d1cd59f3841faaa8ea7f6c90075bd7",
+  "size": 17289
+}

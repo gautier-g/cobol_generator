@@ -1,0 +1,102 @@
+IDENTIFICATION DIVISION.
+       PROGRAM-ID. EMPLOYEE-DAL-DB.
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER. IBM-PC.
+       OBJECT-COMPUTER. IBM-PC.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-CONNECTED           PIC X VALUE 'N'.
+       01 WS-CURSOR-OPEN         PIC X VALUE 'N'.
+       01 WS-SQLCODE             PIC S9(9) COMP-5.
+
+       EXEC SQL INCLUDE SQLCA END-EXEC.
+
+       LINKAGE SECTION.
+       01 LK-OPERATION           PIC X(4).
+       01 LK-END-OF-FILE         PIC X.
+       01 LK-EMPLOYEE.
+           05 LK-EMP-ID          PIC 9(4).
+           05 LK-EMP-NAME        PIC A(30).
+           05 LK-SALARY-BRUT     PIC 9(6)V99.
+           05 LK-SALARY-NET      PIC 9(6)V99.
+
+       PROCEDURE DIVISION USING LK-OPERATION LK-END-OF-FILE LK-EMPLOYEE.
+       MAIN-LOGIC.
+           EVALUATE LK-OPERATION
+               WHEN 'READ'
+                   PERFORM DAL-READ
+               WHEN 'SAVE'
+                   PERFORM DAL-SAVE
+               WHEN 'END '
+                   PERFORM DAL-END
+           END-EVALUATE.
+           EXIT PROGRAM.
+
+       DAL-READ.
+           IF WS-CONNECTED = 'N'
+               EXEC SQL
+                   CONNECT TO 'postgres'
+               END-EXEC
+               IF SQLCODE NOT = 0
+                   MOVE 'Y' TO LK-END-OF-FILE
+                   EXIT PARAGRAPH
+               END-IF
+               MOVE 'Y' TO WS-CONNECTED
+           END-IF.
+
+           IF WS-CURSOR-OPEN = 'N'
+               EXEC SQL
+                   DECLARE C_EMP CURSOR FOR
+                   SELECT EMP_ID, EMP_NAME, SALARY_BRUT, SALARY_NET
+                   FROM EMPLOYEE
+               END-EXEC
+               EXEC SQL
+                   OPEN C_EMP
+               END-EXEC
+               IF SQLCODE NOT = 0
+                   MOVE 'Y' TO LK-END-OF-FILE
+                   EXIT PARAGRAPH
+               END-IF
+               MOVE 'Y' TO WS-CURSOR-OPEN
+           END-IF.
+
+           EXEC SQL
+               FETCH C_EMP INTO
+                   :LK-EMP-ID,
+                   :LK-EMP-NAME,
+                   :LK-SALARY-BRUT,
+                   :LK-SALARY-NET
+           END-EXEC.
+
+           IF SQLCODE NOT = 0
+               MOVE 'Y' TO LK-END-OF-FILE
+           END-IF.
+
+       DAL-SAVE.
+           EXEC SQL
+               UPDATE EMPLOYEE
+               SET SALARY_NET = :LK-SALARY-NET
+               WHERE EMP_ID = :LK-EMP-ID
+           END-EXEC.
+
+       DAL-END.
+           IF WS-CURSOR-OPEN = 'Y'
+               EXEC SQL
+                   CLOSE C_EMP
+               END-EXEC
+               MOVE 'N' TO WS-CURSOR-OPEN
+           END-IF.
+
+           EXEC SQL
+               COMMIT
+           END-EXEC.
+
+           IF WS-CONNECTED = 'Y'
+               EXEC SQL
+                   DISCONNECT ALL
+               END-EXEC
+               MOVE 'N' TO WS-CONNECTED
+           END-IF.

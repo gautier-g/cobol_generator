@@ -1,0 +1,39 @@
+[system] Expert COBOL. Génère uniquement le code COBOL demandé.
+[user] Réponds uniquement avec du code COBOL compilable, sans Markdown ni texte autour. La première ligne doit être IDENTIFICATION DIVISION. Un seul PROGRAM-ID, pas de sous-programmes.
+
+Contexte :
+- Structure EMPLOYEE : 4 champs (EMP-ID, EMP-NAME, SALARY-BRUT, SALARY-NET).
+- Rôle : couche présentation simple, affiche les valeurs.
+Sections requises : environment_division: optional, identification_division: required
+
+Contraintes :
+- PROGRAM-ID doit être exactement : EMPLOYEE-BUSINESS.
+- WORKING-STORAGE : aucun autre 01 que nécessaire. La structure EMPLOYEE est reçue en USING (voir ci-dessous).
+- LINKAGE SECTION / USING : structure imposée :
+LINKAGE SECTION.
+01 EMPLOYEE.
+    05 EMP-ID          PIC 9(4).
+    05 EMP-NAME        PIC A(30).
+    05 SALARY-BRUT     PIC 9(6)V99.
+    05 SALARY-NET      PIC 9(6)V99.
+
+PROCEDURE DIVISION USING EMPLOYEE.
+- Aucun EXEC SQL, aucun CALL, pas de logique métier. Aucun STOP RUN.
+- Une procédure qui affiche EMP-NAME, SALARY-BRUT, SALARY-NET (lignes imposées ci-dessous si présentes).
+- Paragraphes attendus (exhaustif) : DISPLAY-EMPLOYEE et aucun autre paragraphe public.
+- Ne déclare aucune autre variable en WORKING-STORAGE que celles listées ci-dessus.
+Fonctions (depuis YAML.fonctions):
+- DISPLAY-EMPLOYEE: Affiche les informations principales de l'employé courant sur la console: nom, identifiant, salaire brut, salaire net.
+
+  Inputs: EMPLOYEE.EMP_NAME, EMPLOYEE.EMP_ID, EMPLOYEE.SALARY_BRUT, EMPLOYEE.SALARY_NET
+  Emplacement: division=PROCEDURE DIVISION, section=couche_metier, paragraphe=DISPLAY-EMPLOYEE
+Lignes d'affichage (si définies) :
+DISPLAY "EMPLOYE : " EMP-NAME
+DISPLAY "ID      : " EMP-ID
+DISPLAY "BRUT    : " SALARY-BRUT
+DISPLAY "NET     : " SALARY-NET
+
+Tâche : génère le programme COBOL complet respectant ces contraintes (code seulement).
+
+Les erreurs suivantes ont été détectées, corrige-les strictement sans ajouter de texte explicatif:
+- Paragraphes en trop: GOBACK.
