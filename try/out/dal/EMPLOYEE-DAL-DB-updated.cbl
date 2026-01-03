@@ -13,7 +13,7 @@
        EXEC SQL BEGIN DECLARE SECTION END-EXEC.
        01 DBNAME                 PIC X(30) VALUE 'postgres'.
        01 USERNAME               PIC X(30) VALUE 'postgres'.
-       01 PASSWD                 PIC X(10) VALUE SPACE.
+       01 PASSWD                 PIC X(30) VALUE 'postgres'.
        01 WS-EMP-ID              PIC 9(4).
        01 WS-EMP-NAME            PIC X(30).
        01 WS-SALARY-BRUT         PIC 9(6)V99.
@@ -66,6 +66,7 @@
                    OPEN C_EMP
                END-EXEC
                IF SQLCODE NOT = 0
+                   DISPLAY "[DAL-READ] ERREUR ouverture curseur!"
                    MOVE 'Y' TO LK-END-OF-FILE
                    EXIT PARAGRAPH
                END-IF
@@ -83,7 +84,6 @@
            IF SQLCODE NOT = 0
                MOVE 'Y' TO LK-END-OF-FILE
            ELSE
-      *        Copier les données de WS vers LINKAGE
                MOVE WS-EMP-ID        TO LK-EMP-ID
                MOVE WS-EMP-NAME      TO LK-EMP-NAME
                MOVE WS-SALARY-BRUT   TO LK-SALARY-BRUT
@@ -91,7 +91,6 @@
            END-IF.
            
        DAL-SAVE.
-      *    Copier les données de LINKAGE vers WS
            MOVE LK-EMP-ID        TO WS-EMP-ID.
            MOVE LK-SALARY-NET    TO WS-SALARY-NET.
            
@@ -119,3 +118,4 @@
                END-EXEC
                MOVE 'N' TO WS-CONNECTED
            END-IF.
+           

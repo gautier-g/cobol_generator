@@ -13,6 +13,7 @@
            05 SALARY-BRUT     PIC 9(6)V99.
            05 SALARY-NET      PIC 9(6)V99.
        
+OCESQL*
        PROCEDURE DIVISION.
        MAIN-PROCESS.
            MOVE 'READ' TO OPERATION
