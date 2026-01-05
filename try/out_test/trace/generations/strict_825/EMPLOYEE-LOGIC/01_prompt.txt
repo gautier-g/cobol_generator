@@ -1,0 +1,185 @@
+Reponds uniquement avec du code COBOL compilable, sans Markdown ni texte autour.
+La premiere ligne doit etre IDENTIFICATION DIVISION.
+Un seul PROGRAM-ID, pas de sous-programmes.
+Utilise strictement les identifiants, messages, SQL et sequences definis dans la spec.
+N'invente aucune variable, paragraphe, message ou SQL.
+Respecte exactement les listes de WORKING-STORAGE, LINKAGE et USING.
+Toujours utiliser les terminateurs explicites END-IF / END-EVALUATE / END-PERFORM / END-EXEC.
+Pas de GO TO, pas de logique DAL dans LOGIC, pas de SQL hors DAL.
+Toute variable utilisee doit etre declaree (WORKING-STORAGE ou LINKAGE).
+Chaque paragraphe DOIT etre declare sur une ligne avec un point (ex: MAIN-ENTRY.).
+Ne termine aucune instruction par un point (sauf EXEC SQL INCLUDE SQLCA END-EXEC.); seul un point sur une ligne seule termine un paragraphe.
+
+=== STRATEGY ===
+1) Construis d'abord le squelette COBOL complet (DIVISION/SECTION) dans l'ordre.
+2) Insere les blocs WORKING-STORAGE/LINKAGE exacts fournis par la spec.
+3) Ecris la PROCEDURE DIVISION en suivant le flow et les fonctions.
+4) Verifie la coherence: aucune variable/paragraphes inventes.
+
+=== CONTEXT ===
+Regles metier: SALARY_NET = ROUND(SALARY_BRUT * 0.7, 2)
+Batch: traiter tous les employes.
+
+=== STYLE ===
+Guidelines globales: Format FIXED: instructions commencent en colonne 8 (prefixe de 7 espaces).
+Commentaires: '*' en colonne 7 (6 espaces + '*'), pas de commentaires '*>'.
+Ne pas utiliser '>>SOURCE FORMAT FREE'.
+Terminer chaque paragraphe par une ligne avec un seul point.
+Le nom du paragraphe se termine par un point (ex: MAIN-ENTRY.).
+Aucune ligne ne doit depasser 72 colonnes (format FIXED).
+Si une instruction depasse 72 colonnes, la scinder sur plusieurs lignes.
+Pour EXEC SQL FETCH/SELECT/UPDATE: mettre chaque variable hote sur sa propre ligne.
+Ne pas mettre de point en fin de DISPLAY/GOBACK/STOP RUN/CALL/MOVE/IF (sauf EXEC SQL INCLUDE SQLCA END-EXEC.).
+Utiliser des guillemets simples pour les messages DISPLAY.
+Respecter l'ordre: IDENTIFICATION -> ENVIRONMENT -> DATA -> PROCEDURE.
+Dans DATA: WORKING-STORAGE puis LINKAGE (si present).
+Header commentaire (verbatim):
+      *****************************************************************
+      * Programme: EMPLOYEE-LOGIC                                      *
+      * Couche: LOGIC (Orchestration)                                  *
+      * Role: Traitement batch principal                               *
+      *       - Boucle sur les employes                                *
+      *       - Calcul du salaire net (BRUT * 0.7)                     *
+      *       - Sauvegarde en base                                     *
+      *       - Affichage des resultats                                *
+      *****************************************************************
+Style specifique: Utiliser commentaires de bloc pour les sections majeures.
+Afficher les bandeaux debut et fin.
+Bloc commentaire CALCULATE-NET (verbatim):
+      *****************************************************************
+      * Regle metier R1: SALARY_NET = ROUND(SALARY_BRUT * 0.7, 2)    *
+      * Calcul: Salaire net = Salaire brut - 30%                      *
+      *         (20% cotisations sociales + 10% impot)                *
+      *****************************************************************
+
+=== FORMAT ===
+Format COBOL: line_format: fixed
+indent_spaces: 7
+max_line_length: 72
+comment: column=7, prefix=*
+literal_quotes: single
+paragraph_terminator: .
+allow_source_format_directive: False
+
+=== NAMING ===
+Conventions de nommage: variables_case=UPPER_SNAKE, programmes_case=UPPER-KEBAB
+prefixes: flags=WS-, linkage=LK-, working_storage=WS-
+paragraph_style: VERB-NOUN
+
+=== ENVIRONMENT ===
+ENVIRONMENT exact (lignes):
+ENVIRONMENT DIVISION.
+CONFIGURATION SECTION.
+REPOSITORY.
+    FUNCTION ALL INTRINSIC.
+
+=== INTERFACE ===
+Programme DAL: EMPLOYEE-DAL-DB
+Programme BUSINESS: EMPLOYEE-BUSINESS
+Interface DAL (CALL USING): LK-OPERATION: X(4) (direction: in); LK-END-OF-FILE: X (direction: inout); LK-EMPLOYEE: groupe EMPLOYEE (direction: inout)
+
+=== WORKING_STORAGE ===
+Working-Storage obligatoire (lignes exactes):
+01  END-OF-FILE            PIC X VALUE 'N'.
+88  EOF-REACHED        VALUE 'Y'.
+88  NOT-EOF            VALUE 'N'.
+77  OPERATION              PIC X(4).
+77  WS-COUNT               PIC 9(4) VALUE 0.
+01  EMPLOYEE.
+    05 EMP-ID              PIC 9(4).
+    05 EMP-NAME            PIC A(30).
+    05 SALARY-BRUT         PIC S9(6)V99.
+    05 SALARY-NET          PIC S9(6)V99.
+
+=== FLOW ===
+Flux principal LOGIC:
+Afficher le bandeau de debut
+READ initial via DAL (OPERATION='READ')
+Boucle jusqu'a EOF: incrementer WS-COUNT, CALCULATE-NET, SAVE, BUSINESS display, READ suivant
+Appeler DAL avec OPERATION='END '
+Afficher le bandeau de fin avec le compteur
+STOP RUN
+
+=== LOGGING ===
+Messages (verbatim) a afficher:
+==========================================
+DEBUT TRAITEMENT BATCH CALCUL SALAIRE NET
+==========================================
+==========================================
+FIN TRAITEMENT BATCH
+Nombre employes traites: 
+==========================================
+ANOMALIE: Salaire net negatif corrige
+ANOMALIE: SALARY_BRUT invalide
+
+=== CONSTRAINTS ===
+Interdictions: EXEC SQL, GO TO, *>
+Paragraphes publics attendus: MAIN-PROCESS, CALCULATE-NET
+Entry paragraph: MAIN-PROCESS
+Statements obligatoires: STOP RUN, CALL 'EMPLOYEE-DAL-DB' USING OPERATION, END-OF-FILE, EMPLOYEE, CALL 'EMPLOYEE-BUSINESS' USING EMPLOYEE
+
+=== SKELETON ===
+Squelette attendu (rappel structure):
+IDENTIFICATION DIVISION.
+PROGRAM-ID. EMPLOYEE-LOGIC.
+      *****************************************************************
+      * Programme: EMPLOYEE-LOGIC                                      *
+      * Couche: LOGIC (Orchestration)                                  *
+      * Role: Traitement batch principal                               *
+      *       - Boucle sur les employes                                *
+      *       - Calcul du salaire net (BRUT * 0.7)                     *
+      *       - Sauvegarde en base                                     *
+      *       - Affichage des resultats                                *
+      *****************************************************************
+ENVIRONMENT DIVISION.
+CONFIGURATION SECTION.
+REPOSITORY.
+    FUNCTION ALL INTRINSIC.
+DATA DIVISION.
+WORKING-STORAGE SECTION.
+01  END-OF-FILE            PIC X VALUE 'N'.
+88  EOF-REACHED        VALUE 'Y'.
+88  NOT-EOF            VALUE 'N'.
+77  OPERATION              PIC X(4).
+77  WS-COUNT               PIC 9(4) VALUE 0.
+01  EMPLOYEE.
+    05 EMP-ID              PIC 9(4).
+    05 EMP-NAME            PIC A(30).
+    05 SALARY-BRUT         PIC S9(6)V99.
+    05 SALARY-NET          PIC S9(6)V99.
+PROCEDURE DIVISION.
+MAIN-PROCESS.
+
+=== FONCTIONS ===
+- MAIN-PROCESS: Boucle principale du batch: lit les employés via la DAL, calcule le salaire net, sauvegarde le résultat en base et affiche chaque employé.
+
+  visibility: public, required: True
+  Steps:
+    - DISPLAY '=========================================='
+    - DISPLAY 'DEBUT TRAITEMENT BATCH CALCUL SALAIRE NET'
+    - DISPLAY '=========================================='
+    - MOVE 'READ' TO OPERATION; CALL EMPLOYEE-DAL-DB USING OPERATION, END-OF-FILE, EMPLOYEE
+    - PERFORM UNTIL EOF-REACHED: ADD 1 TO WS-COUNT; PERFORM CALCULATE-NET; MOVE 'SAVE' TO OPERATION; CALL DAL; CALL BUSINESS; MOVE 'READ' TO OPERATION; CALL DAL
+    - MOVE 'END ' TO OPERATION; CALL EMPLOYEE-DAL-DB USING OPERATION, END-OF-FILE, EMPLOYEE
+    - DISPLAY '=========================================='
+    - DISPLAY 'FIN TRAITEMENT BATCH'
+    - DISPLAY 'Nombre employes traites: ' WS-COUNT
+    - DISPLAY '=========================================='
+    - STOP RUN
+  Emplacement: division=PROCEDURE DIVISION, section=couche_logique, paragraphe=MAIN-PROCESS
+- CALCULATE-NET: Applique la règle métier SALARY_NET = ROUND(SALARY_BRUT * 0.7, 2) à l'employé courant. Aucun accès base, uniquement traitement en mémoire.
+
+  visibility: public, required: True
+  Inputs: EMPLOYEE.SALARY_BRUT
+  Outputs: EMPLOYEE.SALARY_NET
+  Steps:
+    - IF SALARY-BRUT IS NUMERIC: COMPUTE SALARY-NET ROUNDED = SALARY-BRUT * 0.7
+    - IF SALARY-NET < 0: MOVE 0 TO SALARY-NET, DISPLAY 'ANOMALIE: Salaire net negatif corrige', DISPLAY '  EMP_ID=' EMP-ID
+    - ELSE: DISPLAY 'ANOMALIE: SALARY_BRUT invalide', DISPLAY '  EMP_ID=' EMP-ID, DISPLAY '  EMP_NAME=' EMP-NAME, DISPLAY '  SALARY_BRUT=' SALARY-BRUT, MOVE 0 TO SALARY-NET
+  Emplacement: division=PROCEDURE DIVISION, section=couche_logique, paragraphe=CALCULATE-NET
+
+Tache : genere le programme COBOL complet respectant ces contraintes (code seulement).
+
+Les erreurs suivantes ont été détectées, corrige-les strictement sans ajouter de texte explicatif:
+- Instruction obligatoire manquante: CALL 'EMPLOYEE-DAL-DB' USING OPERATION, END-OF-FILE, EMPLOYEE
+- Point final interdit sur instruction (utiliser '.' uniquement sur ligne seule).

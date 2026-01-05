@@ -1,0 +1,23 @@
+{
+  "created_dirs": [
+    "/home/mfabre/pi/cobol_generator/try/out_test/business",
+    "/home/mfabre/pi/cobol_generator/try/out_test/logic",
+    "/home/mfabre/pi/cobol_generator/try/out_test/dal",
+    "/home/mfabre/pi/cobol_generator/try/out_test/copy",
+    "/home/mfabre/pi/cobol_generator/try/out_test/sql/ddl",
+    "/home/mfabre/pi/cobol_generator/try/out_test/sql/dml",
+    "/home/mfabre/pi/cobol_generator/try/out_test/tests",
+    "/home/mfabre/pi/cobol_generator/try/out_test/reports",
+    "/home/mfabre/pi/cobol_generator/try/out_test/trace",
+    "/home/mfabre/pi/cobol_generator/try/out_test/bin"
+  ],
+  "tests": [
+    "/home/mfabre/pi/cobol_generator/try/out_test/tests/compile_EMPLOYEE-DAL.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test/tests/compile_EMPLOYEE-LOGIC.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test/tests/compile_EMPLOYEE-BUSINESS.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test/tests/compile_EMPLOYEE-DAL-DB.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test/tests/compile_EMPLOYEE-LOGIC.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test/tests/compile_EMPLOYEE-BUSINESS.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test/tests/compile_EMPLOYEE.sh"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-01-05T22:17:48Z",
+  "extra": {
+    "layer": "dal",
+    "program_id": "EMPLOYEE-DAL-DB"
+  },
+  "kind": "program_full_llm_strict",
+  "mtime_utc": "2026-01-05T22:17:48Z",
+  "name": "EMPLOYEE-DAL-DB.cbl",
+  "path": "/home/mfabre/pi/cobol_generator/try/out_test/dal/EMPLOYEE-DAL-DB.cbl",
+  "sha256": "1b72d29d39feef89a99c00db8945483f248c8a6da3a42b88315f0a88f3177331",
+  "size": 7570
+}

@@ -1,9 +1,19 @@
 # config
 
-Configuration par defaut du pipeline.
+Default configuration files used by the pipeline.
 
-Fichiers :
-- `project.yaml` : valeurs par defaut (dialecte COBOL, SGBD, logging, options LLM). Peut etre surcharge via variables d'environnement ou CLI.
-- `mapping_types.yaml` : correspondances de types pour generer les colonnes SQL/COBOL.
+## Files
 
-Chargement : `cli/main.py` lit `project.yaml`, applique les variables `COBOL_*`, `LLM_*`, `DB_*`, puis les arguments CLI.
+### project.yaml
+Purpose: default settings for dialect, SGBD, compiler, logging, and LLM.
+Inputs: loaded by cli/main.py at startup.
+Outputs: merged config dict (then overridden by CLI args and env).
+Exchanges: values flow into ingest/analyze/generate/compile modules.
+
+### mapping_types.yaml
+Purpose: SQL type to COBOL PIC mappings per dialect.
+Inputs: read by analyze/extract_io.py and utils.typing_map.
+Outputs: COBOL PIC clauses for io_map.json and prompts.
+
+### __init__.py
+Purpose: package marker (no runtime logic).

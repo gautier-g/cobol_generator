@@ -1,0 +1,12 @@
+{
+  "created_utc": "2026-01-05T15:52:35Z",
+  "extra": {
+    "entity": "EMPLOYEE"
+  },
+  "kind": "copybook",
+  "mtime_utc": "2026-01-05T15:52:35Z",
+  "name": "EMPLOYEE-RECORD.cpy",
+  "path": "/home/mfabre/pi/cobol_generator/try/out/copy/EMPLOYEE-RECORD.cpy",
+  "sha256": "5801b1a315cac53ed226a4d579e777b19c2ff95b4de20d9fbad9b8382a4f6643",
+  "size": 249
+}

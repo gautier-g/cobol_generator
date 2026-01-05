@@ -8,6 +8,8 @@ Usage:
     python -m cobolsmartgen.cli.main generate --input spec.yaml --out out
     python -m cobolsmartgen.cli.main compile --out out
     python -m cobolsmartgen.cli.main fix --out out
+
+    HWWBg6EZG571EblM7xl4ZFqXFhrQ7rB4
 """
 import argparse
 import shutil

@@ -1,0 +1,76 @@
+{
+  "run_id": "20260105_231643",
+  "timestamp_end": "2026-01-05T23:18:26.849335",
+  "success": true,
+  "steps": [
+    {
+      "step": "step_01_normalize",
+      "success": true,
+      "duration_seconds": 0.145,
+      "timestamp": "2026-01-05T23:16:43.467284",
+      "entities_count": 0
+    },
+    {
+      "step": "step_02_io_mapping",
+      "success": true,
+      "duration_seconds": 0.016,
+      "timestamp": "2026-01-05T23:16:43.483785",
+      "entities_count": 1
+    },
+    {
+      "step": "step_03_program_plan",
+      "success": true,
+      "duration_seconds": 0.009,
+      "timestamp": "2026-01-05T23:16:43.492936",
+      "programs_count": 3
+    },
+    {
+      "step": "step_04_contract",
+      "success": true,
+      "duration_seconds": 0.005,
+      "timestamp": "2026-01-05T23:16:43.497597",
+      "programs_count": 3
+    },
+    {
+      "step": "step_05_rag_index",
+      "success": true,
+      "duration_seconds": 0.029,
+      "timestamp": "2026-01-05T23:16:43.526372"
+    },
+    {
+      "step": "step_06_sql",
+      "success": true,
+      "duration_seconds": 0.005,
+      "timestamp": "2026-01-05T23:16:43.531904",
+      "files_count": 1
+    },
+    {
+      "step": "step_07_structures",
+      "success": true,
+      "duration_seconds": 0.001,
+      "timestamp": "2026-01-05T23:16:43.532811",
+      "files_count": 3
+    },
+    {
+      "step": "step_08_headers",
+      "success": true,
+      "duration_seconds": 0.023,
+      "timestamp": "2026-01-05T23:16:43.555472",
+      "files_count": 3
+    },
+    {
+      "step": "step_09_procedures",
+      "success": true,
+      "duration_seconds": 103.269,
+      "timestamp": "2026-01-05T23:18:26.824123",
+      "files_count": 3
+    },
+    {
+      "step": "step_10_assembly",
+      "success": true,
+      "duration_seconds": 0.025,
+      "timestamp": "2026-01-05T23:18:26.849015",
+      "total_files": 7
+    }
+  ]
+}

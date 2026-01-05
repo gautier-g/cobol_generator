@@ -1,0 +1,15 @@
+{
+  "created_utc": "2026-01-05T19:28:14Z",
+  "extra": {
+    "base": "https://api.mistral.ai/v1",
+    "endpoint": "chat",
+    "model": "mistral-large-latest"
+  },
+  "files": {
+    "prompt": "out/trace/prompts/mistral/20260105/192814_chat.prompt.txt",
+    "response": null
+  },
+  "kind": "mistral",
+  "name": "chat",
+  "slug": "chat"
+}

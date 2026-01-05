@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-01-05T22:18:16Z",
+  "extra": {
+    "layer": "logic",
+    "program_id": "EMPLOYEE-LOGIC"
+  },
+  "kind": "program_full_llm_strict",
+  "mtime_utc": "2026-01-05T22:18:16Z",
+  "name": "EMPLOYEE-LOGIC.cbl",
+  "path": "/home/mfabre/pi/cobol_generator/try/out_test/logic/EMPLOYEE-LOGIC.cbl",
+  "sha256": "769553bdbc64548594287fa2c26056cebcb03dabcfe283ca2c17346d2a4b67e5",
+  "size": 3761
+}

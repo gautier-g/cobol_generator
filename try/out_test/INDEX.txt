@@ -1,0 +1,156 @@
+INDEX DES FICHIERS - Projet COBOL Calcul Salaire Net
+======================================================
+
+PROGRAMMES COBOL (3 fichiers)
+------------------------------
+./dal/EMPLOYEE-DAL-DB.cbl
+  - Couche DAL (Data Access Layer)
+  - Connexion PostgreSQL (empdb)
+  - Operations: READ, SAVE, END
+  - Curseur C_EMP
+  - Gestion paresseuse de la connexion
+  - Utilise: EXEC SQL ... END-EXEC
+
+./logic/EMPLOYEE-LOGIC.cbl
+  - Couche LOGIC (Orchestration)
+  - Programme principal du batch
+  - Boucle de traitement des employes
+  - Calcul: SALARY_NET = SALARY_BRUT * 0.7
+  - Appelle DAL et BUSINESS
+  - Point d'entree: MAIN-PROCESS
+
+./business/EMPLOYEE-BUSINESS.cbl
+  - Couche BUSINESS (Presentation)
+  - Affichage des informations employe
+  - Format: nom, ID, brut, net
+  - Aucun SQL, aucune logique metier
+
+FICHIERS COPY (3 fichiers)
+---------------------------
+./copy/EMPLOYEE-RECORD.cpy
+  - Structure de donnees EMPLOYEE
+  - 4 champs: EMP-ID, EMP-NAME, SALARY-BRUT, SALARY-NET
+  - Partage entre tous les programmes
+
+./copy/SQLCA.cpy
+  - SQL Communication Area
+  - Gestion SQLCODE, SQLSTATE
+  - Messages d'erreur SQL
+
+./copy/STATUS-CODES.cpy
+  - Codes de statut et flags
+  - END-OF-FILE avec valeurs 'Y'/'N'
+  - Niveau 88 pour conditions
+
+FICHIERS SQL (3 fichiers)
+--------------------------
+./sql/create_tables.sql
+  - Creation table EMPLOYEE
+  - 4 colonnes: EMP_ID (PK), EMP_NAME, SALARY_BRUT, SALARY_NET
+  - Index sur EMP_NAME
+
+./sql/insert_data.sql
+  - Donnees de test (2 employes)
+  - Dupont: 3000.00 € brut
+  - Durand: 1500.00 € brut
+
+./sql/setup_db.sh
+  - Script d'initialisation complet
+  - Creation utilisateur empuser
+  - Creation base empdb
+  - Execution create_tables.sql et insert_data.sql
+
+SCRIPTS DE COMPILATION (1 fichier)
+-----------------------------------
+./compile_all.sh
+  - Script principal de compilation
+  - Etape 1: Precompilation avec ocesql (SQL -> COBOL)
+  - Etape 2: Compilation avec cobc (COBOL -> executable)
+  - Etape 3: Linkage avec libpq (PostgreSQL)
+  - Cree repertoires: bin/, precompiled/
+  - Compile les 3 programmes dans l'ordre
+
+SCRIPTS UTILITAIRES (2 fichiers)
+---------------------------------
+./verify_results.sh
+  - Verification des resultats en base
+  - Affiche contenu table EMPLOYEE
+  - Valide la formule de calcul
+  - Statut: OK / ERREUR / NON CALCULE
+
+./Makefile
+  - Automatisation des taches
+  - Cibles: setup, compile, run, verify, clean
+  - Simplifie l'utilisation du projet
+
+DOCUMENTATION (3 fichiers)
+---------------------------
+./README.md (13 KB)
+  - Documentation complete du projet
+  - Architecture 3 couches detaillee
+  - Guide d'installation pas a pas
+  - Description de chaque programme
+  - Schema de communication
+  - Section depannage
+  - Exemples de sortie
+
+./QUICKSTART.md
+  - Guide de demarrage rapide
+  - Installation en 3 etapes
+  - Commandes essentielles
+  - Verification rapide
+
+./INDEX.txt (ce fichier)
+  - Index de tous les fichiers
+  - Description de chaque fichier
+  - Organisation du projet
+
+CONFIGURATION (1 fichier)
+--------------------------
+./.env.example
+  - Exemple de configuration environnement
+  - Variables: DB_NAME, DB_USER, DB_PASSWORD
+  - A copier en .env si besoin
+
+TOTAL: 16 fichiers
+==================
+
+REPERTOIRES GENERES A LA COMPILATION
+-------------------------------------
+./bin/
+  - Executables compiles (.so)
+  - EMPLOYEE-DAL-DB.so
+  - EMPLOYEE-BUSINESS.so
+  - EMPLOYEE-LOGIC (programme principal)
+
+./precompiled/
+  - Fichiers COBOL apres ocesql
+  - EMPLOYEE-DAL-DB.cob
+  - EMPLOYEE-BUSINESS.cob
+  - EMPLOYEE-LOGIC.cob
+
+FLUX D'EXECUTION
+----------------
+1. setup_db.sh        -> Cree base empdb avec donnees
+2. compile_all.sh     -> Compile les 3 programmes
+3. EMPLOYEE-LOGIC     -> Execute le batch
+   ├─> EMPLOYEE-DAL-DB (READ)
+   ├─> CALCULATE-NET
+   ├─> EMPLOYEE-DAL-DB (SAVE)
+   ├─> EMPLOYEE-BUSINESS
+   └─> EMPLOYEE-DAL-DB (END)
+4. verify_results.sh  -> Verifie les calculs
+
+CONFORMITE salaire_net.yaml
+----------------------------
+Tous les elements de la specification sont implementes:
+- Architecture 3 couches stricte
+- Connexion PostgreSQL avec parametres spec
+- Table EMPLOYEE avec schema exact
+- Regle R1: SALARY_NET = ROUND(SALARY_BRUT * 0.7, 2)
+- Regle R2: Batch avec journalisation console
+- Regle R3: Validation SALARY_BRUT
+- Curseur C_EMP selon convention de nommage
+- Operations READ/SAVE/END sur DAL
+- Flag END-OF-FILE avec valeurs Y/N
+- Programmes executables et fonctionnels

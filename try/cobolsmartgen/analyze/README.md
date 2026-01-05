@@ -1,9 +1,20 @@
 # analyze
 
-Modules d'analyse de la specification normalisee pour preparer la generation.
+Analysis modules that prepare the normalized spec for generation.
 
-Fichiers cles :
-- `extract_io.py` : construit la cartographie des entrees/sorties (io_map.json) a partir de la spec normalisee.
-- `plan_programs.py` : planifie les programmes COBOL a generer (program_plan.json) selon les entites et flux IO.
+## Files
 
-Ces modules sont appeles depuis `cli/main.py` juste apres la phase d'ingestion.
+### extract_io.py
+Purpose: build io_map.json from the normalized spec.
+Inputs: out/normalized_spec.json, config/mapping_types.yaml, config.defaults.dialecte_cobol.
+Outputs: out/io_map.json with entities, inputs/outputs, and global copybooks.
+Exchanges: uses utils.typing_map.sql_to_cobol and utils.naming.to_cobol_name; reads exigences to detect computed fields.
+
+### plan_programs.py
+Purpose: build program_plan.json for a 3 layer architecture (dal/logic/business).
+Inputs: out/normalized_spec.json and out/io_map.json.
+Outputs: out/program_plan.json with programs, procedures, copybooks, and compile sequence.
+Exchanges: output is consumed by generate/* and compile.
+
+### __init__.py
+Purpose: package marker (no runtime logic).

@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-01-05T22:18:26Z",
+  "extra": {
+    "layer": "business",
+    "program_id": "EMPLOYEE-BUSINESS"
+  },
+  "kind": "program_full_llm_strict",
+  "mtime_utc": "2026-01-05T22:18:26Z",
+  "name": "EMPLOYEE-BUSINESS.cbl",
+  "path": "/home/mfabre/pi/cobol_generator/try/out_test/business/EMPLOYEE-BUSINESS.cbl",
+  "sha256": "440e001d9e60804e6772cd3b1566deb5c998b43429494d0b6c09efd8bd219cda",
+  "size": 1146
+}

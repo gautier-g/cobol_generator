@@ -1,10 +1,12 @@
 # CobolSmartGen
 
-Lancer la generation en mode Mistral (depuis ce dossier) :
+COBOL generation pipeline driven by a YAML specification and optional LLM calls.
+
+## Quick start (Mistral)
 
 ```bash
 CSG_LLM_PROVIDER=mistral \
-MISTRAL_API_KEY=<votre_cle_mistral> \
+MISTRAL_API_KEY=<your_key> \
 MISTRAL_MODEL=mistral-large-latest \
 CSG_USE_LLM_HEADERS=0 CSG_LLM_PROGRAM_MODE=1 CSG_USE_LLM_PROCS=1 CSG_STRICT_825=1 \
 python3 -m cobolsmartgen.cli.main generate \
@@ -13,32 +15,31 @@ python3 -m cobolsmartgen.cli.main generate \
   --dialecte gnucobol \
   --sgbd postgres \
   --single-pass \
-  --auto-llm
+  --auto-llm \
+  --force-rerun
 ```
 
-Variables clefs :
-- `MISTRAL_API_KEY` / `MISTRAL_MODEL` : credentials et modele utilises par l'adaptateur Mistral.
-- `CSG_USE_LLM_HEADERS` / `CSG_USE_LLM_PROCS` : active les appels LLM pour generer headers et procedures COBOL.
-- `CSG_LLM_PROGRAM_MODE=1` : force le mode generation de programmes.
-- `CSG_STRICT_825=1` : active les garde-fous COBOL 8.2.5.
-- `CSG_RUN_ID` (optionnel) : etiquette pour tracer le run dans `out/trace/`.
+## Key env vars
+MISTRAL_API_KEY / MISTRAL_MODEL: Mistral credentials and model.
+CSG_USE_LLM_HEADERS / CSG_USE_LLM_PROCS: enable LLM for headers and procedures.
+CSG_LLM_PROGRAM_MODE=1: legacy program mode (safe even in strict mode).
+CSG_STRICT_825=1: strict prompt+validation mode for COBOL procedures.
+CSG_RUN_ID: custom run id for out/trace/pipeline_debug.
 
-Pipeline (mode `generate` / `--single-pass`) :
-1) `ingest` : validation et normalisation de la spec YAML.
-2) `analyze` : extraction des IO et planification des programmes.
-3) `rag` : indexation/retrieval des prompts de contexte.
-4) `generate` : generation SQL, headers et procedures via LLM.
-5) `generate/assemble_layout` : assemblage final des fichiers COBOL.
+## Docs
+cli/README.md: full pipeline and CLI behavior.
+SPEC_YAML.md: how the YAML spec is structured and used.
+generate/README.md: COBOL/SQL generation details.
 
-Structure du dossier : chaque sous-dossier contient un README dedie.
-- `adapters/` : clients LLM et compilateur.
-- `analyze/` : extraction IO et planification.
-- `cli/` : point d'entree CLI et orchestration.
-- `core/` : helpers de contrat et structures internes.
-- `generate/` : code generation COBOL/SQL et templates.
-- `ingest/` : parsing/validation des specs.
-- `prompts/` : templates texte pour les appels LLM.
-- `rag/` : indexation et recuperation de contexte.
-- `config/` : configuration par defaut (YAML).
-- `schemas/` : schemas JSON des artefacts intermediaires.
-- `utils/` : utilitaires communs (fs, naming, traces).
+## Folder map
+adapters/: LLM clients and COBOL compiler adapter.
+analyze/: io_map and program_plan builders.
+cli/: CLI entrypoint (main.py).
+config/: defaults and type mappings.
+core/: architecture contract.
+generate/: COBOL/SQL generators and assembly.
+ingest/: spec validation and normalization.
+prompts/: LLM prompt templates.
+rag/: local index and retrieval.
+schemas/: JSON schemas for artifacts.
+utils/: shared helpers.

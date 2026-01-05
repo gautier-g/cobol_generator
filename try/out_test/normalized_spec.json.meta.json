@@ -1,0 +1,12 @@
+{
+  "created_utc": "2026-01-05T22:16:43Z",
+  "extra": {
+    "source_file": "/home/mfabre/pi/cobol_generator/try/salaire_net.yaml"
+  },
+  "kind": "normalized_spec",
+  "mtime_utc": "2026-01-05T22:16:43Z",
+  "name": "normalized_spec.json",
+  "path": "/home/mfabre/pi/cobol_generator/try/out_test/normalized_spec.json",
+  "sha256": "ad30d01572e107f37b2da7f2800f008c24bee6ecac8d8a2c4aa332a90b1531b4",
+  "size": 46984
+}

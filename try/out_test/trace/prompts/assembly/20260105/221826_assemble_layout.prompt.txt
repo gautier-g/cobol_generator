@@ -1,0 +1,12 @@
+{
+  "out_dir": "/home/mfabre/pi/cobol_generator/try/out_test",
+  "generated_files": [
+    "/home/mfabre/pi/cobol_generator/try/out_test/dal/EMPLOYEE-DAL.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out_test/logic/EMPLOYEE-LOGIC.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out_test/business/EMPLOYEE-BUSINESS.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out_test/dal/EMPLOYEE-DAL-DB.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out_test/logic/EMPLOYEE-LOGIC.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out_test/business/EMPLOYEE-BUSINESS.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out_test/sql/EMPLOYEE.sql"
+  ]
+}

@@ -1,0 +1,27 @@
+        IDENTIFICATION DIVISION.
+        PROGRAM-ID. EMPLOYEE-BUSINESS.
+      *****************************************************************
+      * Programme: EMPLOYEE-BUSINESS                                   *
+      * Couche: BUSINESS (Presentation)                                *
+      * Role: Affichage simple des informations employe                *
+      *       - Nom, ID, salaire brut, salaire net                     *
+      *****************************************************************
+        ENVIRONMENT DIVISION.
+        DATA DIVISION.
+        WORKING-STORAGE SECTION.
+        LINKAGE SECTION.
+        01 LK-EMPLOYEE.
+            05 LK-EMP-ID PIC 9(4).
+            05 LK-EMP-NAME PIC A(30).
+            05 LK-SALARY-BRUT PIC S9(6)V99.
+            05 LK-SALARY-NET PIC S9(6)V99.
+
+        PROCEDURE DIVISION USING LK-EMPLOYEE.
+        DISPLAY-EMPLOYEE.
+            DISPLAY '----------------------------------------'
+            DISPLAY 'EMPLOYE : ' LK-EMP-NAME
+            DISPLAY 'ID      : ' LK-EMP-ID
+            DISPLAY 'BRUT    : ' LK-SALARY-BRUT
+            DISPLAY 'NET     : ' LK-SALARY-NET
+            GOBACK
+            .

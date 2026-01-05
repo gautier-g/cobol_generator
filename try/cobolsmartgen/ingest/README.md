@@ -1,9 +1,20 @@
 # ingest
 
-Preparation des specifications en entree avant l'analyse.
+Input specification validation and normalization.
 
-Fichiers cles :
-- `validate_and_normalize.py` : charge le YAML utilisateur, applique les validations/schema et produit `normalized_spec.json`.
-- `diagram_parser.py` : parse et nettoie les schemas de sequence/diagrammes si fournis.
+## Files
 
-Premier maillon du pipeline, appele au debut de `cli/main.py`.
+### validate_and_normalize.py
+Purpose: load a YAML/JSON spec, validate it, and normalize naming and types.
+Inputs: input spec file, schemas/input_spec.schema.json, config defaults.
+Outputs: out/normalized_spec.json plus .meta/.sha256 sidecars.
+Exchanges: uses utils.fs/trace/typing_map; calls diagram_parser when spec has a diagramme field.
+
+### diagram_parser.py
+Purpose: parse diagram strings (Mermaid ERD, PlantUML, or UML JSON) into entities/relations.
+Inputs: spec["diagramme"] string.
+Outputs: a dict with entities and relations merged into the normalized spec.
+Exchanges: used by validate_and_normalize.
+
+### __init__.py
+Purpose: package marker (no runtime logic).

@@ -1,8 +1,15 @@
 # core
 
-Noyau metier pour assembler les contrats et structures partagees par le pipeline.
+Core architecture contract and shared constraints.
 
-Fichier cle :
-- `contract_generator.py` : construit les structures de contrat (programmes, tables, IO) consommees par les phases de generation COBOL/SQL.
+## Files
 
-Import typique : `from cobolsmartgen.core import contract_generator` pour reutiliser les helpers de construction.
+### contract_generator.py
+Purpose: build an immutable architecture_contract.json.
+Inputs: out/normalized_spec.json, out/io_map.json, out/program_plan.json.
+Outputs: out/architecture_contract.json with allowed variables/procedures per program and layer rules.
+Config/env: CSG_COMPILE_MAX_PASSES, CSG_MAX_LLM_CORRECTIONS, CSG_FAIL_FAST influence contract compilation rules.
+Exchanges: consumed by generate/cobol_procedures.py strict validation and by other validators.
+
+### __init__.py
+Purpose: package marker (no runtime logic).

@@ -1,0 +1,57 @@
+[system] Expert COBOL. Génère uniquement le code COBOL demandé.
+[user] Reponds uniquement avec du code COBOL compilable, sans Markdown ni texte autour.
+La premiere ligne doit etre IDENTIFICATION DIVISION.
+Un seul PROGRAM-ID, pas de sous-programmes.
+Utilise strictement les identifiants, messages, SQL et sequences definis dans la spec.
+N'invente aucune variable, paragraphe, message ou SQL.
+Respecte exactement les listes de WORKING-STORAGE, LINKAGE et USING.
+
+=== CONTEXT ===
+Role: couche presentation simple, affiche les valeurs.
+Structure EMPLOYEE: EMP-ID PIC 9(4), EMP-NAME PIC A(30), SALARY-BRUT PIC S9(6)V99, SALARY-NET PIC S9(6)V99
+
+=== ENVIRONMENT ===
+ENVIRONMENT exact (lignes):
+ENVIRONMENT DIVISION.
+
+=== INTERFACE ===
+LINKAGE attendu (exemple exact):
+LINKAGE SECTION.
+01 LK-EMPLOYEE.
+    05 LK-EMP-ID PIC 9(4).
+    05 LK-EMP-NAME PIC A(30).
+    05 LK-SALARY-BRUT PIC S9(6)V99.
+    05 LK-SALARY-NET PIC S9(6)V99.
+
+PROCEDURE DIVISION USING LK-EMPLOYEE.
+
+=== LOGGING ===
+Lignes DISPLAY (verbatim):
+DISPLAY "----------------------------------------"
+DISPLAY "EMPLOYE : " LK-EMP-NAME
+DISPLAY "ID      : " LK-EMP-ID
+DISPLAY "BRUT    : " LK-SALARY-BRUT
+DISPLAY "NET     : " LK-SALARY-NET
+
+=== CONSTRAINTS ===
+Interdictions: EXEC SQL, STOP RUN
+Paragraphes publics attendus: DISPLAY-EMPLOYEE
+Entry paragraph: DISPLAY-EMPLOYEE
+
+=== FONCTIONS ===
+- DISPLAY-EMPLOYEE: Affiche les informations principales de l'employé courant sur la console: nom, identifiant, salaire brut, salaire net.
+
+  visibility: public, required: True
+  Inputs: EMPLOYEE.EMP_NAME, EMPLOYEE.EMP_ID, EMPLOYEE.SALARY_BRUT, EMPLOYEE.SALARY_NET
+  Steps:
+    - DISPLAY '----------------------------------------'
+    - DISPLAY 'EMPLOYE : ' LK-EMP-NAME
+    - DISPLAY 'ID      : ' LK-EMP-ID
+    - DISPLAY 'BRUT    : ' LK-SALARY-BRUT
+    - DISPLAY 'NET     : ' LK-SALARY-NET
+    - GOBACK
+  Emplacement: division=PROCEDURE DIVISION, section=couche_metier, paragraphe=DISPLAY-EMPLOYEE
+
+Tache : genere le programme COBOL complet respectant ces contraintes (code seulement).
+
+Les erreurs suivantes ont été détecté…

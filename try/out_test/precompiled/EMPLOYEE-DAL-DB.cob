@@ -1,0 +1,309 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. EMPLOYEE-DAL-DB.
+      *****************************************************************
+      * Programme: EMPLOYEE-DAL-DB                                     *
+      * Couche: DAL (Data Access Layer)                                *
+      * Role: Acces a la base PostgreSQL pour EMPLOYEE                 *
+      *       Operations: READ, SAVE, END                              *
+      *****************************************************************
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       REPOSITORY.
+           FUNCTION ALL INTRINSIC.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+OCESQL*EXEC SQL INCLUDE SQLCA END-EXEC.
+OCESQL     copy "sqlca.cbl".
+       01  WS-CONNECTED-FLAG      PIC X VALUE 'N'.
+           88  WS-CONNECTED           VALUE 'Y'.
+       01  WS-CURSOR-OPEN-FLAG    PIC X VALUE 'N'.
+           88  WS-CURSOR-OPEN         VALUE 'Y'.
+       01  WS-EMP-ID              PIC 9(4).
+       01  WS-EMP-NAME            PIC A(30).
+       01  WS-SALARY-BRUT         PIC S9(6)V99.
+       01  WS-SALARY-NET          PIC S9(6)V99.
+       01  WS-DB-NAME.
+           05  WS-DB-NAME-TEXT     PIC X(5) VALUE 'empdb'.
+           05  WS-DB-NAME-TERM     PIC X VALUE X'00'.
+       01  WS-DB-USER.
+           05  WS-DB-USER-TEXT     PIC X(7) VALUE 'empuser'.
+           05  WS-DB-USER-TERM     PIC X VALUE X'00'.
+       01  WS-DB-PASSWORD.
+           05  WS-DB-PASSWORD-TEXT PIC X(9) VALUE 'SECRETPWD'.
+           05  WS-DB-PASSWORD-TERM PIC X VALUE X'00'.
+       01  WS-DB-NAME-LEN         PIC S9(4) COMP-5 VALUE 5.
+       01  WS-DB-USER-LEN         PIC S9(4) COMP-5 VALUE 7.
+       01  WS-DB-PASSWORD-LEN     PIC S9(4) COMP-5 VALUE 9.
+       01  WS-PGHOST-NAME         PIC X(6) VALUE 'PGHOST'.
+       01  WS-PGHOST-VALUE        PIC X(64) VALUE 'localhost'.
+       01  WS-PGPORT-NAME         PIC X(6) VALUE 'PGPORT'.
+       01  WS-PGPORT-VALUE        PIC X(5) VALUE '5432'.
+       01  WS-PGUSER-NAME         PIC X(6) VALUE 'PGUSER'.
+       01  WS-PGUSER-VALUE        PIC X(64) VALUE 'empuser'.
+       01  WS-PGPASSWORD-NAME     PIC X(10) VALUE 'PGPASSWORD'.
+       01  WS-PGPASSWORD-VALUE    PIC X(64) VALUE 'SECRETPWD'.
+       01  WS-PGDATABASE-NAME     PIC X(10) VALUE 'PGDATABASE'.
+       01  WS-PGDATABASE-VALUE    PIC X(64) VALUE 'empdb'.
+
+OCESQL*
+OCESQL 01  SQ0001.
+OCESQL     02  FILLER PIC X(078) VALUE "SELECT EMP_ID, EMP_NAME, SALAR"
+OCESQL  &  "Y_BRUT, SALARY_NET FROM EMPLOYEE ORDER BY EMP_ID".
+OCESQL     02  FILLER PIC X(1) VALUE X"00".
+OCESQL*
+OCESQL 01  SQ0002.
+OCESQL     02  FILLER PIC X(053) VALUE "UPDATE EMPLOYEE SET SALARY_NET"
+OCESQL  &  " = $1 WHERE EMP_ID = $2".
+OCESQL     02  FILLER PIC X(1) VALUE X"00".
+OCESQL*
+OCESQL 01  SQ0003.
+OCESQL     02  FILLER PIC X(014) VALUE "DISCONNECT ALL".
+OCESQL     02  FILLER PIC X(1) VALUE X"00".
+OCESQL*
+       LINKAGE SECTION.
+       01 LK-OPERATION PIC X(4).
+       01 LK-END-OF-FILE PIC X.
+       01 LK-EMPLOYEE.
+           05 LK-EMP-ID PIC 9(4).
+           05 LK-EMP-NAME PIC A(30).
+           05 LK-SALARY-BRUT PIC S9(6)V99.
+           05 LK-SALARY-NET PIC S9(6)V99.
+
+       PROCEDURE DIVISION USING LK-OPERATION LK-END-OF-FILE LK-EMPLOYEE.
+       MAIN-ENTRY.
+           IF LK-OPERATION NOT = 'END '
+               PERFORM DAL-CONNECT
+               IF NOT WS-CONNECTED
+                   MOVE 'Y' TO LK-END-OF-FILE
+                   GOBACK
+               END-IF
+           END-IF
+
+           EVALUATE LK-OPERATION
+               WHEN 'READ'
+                   PERFORM DAL-READ
+               WHEN 'SAVE'
+                   PERFORM DAL-SAVE
+               WHEN 'END '
+                   PERFORM DAL-END
+               WHEN OTHER
+                   DISPLAY 'ERREUR: Operation inconnue: ' LK-OPERATION
+           END-EVALUATE
+           GOBACK
+           .
+
+       DAL-SET-ENV.
+           DISPLAY WS-PGHOST-NAME UPON ENVIRONMENT-NAME
+           DISPLAY WS-PGHOST-VALUE UPON ENVIRONMENT-VALUE
+           DISPLAY WS-PGPORT-NAME UPON ENVIRONMENT-NAME
+           DISPLAY WS-PGPORT-VALUE UPON ENVIRONMENT-VALUE
+           DISPLAY WS-PGUSER-NAME UPON ENVIRONMENT-NAME
+           DISPLAY WS-PGUSER-VALUE UPON ENVIRONMENT-VALUE
+           DISPLAY WS-PGPASSWORD-NAME UPON ENVIRONMENT-NAME
+           DISPLAY WS-PGPASSWORD-VALUE UPON ENVIRONMENT-VALUE
+           DISPLAY WS-PGDATABASE-NAME UPON ENVIRONMENT-NAME
+           DISPLAY WS-PGDATABASE-VALUE UPON ENVIRONMENT-VALUE
+           .
+
+       DAL-CONNECT.
+           IF NOT WS-CONNECTED
+               PERFORM DAL-SET-ENV
+               CALL "OCESQLStartSQL" END-CALL
+               CALL "OCESQLConnect" USING
+                   BY REFERENCE SQLCA
+                   BY REFERENCE WS-DB-USER
+                   BY VALUE WS-DB-USER-LEN
+                   BY REFERENCE WS-DB-PASSWORD
+                   BY VALUE WS-DB-PASSWORD-LEN
+                   BY REFERENCE WS-DB-NAME
+                   BY VALUE WS-DB-NAME-LEN
+               END-CALL
+               CALL "OCESQLEndSQL" END-CALL
+
+               IF SQLCODE = 0
+                   SET WS-CONNECTED TO TRUE
+                   DISPLAY 'Connexion DB reussie: empdb'
+               ELSE
+                   DISPLAY 'ERREUR CONNECT: SQLCODE=' SQLCODE
+                   DISPLAY 'SQLSTATE=' SQLSTATE
+                   DISPLAY 'SQLERRMC=' SQLERRMC
+               END-IF
+           END-IF
+           .
+
+       DAL-READ.
+           IF NOT WS-CURSOR-OPEN
+OCESQL*        EXEC SQL
+OCESQL*            DECLARE C_EMP CURSOR FOR
+OCESQL*            SELECT EMP_ID, EMP_NAME, SALARY_BRUT, SALARY_NET
+OCESQL*            FROM EMPLOYEE
+OCESQL*            ORDER BY EMP_ID
+OCESQL*        END-EXEC
+OCESQL     CALL "OCESQLCursorDeclare" USING
+OCESQL          BY REFERENCE SQLCA
+OCESQL          BY REFERENCE "EMPLOYEE_DAL_DB_C_EMP" & x"00"
+OCESQL          BY REFERENCE SQ0001
+OCESQL     END-CALL
+
+OCESQL*        EXEC SQL
+OCESQL*            OPEN C_EMP
+OCESQL*        END-EXEC
+OCESQL     CALL "OCESQLCursorOpen" USING
+OCESQL          BY REFERENCE SQLCA
+OCESQL          BY REFERENCE "EMPLOYEE_DAL_DB_C_EMP" & x"00"
+OCESQL     END-CALL
+
+               IF SQLCODE NOT = 0
+                   DISPLAY 'ERREUR OPEN: SQLCODE=' SQLCODE
+                   MOVE 'Y' TO LK-END-OF-FILE
+                   EXIT PARAGRAPH
+               END-IF
+
+               SET WS-CURSOR-OPEN TO TRUE
+               DISPLAY 'Curseur C_EMP ouvert'
+           END-IF
+
+OCESQL*    EXEC SQL
+OCESQL*        FETCH C_EMP INTO
+OCESQL*            :WS-EMP-ID,
+OCESQL*            :WS-EMP-NAME,
+OCESQL*            :WS-SALARY-BRUT,
+OCESQL*            :WS-SALARY-NET
+OCESQL*    END-EXEC
+OCESQL     CALL "OCESQLStartSQL"
+OCESQL     END-CALL
+OCESQL     CALL "OCESQLSetResultParams" USING
+OCESQL          BY VALUE 1
+OCESQL          BY VALUE 4
+OCESQL          BY VALUE 0
+OCESQL          BY REFERENCE WS-EMP-ID
+OCESQL     END-CALL
+OCESQL     CALL "OCESQLSetResultParams" USING
+OCESQL          BY VALUE 22
+OCESQL          BY VALUE 0
+OCESQL          BY VALUE 0
+OCESQL          BY REFERENCE WS-EMP-NAME
+OCESQL     END-CALL
+OCESQL     CALL "OCESQLSetResultParams" USING
+OCESQL          BY VALUE 3
+OCESQL          BY VALUE 8
+OCESQL          BY VALUE -2
+OCESQL          BY REFERENCE WS-SALARY-BRUT
+OCESQL     END-CALL
+OCESQL     CALL "OCESQLSetResultParams" USING
+OCESQL          BY VALUE 3
+OCESQL          BY VALUE 8
+OCESQL          BY VALUE -2
+OCESQL          BY REFERENCE WS-SALARY-NET
+OCESQL     END-CALL
+OCESQL     CALL "OCESQLCursorFetchOne" USING
+OCESQL          BY REFERENCE SQLCA
+OCESQL          BY REFERENCE "EMPLOYEE_DAL_DB_C_EMP" & x"00"
+OCESQL     END-CALL
+OCESQL     CALL "OCESQLEndSQL"
+OCESQL     END-CALL
+
+           EVALUATE SQLCODE
+               WHEN 0
+                   MOVE 'N' TO LK-END-OF-FILE
+                   MOVE WS-EMP-ID TO LK-EMP-ID
+                   MOVE WS-EMP-NAME TO LK-EMP-NAME
+                   MOVE WS-SALARY-BRUT TO LK-SALARY-BRUT
+                   MOVE WS-SALARY-NET TO LK-SALARY-NET
+               WHEN 100
+                   MOVE 'Y' TO LK-END-OF-FILE
+               WHEN OTHER
+                   DISPLAY 'ERREUR FETCH: SQLCODE=' SQLCODE
+                   DISPLAY 'SQLSTATE=' SQLSTATE
+                   MOVE 'Y' TO LK-END-OF-FILE
+           END-EVALUATE
+           .
+
+       DAL-SAVE.
+           MOVE LK-EMP-ID TO WS-EMP-ID
+           MOVE LK-SALARY-NET TO WS-SALARY-NET
+
+OCESQL*    EXEC SQL
+OCESQL*        UPDATE EMPLOYEE
+OCESQL*        SET SALARY_NET = :WS-SALARY-NET
+OCESQL*        WHERE EMP_ID = :WS-EMP-ID
+OCESQL*    END-EXEC
+OCESQL     CALL "OCESQLStartSQL"
+OCESQL     END-CALL
+OCESQL     CALL "OCESQLSetSQLParams" USING
+OCESQL          BY VALUE 3
+OCESQL          BY VALUE 8
+OCESQL          BY VALUE -2
+OCESQL          BY REFERENCE WS-SALARY-NET
+OCESQL     END-CALL
+OCESQL     CALL "OCESQLSetSQLParams" USING
+OCESQL          BY VALUE 1
+OCESQL          BY VALUE 4
+OCESQL          BY VALUE 0
+OCESQL          BY REFERENCE WS-EMP-ID
+OCESQL     END-CALL
+OCESQL     CALL "OCESQLExecParams" USING
+OCESQL          BY REFERENCE SQLCA
+OCESQL          BY REFERENCE SQ0002
+OCESQL          BY VALUE 2
+OCESQL     END-CALL
+OCESQL     CALL "OCESQLEndSQL"
+OCESQL     END-CALL
+
+           IF SQLCODE NOT = 0
+               DISPLAY 'ERREUR UPDATE: SQLCODE=' SQLCODE
+               DISPLAY 'SQLSTATE=' SQLSTATE
+               DISPLAY 'EMP_ID=' LK-EMP-ID
+           END-IF
+           .
+
+       DAL-END.
+           IF WS-CURSOR-OPEN
+OCESQL*        EXEC SQL
+OCESQL*            CLOSE C_EMP
+OCESQL*        END-EXEC
+OCESQL     CALL "OCESQLCursorClose"  USING
+OCESQL          BY REFERENCE SQLCA
+OCESQL          BY REFERENCE "EMPLOYEE_DAL_DB_C_EMP" & x"00"
+OCESQL     END-CALL
+
+               IF SQLCODE NOT = 0
+                   DISPLAY 'ERREUR CLOSE: SQLCODE=' SQLCODE
+               END-IF
+
+               MOVE 'N' TO WS-CURSOR-OPEN-FLAG
+           END-IF
+
+           IF WS-CONNECTED
+OCESQL*        EXEC SQL
+OCESQL*            COMMIT
+OCESQL*        END-EXEC
+OCESQL     CALL "OCESQLStartSQL"
+OCESQL     END-CALL
+OCESQL     CALL "OCESQLExec" USING
+OCESQL          BY REFERENCE SQLCA
+OCESQL          BY REFERENCE "COMMIT" & x"00"
+OCESQL     END-CALL
+OCESQL     CALL "OCESQLEndSQL"
+OCESQL     END-CALL
+
+               IF SQLCODE NOT = 0
+                   DISPLAY 'ERREUR COMMIT: SQLCODE=' SQLCODE
+               END-IF
+
+OCESQL*        EXEC SQL
+OCESQL*            DISCONNECT ALL
+OCESQL*        END-EXEC
+OCESQL     CALL "OCESQLDisconnect" USING
+OCESQL          BY REFERENCE SQLCA
+OCESQL     END-CALL
+
+               IF SQLCODE NOT = 0
+                   DISPLAY 'ERREUR DISCONNECT: SQLCODE=' SQLCODE
+               END-IF
+
+               MOVE 'N' TO WS-CONNECTED-FLAG
+               DISPLAY 'Fermeture connexion'
+           END-IF
+           .

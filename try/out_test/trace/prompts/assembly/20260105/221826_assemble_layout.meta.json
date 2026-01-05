@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-01-05T22:18:26Z",
+  "extra": {
+    "action": "assemble"
+  },
+  "files": {
+    "prompt": "/home/mfabre/pi/cobol_generator/try/out_test/trace/prompts/assembly/20260105/221826_assemble_layout.prompt.txt",
+    "response": "/home/mfabre/pi/cobol_generator/try/out_test/trace/prompts/assembly/20260105/221826_assemble_layout.response.txt"
+  },
+  "kind": "assembly",
+  "name": "assemble_layout",
+  "slug": "assemble_layout"
+}

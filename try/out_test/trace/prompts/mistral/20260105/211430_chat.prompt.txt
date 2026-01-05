@@ -1,0 +1,35 @@
+[system] Expert COBOL. Génère uniquement le code COBOL demandé.
+[user] Reponds uniquement avec du code COBOL compilable, sans Markdown ni texte autour.
+La premiere ligne doit etre IDENTIFICATION DIVISION.
+Un seul PROGRAM-ID, pas de sous-programmes.
+Utilise strictement les identifiants, messages, SQL et sequences definis dans la spec.
+N'invente aucune variable, paragraphe, message ou SQL.
+Respecte exactement les listes de WORKING-STORAGE, LINKAGE et USING.
+Toujours utiliser les terminateurs explicites END-IF / END-EVALUATE / END-PERFORM / END-EXEC.
+Pas de GO TO, pas de logique DAL dans LOGIC, pas de SQL hors DAL.
+Toute variable utilisee doit etre declaree (WORKING-STORAGE ou LINKAGE).
+Ne termine aucune instruction par un point (sauf EXEC SQL INCLUDE SQLCA END-EXEC.); seul un point sur une ligne seule termine un paragraphe.
+
+=== STRATEGY ===
+1) Construis d'abord le squelette COBOL complet (DIVISION/SECTION) dans l'ordre.
+2) Insere les blocs WORKING-STORAGE/LINKAGE exacts fournis par la spec.
+3) Ecris la PROCEDURE DIVISION en suivant le flow et les fonctions.
+4) Verifie la coherence: aucune variable/paragraphes inventes.
+
+=== CONTEXT ===
+SGBD: postgres. Dialecte COBOL: gnucobol.
+Table EMPLOYEE: EMP_ID INT PK, EMP_NAME VARCHAR(30), SALARY_BRUT DECIMAL(8,2), SALARY_NET DECIMAL(8,2)
+Role: couche DAL pour EMPLOYEE.
+
+=== STYLE ===
+Guidelines globales: Format FIXED: instructions commencent en colonne 8 (prefixe de 7 espaces).
+Commentaires: '*' en colonne 7 (6 espaces + '*'), pas de commentaires '*>'.
+Ne pas utiliser '>>SOURCE FORMAT FREE'.
+Terminer chaque paragraphe par une ligne avec un seul point.
+Ne pas mettre de point en fin de DISPLAY/GOBACK/STOP RUN/CALL/MOVE/IF (sauf EXEC SQL INCLUDE SQLCA END-EXEC.).
+Utiliser des guillemets simples pour les messages DISPLAY.
+Respecter l'ordre: IDENTIFICATION -> ENVIRONMENT -> DATA -> PROCEDURE.
+Dans DATA: WORKING-STORAGE puis LINKAGE (si present).
+Header commentaire (verbatim):
+      *****************************************************************
+      * Programme: EMPLOYEE-DAL-DB                     …

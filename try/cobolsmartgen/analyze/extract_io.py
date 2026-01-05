@@ -97,6 +97,10 @@ def build_io_map(spec: Dict, mapping_config: Dict, dialect: str) -> Dict:
                 dialect,
                 mapping_config.get('mappings', {}).get(dialect, {})
             )
+            # Respect explicit cobol_pic from spec when provided
+            cobol_pic = attr.get('cobol_pic') or attr.get('pic')
+            if cobol_pic:
+                cobol_type = cobol_pic.replace("PIC ", "").strip()
             
             # Create IO field
             io_field = {

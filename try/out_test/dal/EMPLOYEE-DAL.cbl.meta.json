@@ -1,0 +1,15 @@
+{
+  "created_utc": "2026-01-05T22:16:43Z",
+  "extra": {
+    "entity": "EMPLOYEE",
+    "generated_by": "static",
+    "layer": "dal",
+    "program_id": "EMPLOYEE-DAL"
+  },
+  "kind": "header",
+  "mtime_utc": "2026-01-05T22:16:43Z",
+  "name": "EMPLOYEE-DAL.cbl",
+  "path": "/home/mfabre/pi/cobol_generator/try/out_test/dal/EMPLOYEE-DAL.cbl",
+  "sha256": "7b077f3f3b2088f998b1a4419031d1bf8f9ffa3fbe1f12c6078ede1285eb29da",
+  "size": 274
+}

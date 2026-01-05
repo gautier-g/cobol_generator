@@ -1,0 +1,1174 @@
+# Exemple 1 — Salaire net (NET = BRUT * 0.7 arrondi à 2 décimales)
+title: CALCUL-SALAIRE
+dialecte_cobol: gnucobol
+sql_cible: postgres
+
+nommage:
+  variables_case: UPPER_SNAKE      # ex : SALARY_NET, END-OF-FILE
+  programmes_case: UPPER-KEBAB     # ex : EMPLOYEE-DAL-DB, EMPLOYEE-LOGIC
+
+fonctionnalites:
+  - id: F1
+    resume: "Calculer le salaire net à partir du salaire brut pour chaque employé."
+
+exigences:
+  - id: R1
+    type: regle_metier
+    regle: "SALARY_NET = ROUND(SALARY_BRUT * 0.7, 2)"
+    notes: "Salaire net = salaire brut − cotisations sociales (20%) − impôt (10%). Arrondi bancaire à 2 décimales. SALARY_NET ne doit pas être négatif."
+  - id: R2
+    type: technique
+    regle: "Traitement batch quotidien; journalisation des exécutions (messages simples sur la console)."
+  - id: R3
+    type: validation
+    regle: "Si SALARY_BRUT est NULL ou invalide, ignorer la ligne ou la signaler en anomalie."
+
+mcd:
+  entites:
+    - name: EMPLOYEE
+      attrs:
+        - name: EMP_ID
+          type: INT
+          sql_type: INT
+          cobol_pic: "9(4)"
+          pk: true
+          nullable: false
+        - name: EMP_NAME
+          type: VARCHAR(30)
+          sql_type: VARCHAR(30)
+          cobol_pic: "A(30)"
+          nullable: false
+        - name: SALARY_BRUT
+          type: DECIMAL(8,2)
+          sql_type: DECIMAL(8,2)
+          cobol_pic: "S9(6)V99"
+          nullable: false
+        - name: SALARY_NET
+          type: DECIMAL(8,2)
+          sql_type: DECIMAL(8,2)
+          cobol_pic: "S9(6)V99"
+          nullable: true
+  relations: []
+
+diagramme: |
+  erDiagram
+    EMPLOYEE {
+      INT EMP_ID PK
+      VARCHAR EMP_NAME
+      DECIMAL SALARY_BRUT
+      DECIMAL SALARY_NET
+    }
+
+sql:
+  ddl:
+    EMPLOYEE: |
+      CREATE TABLE EMPLOYEE (
+          EMP_ID INT PRIMARY KEY,
+          EMP_NAME VARCHAR(30),
+          SALARY_BRUT DECIMAL(8,2),
+          SALARY_NET DECIMAL(8,2)
+      );
+  initial_data:
+    EMPLOYEE:
+      - EMP_ID: 1
+        EMP_NAME: "Dupont"
+        SALARY_BRUT: 3000.00
+        SALARY_NET: 0.00
+      - EMP_ID: 2
+        EMP_NAME: "Durand"
+        SALARY_BRUT: 1500.00
+        SALARY_NET: 0.00
+  indexes:
+    - entity: EMPLOYEE
+      name: EMPLOYEE_EMP_NAME_IDX
+      columns: [EMP_NAME]
+  connection:
+    engine: postgres
+    method: ocesql
+    dbname: empdb
+    user: empuser
+    password: SECRETPWD
+    host: localhost
+    port: 5432
+    env_vars:
+      PGHOST: "localhost"
+      PGPORT: "5432"
+      PGUSER: "empuser"
+      PGPASSWORD: "SECRETPWD"
+      PGDATABASE: "empdb"
+    env_set_method:
+      - "DISPLAY <ENV_NAME> UPON ENVIRONMENT-NAME"
+      - "DISPLAY <ENV_VALUE> UPON ENVIRONMENT-VALUE"
+    ocesql:
+      start_call: "OCESQLStartSQL"
+      connect_call: "OCESQLConnect"
+      end_call: "OCESQLEndSQL"
+      connect_args:
+        - "SQLCA"
+        - "WS-DB-USER"
+        - "WS-DB-USER-LEN"
+        - "WS-DB-PASSWORD"
+        - "WS-DB-PASSWORD-LEN"
+        - "WS-DB-NAME"
+        - "WS-DB-NAME-LEN"
+      connect_args_order_note: "order: SQLCA, user, user_len, password, password_len, dbname, dbname_len"
+
+# Règles générales de mapping (pour d'autres cas réutilisables)
+mapping_types:
+  - sql: "INT"
+    cobol_pic_default: "9(4)"
+  - sql: "VARCHAR(30)"
+    cobol_pic_default: "A(30)"
+  - sql: "DECIMAL(8,2)"
+    cobol_pic_default: "S9(6)V99"
+
+technique:
+  cursor_naming:
+    pattern: "C_<ENTITY_UPPER3>"
+    example:
+      EMPLOYEE: "C_EMP"
+  eof_flag:
+    name: "END-OF-FILE"
+    pic: "X"
+    initial_value: "N"
+    true_value: "Y"
+    false_value: "N"
+  sqlca_required: true   # la DAL doit inclure SQLCA dès qu'elle utilise SQLCODE
+  dal_call_pattern:
+    description: "Programme DAL appelé avec un code opération court (READ, SAVE, END)."
+    operation_param_name: "OPERATION"
+    operation_pic: "X(4)"
+    eof_param_name: "END-OF-FILE"
+    employee_param_name: "EMPLOYEE"
+
+prompting:
+  global_constraints:
+    - "Reponds uniquement avec du code COBOL compilable, sans Markdown ni texte autour."
+    - "La premiere ligne doit etre IDENTIFICATION DIVISION."
+    - "Un seul PROGRAM-ID, pas de sous-programmes."
+  global_directives:
+    - "Utilise strictement les identifiants, messages, SQL et sequences definis dans la spec."
+    - "N'invente aucune variable, paragraphe, message ou SQL."
+    - "Respecte exactement les listes de WORKING-STORAGE, LINKAGE et USING."
+  programs:
+    EMPLOYEE-DAL-DB:
+      sections_order: [context, environment, interface, structure, working_storage, sql, flow, logging, constraints, fonctions]
+      context:
+        - "SGBD: {sql_cible}. Dialecte COBOL: {dialecte_cobol}."
+        - "Table {entity}: {table_signature}"
+        - "Role: couche DAL pour {entity}."
+      environment:
+        - "ENVIRONMENT exact (lignes):"
+        - "{environment_lines}"
+      interface:
+        - "Interface CALL/USING attendue: {call_interface}"
+      structure:
+        - "LINKAGE attendu (exemple exact):"
+        - "{linkage_struct}"
+      working_storage:
+        - "Working-Storage obligatoire (lignes exactes, ordre conseille):"
+        - "{working_storage_lines}"
+      sql:
+        - "Connexion OCESQL: {connection_details}"
+        - "SQL utilises:"
+        - "{sql_statements}"
+      flow:
+        - "Flux principal DAL:"
+        - "{flow_notes}"
+      logging:
+        - "Messages (verbatim) a afficher:"
+        - "{logging_lines}"
+      constraints:
+        - "Interdictions: {forbidden_items}"
+        - "Paragraphes publics attendus: {public_paragraphs}"
+        - "Paragraphes internes autorises: {internal_paragraphs}"
+        - "Entry paragraph: {entry_paragraph}"
+        - "Statements obligatoires: {required_statements}"
+      fonctions:
+        - "{function_details}"
+    EMPLOYEE-LOGIC:
+      sections_order: [context, environment, interface, working_storage, flow, logging, constraints, fonctions]
+      context:
+        - "Regles metier: {business_rules}"
+        - "Batch: traiter tous les employes."
+      environment:
+        - "ENVIRONMENT exact (lignes):"
+        - "{environment_lines}"
+      interface:
+        - "Programme DAL: {dal_program}"
+        - "Programme BUSINESS: {business_program}"
+        - "Interface DAL (CALL USING): {call_interface}"
+      working_storage:
+        - "Working-Storage obligatoire (lignes exactes):"
+        - "{working_storage_lines}"
+      flow:
+        - "Flux principal LOGIC:"
+        - "{flow_notes}"
+      logging:
+        - "Messages (verbatim) a afficher:"
+        - "{logging_lines}"
+      constraints:
+        - "Interdictions: {forbidden_items}"
+        - "Paragraphes publics attendus: {public_paragraphs}"
+        - "Entry paragraph: {entry_paragraph}"
+        - "Statements obligatoires: {required_statements}"
+      fonctions:
+        - "{function_details}"
+    EMPLOYEE-BUSINESS:
+      sections_order: [context, environment, interface, working_storage, logging, constraints, fonctions]
+      context:
+        - "Role: couche presentation simple, affiche les valeurs."
+        - "Structure EMPLOYEE: {entity_fields_list}"
+      environment:
+        - "ENVIRONMENT exact (lignes):"
+        - "{environment_lines}"
+      interface:
+        - "LINKAGE attendu (exemple exact):"
+        - "{linkage_struct}"
+      working_storage:
+        - "Working-Storage obligatoire (lignes exactes):"
+        - "{working_storage_lines}"
+      logging:
+        - "Lignes DISPLAY (verbatim):"
+        - "{display_lines}"
+      constraints:
+        - "Interdictions: {forbidden_items}"
+        - "Paragraphes publics attendus: {public_paragraphs}"
+        - "Entry paragraph: {entry_paragraph}"
+        - "Statements obligatoires: {required_statements}"
+      fonctions:
+        - "{function_details}"
+
+sources:
+  cobol:
+    - programme: EMPLOYEE-DAL-DB
+      fichier: "employee_dal_db.cob"
+    - programme: EMPLOYEE-LOGIC
+      fichier: "employee_logic.cob"
+    - programme: EMPLOYEE-BUSINESS
+      fichier: "employee_business.cob"
+  sql:
+    - logical_name: "EMPLOYEE-INIT"
+      fichier: "employee_init.sql"
+      entity: EMPLOYEE
+
+programmes:
+  - name: EMPLOYEE-DAL-DB
+    layer: dal
+    role: "Couche d'accès à la base pour EMPLOYEE (lecture via curseur et mise à jour de SALARY_NET)."
+    entities: [EMPLOYEE]
+    allowed_sql: true
+    allowed_business_logic: false
+    allow_display: true
+    environment_lines:
+      - "ENVIRONMENT DIVISION."
+      - "CONFIGURATION SECTION."
+      - "REPOSITORY."
+      - "    FUNCTION ALL INTRINSIC."
+    main_cursor: "C_EMP"
+    internal_paragraphs: ["DAL-CONNECT", "DAL-SET-ENV"]
+    working_storage_lines:
+      - "EXEC SQL INCLUDE SQLCA END-EXEC."
+      - "01  WS-CONNECTED-FLAG      PIC X VALUE 'N'."
+      - "88  WS-CONNECTED           VALUE 'Y'."
+      - "01  WS-CURSOR-OPEN-FLAG    PIC X VALUE 'N'."
+      - "88  WS-CURSOR-OPEN         VALUE 'Y'."
+      - "01  WS-EMP-ID              PIC 9(4)."
+      - "01  WS-EMP-NAME            PIC A(30)."
+      - "01  WS-SALARY-BRUT         PIC S9(6)V99."
+      - "01  WS-SALARY-NET          PIC S9(6)V99."
+      - "01  WS-DB-NAME."
+      - "05  WS-DB-NAME-TEXT     PIC X(5) VALUE 'empdb'."
+      - "05  WS-DB-NAME-TERM     PIC X VALUE X'00'."
+      - "01  WS-DB-USER."
+      - "05  WS-DB-USER-TEXT     PIC X(7) VALUE 'empuser'."
+      - "05  WS-DB-USER-TERM     PIC X VALUE X'00'."
+      - "01  WS-DB-PASSWORD."
+      - "05  WS-DB-PASSWORD-TEXT PIC X(9) VALUE 'SECRETPWD'."
+      - "05  WS-DB-PASSWORD-TERM PIC X VALUE X'00'."
+      - "01  WS-DB-NAME-LEN         PIC S9(4) COMP-5 VALUE 5."
+      - "01  WS-DB-USER-LEN         PIC S9(4) COMP-5 VALUE 7."
+      - "01  WS-DB-PASSWORD-LEN     PIC S9(4) COMP-5 VALUE 9."
+      - "01  WS-PGHOST-NAME         PIC X(6) VALUE 'PGHOST'."
+      - "01  WS-PGHOST-VALUE        PIC X(64) VALUE 'localhost'."
+      - "01  WS-PGPORT-NAME         PIC X(6) VALUE 'PGPORT'."
+      - "01  WS-PGPORT-VALUE        PIC X(5) VALUE '5432'."
+      - "01  WS-PGUSER-NAME         PIC X(6) VALUE 'PGUSER'."
+      - "01  WS-PGUSER-VALUE        PIC X(64) VALUE 'empuser'."
+      - "01  WS-PGPASSWORD-NAME     PIC X(10) VALUE 'PGPASSWORD'."
+      - "01  WS-PGPASSWORD-VALUE    PIC X(64) VALUE 'SECRETPWD'."
+      - "01  WS-PGDATABASE-NAME     PIC X(10) VALUE 'PGDATABASE'."
+      - "01  WS-PGDATABASE-VALUE    PIC X(64) VALUE 'empdb'."
+    flow:
+      - "MAIN-ENTRY: si LK-OPERATION <> 'END ' alors PERFORM DAL-CONNECT"
+      - "EVALUATE LK-OPERATION: READ->DAL-READ, SAVE->DAL-SAVE, END->DAL-END, OTHER->DISPLAY erreur"
+      - "GOBACK apres EVALUATE"
+      - "DAL-READ: ouverture curseur paresseuse, FETCH, mise a jour EOF"
+      - "DAL-SAVE: UPDATE SALARY_NET"
+      - "DAL-END: CLOSE cursor, COMMIT, DISCONNECT, reset flags"
+    required_statements:
+      - "GOBACK"
+    allow_procedure_sections: false
+    require_working_storage_section: true
+    logging_lines:
+      - "Connexion DB reussie: empdb"
+      - "ERREUR CONNECT: SQLCODE="
+      - "SQLSTATE="
+      - "SQLERRMC="
+      - "Curseur C_EMP ouvert"
+      - "ERREUR OPEN: SQLCODE="
+      - "ERREUR FETCH: SQLCODE="
+      - "ERREUR UPDATE: SQLCODE="
+      - "ERREUR CLOSE: SQLCODE="
+      - "ERREUR COMMIT: SQLCODE="
+      - "ERREUR DISCONNECT: SQLCODE="
+      - "ERREUR: Operation inconnue: "
+      - "Fermeture connexion"
+    call_interface:
+      type: "CALL USING"
+      description: "CALL 'EMPLOYEE-DAL-DB' USING OPERATION, END-OF-FILE, EMPLOYEE."
+      linkage_parameters:
+        - name: "LK-OPERATION"
+          pic: "X(4)"
+          direction: in
+        - name: "LK-END-OF-FILE"
+          pic: "X"
+          direction: inout
+        - name: "LK-EMPLOYEE"
+          pic: "groupe EMPLOYEE"
+          direction: inout
+      operations:
+        read: "READ"
+        save: "SAVE"
+        end: "END "
+    cobol_sections:
+      identification_division: required
+      environment_division: optional
+      data_division:
+        working_storage: required
+        linkage: required
+      procedure_division:
+        using_clause: ["LK-OPERATION", "LK-END-OF-FILE", "LK-EMPLOYEE"]
+        entry_paragraph: "MAIN-ENTRY"
+
+  - name: EMPLOYEE-LOGIC
+    layer: logic
+    role: "Traitement batch principal : boucle sur les employés, calcul du net, sauvegarde, affichage."
+    entities: [EMPLOYEE]
+    allowed_sql: false
+    allowed_business_logic: true
+    allow_display: true
+    environment_lines:
+      - "ENVIRONMENT DIVISION."
+      - "CONFIGURATION SECTION."
+      - "REPOSITORY."
+      - "    FUNCTION ALL INTRINSIC."
+    working_storage_lines:
+      - "01  END-OF-FILE            PIC X VALUE 'N'."
+      - "88  EOF-REACHED        VALUE 'Y'."
+      - "88  NOT-EOF            VALUE 'N'."
+      - "77  OPERATION              PIC X(4)."
+      - "77  WS-COUNT               PIC 9(4) VALUE 0."
+      - "01  EMPLOYEE."
+      - "    05 EMP-ID              PIC 9(4)."
+      - "    05 EMP-NAME            PIC A(30)."
+      - "    05 SALARY-BRUT         PIC S9(6)V99."
+      - "    05 SALARY-NET          PIC S9(6)V99."
+    flow:
+      - "Afficher le bandeau de debut"
+      - "READ initial via DAL (OPERATION='READ')"
+      - "Boucle jusqu'a EOF: incrementer WS-COUNT, CALCULATE-NET, SAVE, BUSINESS display, READ suivant"
+      - "Appeler DAL avec OPERATION='END '"
+      - "Afficher le bandeau de fin avec le compteur"
+      - "STOP RUN"
+    logging_lines:
+      - "=========================================="
+      - "DEBUT TRAITEMENT BATCH CALCUL SALAIRE NET"
+      - "=========================================="
+      - "=========================================="
+      - "FIN TRAITEMENT BATCH"
+      - "Nombre employes traites: "
+      - "=========================================="
+      - "ANOMALIE: Salaire net negatif corrige"
+      - "ANOMALIE: SALARY_BRUT invalide"
+    required_statements:
+      - "STOP RUN"
+    allow_procedure_sections: false
+    require_working_storage_section: true
+    cobol_sections:
+      identification_division: required
+      environment_division: optional
+      data_division:
+        working_storage: required
+        linkage: none
+      procedure_division:
+        entry_paragraph: "MAIN-PROCESS"
+
+  - name: EMPLOYEE-BUSINESS
+    layer: business
+    role: "Affichage simple des informations d'un employé (nom, ID, salaire brut/net)."
+    entities: [EMPLOYEE]
+    allowed_sql: false
+    allowed_business_logic: "lecture_seule"
+    allow_display: true
+    environment_lines:
+      - "ENVIRONMENT DIVISION."
+    working_storage_lines:
+      - "WORKING-STORAGE SECTION."
+    logging_lines:
+      - "----------------------------------------"
+      - "EMPLOYE : "
+      - "ID      : "
+      - "BRUT    : "
+      - "NET     : "
+    required_statements:
+      - "GOBACK"
+    allow_procedure_sections: false
+    require_working_storage_section: true
+    call_interface:
+      type: "CALL USING"
+      description: "CALL 'EMPLOYEE-BUSINESS' USING LK-EMPLOYEE."
+      linkage_parameters:
+        - name: "LK-EMPLOYEE"
+          pic: "groupe EMPLOYEE"
+          direction: in
+    cobol_sections:
+      identification_division: required
+      environment_division: optional
+      data_division:
+        working_storage: none
+        linkage: required
+      procedure_division:
+        using_clause: ["LK-EMPLOYEE"]
+        entry_paragraph: "DISPLAY-EMPLOYEE"
+
+fonctions:
+  # --- Couche DAL / Physique ---
+
+  - id: FN-DAL-CONNECT
+    name: DAL-CONNECT
+    programme: EMPLOYEE-DAL-DB
+    layer: dal
+    visibility: internal
+    required: true
+    entity: EMPLOYEE
+    description: >
+      Connexion paresseuse a la base via OCESQL. Initialise les variables
+      d'environnement PostgreSQL, puis execute OCESQLStartSQL/OCESQLConnect/OCESQLEndSQL.
+    inputs: []
+    outputs:
+      - "SQLCODE"
+      - "SQLSTATE"
+    modifies:
+      - "WS-CONNECTED"
+      - "SQLCODE"
+    steps:
+      - "PERFORM DAL-SET-ENV"
+      - "CALL OCESQLStartSQL"
+      - "CALL OCESQLConnect USING SQLCA, WS-DB-USER, WS-DB-USER-LEN, WS-DB-PASSWORD, WS-DB-PASSWORD-LEN, WS-DB-NAME, WS-DB-NAME-LEN"
+      - "CALL OCESQLEndSQL"
+      - "SQLCODE=0: SET WS-CONNECTED TO TRUE, DISPLAY 'Connexion DB reussie: empdb'"
+      - "Sinon: DISPLAY 'ERREUR CONNECT: SQLCODE=' SQLCODE, DISPLAY 'SQLSTATE=' SQLSTATE, DISPLAY 'SQLERRMC=' SQLERRMC"
+    related_exigences: [R2]
+    sql:
+      connection_method: "OCESQL (voir sql.connection)"
+      connection_calls:
+        - "CALL OCESQLStartSQL"
+        - "CALL OCESQLConnect USING SQLCA, WS-DB-USER, WS-DB-USER-LEN, WS-DB-PASSWORD, WS-DB-PASSWORD-LEN, WS-DB-NAME, WS-DB-NAME-LEN"
+        - "CALL OCESQLEndSQL"
+    cobol_location:
+      fichier: "employee_dal_db.cob"
+      programme: "EMPLOYEE-DAL-DB"
+      division: "PROCEDURE DIVISION"
+      paragraph: "DAL-CONNECT"
+      section: "couche_dal"
+
+  - id: FN-DAL-SET-ENV
+    name: DAL-SET-ENV
+    programme: EMPLOYEE-DAL-DB
+    layer: dal
+    visibility: internal
+    required: true
+    entity: EMPLOYEE
+    description: >
+      Force les variables d'environnement PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDATABASE.
+    inputs: []
+    outputs: []
+    modifies: []
+    steps:
+      - "DISPLAY WS-PGHOST-NAME UPON ENVIRONMENT-NAME"
+      - "DISPLAY WS-PGHOST-VALUE UPON ENVIRONMENT-VALUE"
+      - "DISPLAY WS-PGPORT-NAME UPON ENVIRONMENT-NAME"
+      - "DISPLAY WS-PGPORT-VALUE UPON ENVIRONMENT-VALUE"
+      - "DISPLAY WS-PGUSER-NAME UPON ENVIRONMENT-NAME"
+      - "DISPLAY WS-PGUSER-VALUE UPON ENVIRONMENT-VALUE"
+      - "DISPLAY WS-PGPASSWORD-NAME UPON ENVIRONMENT-NAME"
+      - "DISPLAY WS-PGPASSWORD-VALUE UPON ENVIRONMENT-VALUE"
+      - "DISPLAY WS-PGDATABASE-NAME UPON ENVIRONMENT-NAME"
+      - "DISPLAY WS-PGDATABASE-VALUE UPON ENVIRONMENT-VALUE"
+    related_exigences: [R2]
+    cobol_location:
+      fichier: "employee_dal_db.cob"
+      programme: "EMPLOYEE-DAL-DB"
+      division: "PROCEDURE DIVISION"
+      paragraph: "DAL-SET-ENV"
+      section: "couche_dal"
+
+  - id: FN-DAL-READ
+    name: DAL-READ
+    programme: EMPLOYEE-DAL-DB
+    layer: dal
+    visibility: public
+    required: true
+    entity: EMPLOYEE
+    description: >
+      Connecte à la base si nécessaire, ouvre le curseur C_EMP si nécessaire,
+      fait un FETCH et remplit la structure EMPLOYEE. Met END-OF-FILE à 'Y'
+      en cas de fin de données ou d'erreur.
+    operation_code: "READ"
+    inputs:
+      - "OPERATION = 'READ'"
+      - "Connexion non garantie à l'avance (connexion paresseuse)."
+      - "Curseur non garanti ouvert (ouverture paresseuse)."
+    outputs:
+      - "EMPLOYEE.EMP_ID"
+      - "EMPLOYEE.EMP_NAME"
+      - "EMPLOYEE.SALARY_BRUT"
+      - "EMPLOYEE.SALARY_NET"
+      - "END-OF-FILE"
+      - "SQLCODE"
+    modifies:
+      - "EMPLOYEE.*"
+      - "END-OF-FILE"
+      - "WS-CONNECTED"
+      - "WS-CURSOR-OPEN"
+      - "SQLCODE"
+    preconditions: []
+    postconditions:
+      - "Si SQLCODE = 0 : EMPLOYEE contient un enregistrement valide et END-OF-FILE = 'N'."
+      - "Si SQLCODE = 100 : fin de données, END-OF-FILE = 'Y'."
+      - "Si SQLCODE != 0 et != 100 : message d'erreur affiché et END-OF-FILE = 'Y'."
+    errors_flags:
+      - "SQLCODE = 0 : succès, une ligne lue."
+      - "SQLCODE = 100 : fin de curseur."
+      - "SQLCODE != 0 et != 100 : erreur SQL, le batch s'arrête logiquement."
+    steps:
+      - "Si non connecte: PERFORM DAL-CONNECT"
+      - "Si curseur non ouvert: DECLARE C_EMP, OPEN C_EMP"
+      - "Sur erreur OPEN: DISPLAY 'ERREUR OPEN: SQLCODE=' SQLCODE, EOF='Y'"
+      - "Sur succes OPEN: SET WS-CURSOR-OPEN TO TRUE, SET WS-CONNECTED TO TRUE, DISPLAY 'Curseur C_EMP ouvert'"
+      - "FETCH C_EMP INTO WS-EMP-ID, WS-EMP-NAME, WS-SALARY-BRUT, WS-SALARY-NET"
+      - "SQLCODE=0: EOF='N', MOVE WS-* vers LK-*"
+      - "SQLCODE=100: EOF='Y'"
+      - "AUTRE: DISPLAY 'ERREUR FETCH: SQLCODE=' SQLCODE, DISPLAY SQLSTATE, EOF='Y'"
+    related_exigences: [R2, R3]
+    sql:
+      declare_cursor: |
+        DECLARE C_EMP CURSOR FOR
+        SELECT EMP_ID, EMP_NAME, SALARY_BRUT, SALARY_NET
+        FROM EMPLOYEE
+        ORDER BY EMP_ID
+      open_cursor: "OPEN C_EMP"
+      fetch_into: "FETCH C_EMP INTO :WS-EMP-ID, :WS-EMP-NAME, :WS-SALARY-BRUT, :WS-SALARY-NET"
+    eof_logic:
+      on_sqlcode_100_set_eof: true
+      eof_flag_name: "LK-END-OF-FILE"
+      eof_true_value: "Y"
+      eof_false_value: "N"
+    cobol_location:
+      fichier: "employee_dal_db.cob"
+      programme: "EMPLOYEE-DAL-DB"
+      division: "PROCEDURE DIVISION"
+      paragraph: "DAL-READ"
+      section: "couche_dal"
+
+  - id: FN-DAL-SAVE
+    name: DAL-SAVE
+    programme: EMPLOYEE-DAL-DB
+    layer: dal
+    visibility: public
+    required: true
+    entity: EMPLOYEE
+    description: >
+      Met à jour en base la colonne SALARY_NET pour l'employé courant (EMP_ID)
+      à partir de la valeur SALARY_NET de la structure EMPLOYEE.
+    operation_code: "SAVE"
+    inputs:
+      - "EMPLOYEE.EMP_ID"
+      - "EMPLOYEE.SALARY_NET"
+    outputs:
+      - "SQLCODE"
+    modifies:
+      - "SQLCODE"
+    preconditions:
+      - "EMPLOYEE.EMP_ID contient un identifiant existant en base."
+    postconditions:
+      - "Si SQLCODE = 0 : la ligne EMPLOYEE correspondante en base a été mise à jour."
+    errors_flags:
+      - "SQLCODE = 0 : succès."
+      - "SQLCODE != 0 : erreur SQL, message affiché."
+    steps:
+      - "MOVE LK-EMP-ID TO WS-EMP-ID"
+      - "MOVE LK-SALARY-NET TO WS-SALARY-NET"
+      - "EXEC SQL UPDATE EMPLOYEE SET SALARY_NET = :WS-SALARY-NET WHERE EMP_ID = :WS-EMP-ID"
+      - "Si SQLCODE != 0: DISPLAY 'ERREUR UPDATE: SQLCODE=' SQLCODE, DISPLAY 'SQLSTATE=' SQLSTATE, DISPLAY 'EMP_ID=' LK-EMP-ID"
+    related_exigences: [R1, R2]
+    sql:
+      update_statement: |
+        UPDATE EMPLOYEE
+        SET SALARY_NET = :WS-SALARY-NET
+        WHERE EMP_ID = :WS-EMP-ID
+    cobol_location:
+      fichier: "employee_dal_db.cob"
+      programme: "EMPLOYEE-DAL-DB"
+      division: "PROCEDURE DIVISION"
+      paragraph: "DAL-SAVE"
+      section: "couche_dal"
+
+  - id: FN-DAL-END
+    name: DAL-END
+    programme: EMPLOYEE-DAL-DB
+    layer: dal
+    visibility: public
+    required: true
+    entity: EMPLOYEE
+    description: >
+      Ferme le curseur s'il est ouvert, commit la transaction et ferme la connexion à la base.
+      Appelée une fois en fin de traitement.
+    operation_code: "END "
+    inputs: []
+    outputs:
+      - "SQLCODE"
+    modifies:
+      - "WS-CURSOR-OPEN"
+      - "WS-CONNECTED"
+      - "SQLCODE"
+    preconditions: []
+    postconditions:
+      - "Curseur fermé si besoin."
+      - "COMMIT effectué."
+      - "Connexion base fermée."
+    errors_flags:
+      - "Les erreurs de CLOSE/COMMIT/DISCONNECT sont simplement affichées."
+    steps:
+      - "Si curseur ouvert: EXEC SQL CLOSE C_EMP"
+      - "Si SQLCODE != 0: DISPLAY 'ERREUR CLOSE: SQLCODE=' SQLCODE"
+      - "MOVE 'N' TO WS-CURSOR-OPEN-FLAG"
+      - "Si connecte: EXEC SQL COMMIT"
+      - "Si SQLCODE != 0: DISPLAY 'ERREUR COMMIT: SQLCODE=' SQLCODE"
+      - "EXEC SQL DISCONNECT ALL"
+      - "Si SQLCODE != 0: DISPLAY 'ERREUR DISCONNECT: SQLCODE=' SQLCODE"
+      - "MOVE 'N' TO WS-CONNECTED-FLAG"
+      - "DISPLAY 'Fermeture connexion'"
+    related_exigences: [R2]
+    sql:
+      close_cursor: "CLOSE C_EMP"
+      commit: "COMMIT"
+      disconnect: "DISCONNECT ALL"
+    cobol_location:
+      fichier: "employee_dal_db.cob"
+      programme: "EMPLOYEE-DAL-DB"
+      division: "PROCEDURE DIVISION"
+      paragraph: "DAL-END"
+      section: "couche_dal"
+
+  # --- Couche LOGIQUE / Orchestration batch ---
+
+  - id: FN-LOGIC-MAIN
+    name: MAIN-PROCESS
+    programme: EMPLOYEE-LOGIC
+    layer: logic
+    visibility: public
+    required: true
+    entity: EMPLOYEE
+    description: >
+      Boucle principale du batch: lit les employés via la DAL, calcule le salaire net,
+      sauvegarde le résultat en base et affiche chaque employé.
+    inputs: []
+    outputs: []
+    modifies:
+      - "EMPLOYEE.*"
+      - "END-OF-FILE"
+    preconditions: []
+    postconditions:
+      - "Tous les employés de la table EMPLOYEE ont un SALARY_NET calculé selon R1."
+    calls:
+      - "EMPLOYEE-DAL-DB avec OPERATION='READ'"
+      - "CALCULATE-NET"
+      - "EMPLOYEE-DAL-DB avec OPERATION='SAVE'"
+      - "EMPLOYEE-BUSINESS.DISPLAY-EMPLOYEE"
+      - "EMPLOYEE-DAL-DB avec OPERATION='END '"
+    loop_control:
+      eof_flag_name: "END-OF-FILE"
+      eof_true_value: "Y"
+      eof_false_value: "N"
+    steps:
+      - "DISPLAY '=========================================='"
+      - "DISPLAY 'DEBUT TRAITEMENT BATCH CALCUL SALAIRE NET'"
+      - "DISPLAY '=========================================='"
+      - "MOVE 'READ' TO OPERATION; CALL EMPLOYEE-DAL-DB USING OPERATION, END-OF-FILE, EMPLOYEE"
+      - "PERFORM UNTIL EOF-REACHED: ADD 1 TO WS-COUNT; PERFORM CALCULATE-NET; MOVE 'SAVE' TO OPERATION; CALL DAL; CALL BUSINESS; MOVE 'READ' TO OPERATION; CALL DAL"
+      - "MOVE 'END ' TO OPERATION; CALL EMPLOYEE-DAL-DB USING OPERATION, END-OF-FILE, EMPLOYEE"
+      - "DISPLAY '=========================================='"
+      - "DISPLAY 'FIN TRAITEMENT BATCH'"
+      - "DISPLAY 'Nombre employes traites: ' WS-COUNT"
+      - "DISPLAY '=========================================='"
+    related_exigences: [F1, R1, R2, R3]
+    cobol_location:
+      fichier: "employee_logic.cob"
+      programme: "EMPLOYEE-LOGIC"
+      division: "PROCEDURE DIVISION"
+      paragraph: "MAIN-PROCESS"
+      section: "couche_logique"
+
+  - id: FN-LOGIC-CALC
+    name: CALCULATE-NET
+    programme: EMPLOYEE-LOGIC
+    layer: logic
+    visibility: public
+    required: true
+    entity: EMPLOYEE
+    description: >
+      Applique la règle métier SALARY_NET = ROUND(SALARY_BRUT * 0.7, 2) à l'employé courant.
+      Aucun accès base, uniquement traitement en mémoire.
+    inputs:
+      - "EMPLOYEE.SALARY_BRUT"
+    outputs:
+      - "EMPLOYEE.SALARY_NET"
+    modifies:
+      - "EMPLOYEE.SALARY_NET"
+    preconditions:
+      - "EMPLOYEE.SALARY_BRUT contient une valeur numérique valide."
+    postconditions:
+      - "EMPLOYEE.SALARY_NET >= 0."
+      - "EMPLOYEE.SALARY_NET correspond à SALARY_BRUT * 0.7 arrondi à 2 décimales."
+    errors_flags:
+      - "Si SALARY_BRUT invalide, la logique appelante peut ignorer la ligne ou la journaliser (R3)."
+    steps:
+      - "IF SALARY-BRUT IS NUMERIC: COMPUTE SALARY-NET ROUNDED = SALARY-BRUT * 0.7"
+      - "IF SALARY-NET < 0: MOVE 0 TO SALARY-NET, DISPLAY 'ANOMALIE: Salaire net negatif corrige', DISPLAY '  EMP_ID=' EMP-ID"
+      - "ELSE: DISPLAY 'ANOMALIE: SALARY_BRUT invalide', DISPLAY '  EMP_ID=' EMP-ID, DISPLAY '  EMP_NAME=' EMP-NAME, DISPLAY '  SALARY_BRUT=' SALARY-BRUT, MOVE 0 TO SALARY-NET"
+    related_exigences: [R1, R3]
+    expression:
+      target: "EMPLOYEE.SALARY_NET"
+      formula: "ROUND(EMPLOYEE.SALARY_BRUT * 0.7, 2)"
+      cobol_hint: "COMPUTE SALARY-NET ROUNDED = SALARY-BRUT * 0.7"
+    cobol_location:
+      fichier: "employee_logic.cob"
+      programme: "EMPLOYEE-LOGIC"
+      division: "PROCEDURE DIVISION"
+      paragraph: "CALCULATE-NET"
+      section: "couche_logique"
+
+  # --- Couche MÉTIER / Présentation ---
+
+  - id: FN-BIZ-DISPLAY
+    name: DISPLAY-EMPLOYEE
+    programme: EMPLOYEE-BUSINESS
+    layer: business
+    visibility: public
+    required: true
+    entity: EMPLOYEE
+    description: >
+      Affiche les informations principales de l'employé courant sur la console:
+      nom, identifiant, salaire brut, salaire net.
+    inputs:
+      - "EMPLOYEE.EMP_NAME"
+      - "EMPLOYEE.EMP_ID"
+      - "EMPLOYEE.SALARY_BRUT"
+      - "EMPLOYEE.SALARY_NET"
+    outputs: []
+    modifies: []
+    preconditions:
+      - "EMPLOYEE contient des valeurs lues/calculées cohérentes."
+    postconditions: []
+    errors_flags: []
+    related_exigences: [F1]
+    steps:
+      - "DISPLAY '----------------------------------------'"
+      - "DISPLAY 'EMPLOYE : ' LK-EMP-NAME"
+      - "DISPLAY 'ID      : ' LK-EMP-ID"
+      - "DISPLAY 'BRUT    : ' LK-SALARY-BRUT"
+      - "DISPLAY 'NET     : ' LK-SALARY-NET"
+      - "GOBACK"
+    display_lines:
+      - 'DISPLAY ''----------------------------------------'''
+      - 'DISPLAY ''EMPLOYE : '' LK-EMP-NAME'
+      - 'DISPLAY ''ID      : '' LK-EMP-ID'
+      - 'DISPLAY ''BRUT    : '' LK-SALARY-BRUT'
+      - 'DISPLAY ''NET     : '' LK-SALARY-NET'
+    cobol_location:
+      fichier: "employee_business.cob"
+      programme: "EMPLOYEE-BUSINESS"
+      division: "PROCEDURE DIVISION"
+      paragraph: "DISPLAY-EMPLOYEE"
+      section: "couche_metier"
+# # Exemple 1 — Salaire net (NET = BRUT * 0.7 arrondi à 2 décimales)
+# title: CALCUL-SALAIRE
+# dialecte_cobol: gnucobol
+# sql_cible: postgres
+# 
+# nommage:
+#   variables_case: UPPER_SNAKE      # ex : SALARY_NET, END_OF_FILE
+#   programmes_case: UPPER-KEBAB     # ex : EMPLOYEE-DAL-DB, EMPLOYEE-LOGIC
+# 
+# fonctionnalites:
+#   - id: F1
+#     resume: "Calculer le salaire net à partir du salaire brut pour chaque employé."
+# 
+# exigences:
+#   - id: R1
+#     type: regle_metier
+#     regle: "SALARY_NET = ROUND(SALARY_BRUT * 0.7, 2)"
+#     notes: "Salaire net = salaire brut − cotisations sociales (20%) − impôt (10%). Arrondi bancaire à 2 décimales. SALARY_NET ne doit pas être négatif."
+#   - id: R2
+#     type: technique
+#     regle: "Traitement batch quotidien; journalisation des exécutions."
+#   - id: R3
+#     type: validation
+#     regle: "Si SALARY_BRUT est NULL ou invalide, ignorer la ligne ou la signaler en anomalie."
+# 
+# mcd:
+#   entites:
+#     - name: EMPLOYEE
+#       attrs:
+#         - name: EMP_ID
+#           type: INT
+#           sql_type: INT
+#           cobol_pic: "9(4)"
+#           pk: true
+#           nullable: false
+#         - name: EMP_NAME
+#           type: VARCHAR(30)
+#           sql_type: VARCHAR(30)
+#           cobol_pic: "A(30)"
+#           nullable: false
+#         - name: SALARY_BRUT
+#           type: DECIMAL(8,2)
+#           sql_type: DECIMAL(8,2)
+#           cobol_pic: "9(6)V99"
+#           nullable: false
+#         - name: SALARY_NET
+#           type: DECIMAL(8,2)
+#           sql_type: DECIMAL(8,2)
+#           cobol_pic: "9(6)V99"
+#           nullable: true
+#   relations: []
+# 
+# diagramme: |
+#   erDiagram
+#     EMPLOYEE {
+#       INT EMP_ID PK
+#       VARCHAR EMP_NAME
+#       DECIMAL SALARY_BRUT
+#       DECIMAL SALARY_NET
+#     }
+# 
+# sql:
+#   # DDL exact à générer (rien à deviner)
+#   ddl:
+#     EMPLOYEE: |
+#       CREATE TABLE EMPLOYEE (
+#           EMP_ID INT PRIMARY KEY,
+#           EMP_NAME VARCHAR(30),
+#           SALARY_BRUT DECIMAL(8,2),
+#           SALARY_NET DECIMAL(8,2)
+#       );
+#   # Données initiales exactes
+#   initial_data:
+#     EMPLOYEE:
+#       - EMP_ID: 1
+#         EMP_NAME: "Dupont"
+#         SALARY_BRUT: 3000.00
+#         SALARY_NET: 0.00
+#   indexes:
+#     - entity: EMPLOYEE
+#       name: EMPLOYEE_EMP_NAME_IDX
+#       columns: [EMP_NAME]
+# 
+# # Règles générales de mapping (pour d'autres cas réutilisables)
+# mapping_types:
+#   - sql: "INT"
+#     cobol_pic_default: "9(4)"
+#   - sql: "VARCHAR(30)"
+#     cobol_pic_default: "A(30)"
+#   - sql: "DECIMAL(8,2)"
+#     cobol_pic_default: "9(6)V99"
+# 
+# technique:
+#   cursor_naming:
+#     pattern: "C_<ENTITY_UPPER3>"
+#     example:
+#       EMPLOYEE: "C_EMP"
+#   eof_flag:
+#     name: "END-OF-FILE"
+#     pic: "X"
+#     initial_value: "N"
+#     true_value: "Y"
+#     false_value: "N"
+#   sqlca_required: true   # la DAL doit inclure SQLCA dès qu'elle utilise SQLCODE
+# 
+# programmes:
+#   - name: EMPLOYEE-DAL-DB
+#     layer: dal
+#     role: "Couche physique d'accès à la base pour EMPLOYEE (curseur + update SALARY_NET)."
+#     entities: [EMPLOYEE]
+#     allowed_sql: true
+#     allowed_business_logic: false
+#     main_cursor: "C_EMP"
+# 
+#   - name: EMPLOYEE-LOGIC
+#     layer: logic
+#     role: "Traitement batch principal : boucle sur les employés, appel DAL + calcul salaire net."
+#     entities: [EMPLOYEE]
+#     allowed_sql: false
+#     allowed_business_logic: true
+# 
+#   - name: EMPLOYEE-BUSINESS
+#     layer: business
+#     role: "Affichage simple des informations d'un employé."
+#     entities: [EMPLOYEE]
+#     allowed_sql: false
+#     allowed_business_logic: lecture_seule
+# 
+# fonctions:
+#   # --- Couche DAL / Physique ---
+# 
+#   - id: FN-DAL-OPEN
+#     name: OPEN-CURSOR
+#     programme: EMPLOYEE-DAL-DB
+#     layer: dal
+#     entity: EMPLOYEE
+#     description: >
+#       Ouvre le curseur SQL pour parcourir toutes les lignes de la table EMPLOYEE.
+#     inputs: []
+#     outputs:
+#       - "SQLCODE"
+#     modifies:
+#       - "SQLCODE"
+#     preconditions: []
+#     postconditions:
+#       - "Si SQLCODE = 0, le curseur C_EMP est ouvert et prêt à lire le premier employé."
+#     errors_flags:
+#       - "SQLCODE = 0 : succès."
+#       - "SQLCODE != 0 : erreur d'ouverture de curseur (à journaliser selon R2)."
+#     related_exigences: [R2]
+#     sql:
+#       declare_cursor: |
+#         DECLARE C_EMP CURSOR FOR
+#         SELECT EMP_ID, EMP_NAME, SALARY_BRUT, SALARY_NET
+#         FROM EMPLOYEE
+#       open_cursor: "OPEN C_EMP"
+# 
+#   - id: FN-DAL-READ
+#     name: READ-EMPLOYEE
+#     programme: EMPLOYEE-DAL-DB
+#     layer: dal
+#     entity: EMPLOYEE
+#     description: >
+#       Lit le prochain employé via le curseur C_EMP et remplit la structure EMPLOYEE.
+#       Met à jour END-OF-FILE en fonction de la présence ou non d'une ligne suivante.
+#     inputs:
+#       - "curseur C_EMP déjà ouvert"
+#     outputs:
+#       - "EMPLOYEE.EMP_ID"
+#       - "EMPLOYEE.EMP_NAME"
+#       - "EMPLOYEE.SALARY_BRUT"
+#       - "EMPLOYEE.SALARY_NET"
+#       - "END-OF-FILE"
+#       - "SQLCODE"
+#     modifies:
+#       - "EMPLOYEE.EMP_ID"
+#       - "EMPLOYEE.EMP_NAME"
+#       - "EMPLOYEE.SALARY_BRUT"
+#       - "EMPLOYEE.SALARY_NET"
+#       - "END-OF-FILE"
+#       - "SQLCODE"
+#     preconditions:
+#       - "Le curseur C_EMP a été ouvert avec succès (SQLCODE = 0 lors de OPEN-CURSOR)."
+#     postconditions:
+#       - "Si SQLCODE = 0 : EMPLOYEE contient un enregistrement valide et END-OF-FILE = 'N'."
+#       - "Si SQLCODE = 100 : fin de données, END-OF-FILE = 'Y'."
+#     errors_flags:
+#       - "SQLCODE = 0 : ligne lue."
+#       - "SQLCODE = 100 : fin du curseur, plus de lignes."
+#       - "SQLCODE != 0 et != 100 : erreur SQL (à journaliser)."
+#     related_exigences: [R2, R3]
+#     sql:
+#       fetch_into: "FETCH C_EMP INTO :EMP-ID, :EMP-NAME, :SALARY-BRUT, :SALARY-NET"
+#     eof_logic:
+#       on_sqlcode_100_set_eof: true
+# 
+#   - id: FN-DAL-SAVE
+#     name: SAVE-EMPLOYEE
+#     programme: EMPLOYEE-DAL-DB
+#     layer: dal
+#     entity: EMPLOYEE
+#     description: >
+#       Met à jour en base la colonne SALARY_NET de la table EMPLOYEE pour l'identifiant EMP_ID courant,
+#       en utilisant la valeur SALARY_NET de la structure EMPLOYEE.
+#     inputs:
+#       - "EMPLOYEE.EMP_ID"
+#       - "EMPLOYEE.SALARY_NET"
+#     outputs:
+#       - "SQLCODE"
+#     modifies:
+#       - "SQLCODE"
+#     preconditions:
+#       - "EMPLOYEE.EMP_ID est renseigné."
+#       - "EMPLOYEE.SALARY_NET contient une valeur calculée et valide (>= 0)."
+#     postconditions:
+#       - "Si SQLCODE = 0 : la ligne EMPLOYEE correspondante en base a été mise à jour."
+#     errors_flags:
+#       - "SQLCODE = 0 : succès."
+#       - "SQLCODE != 0 : erreur SQL lors de la mise à jour (à journaliser)."
+#     related_exigences: [R1, R2]
+#     sql:
+#       update_statement: |
+#         UPDATE EMPLOYEE
+#         SET SALARY_NET = :SALARY-NET
+#         WHERE EMP_ID = :EMP-ID
+# 
+#   # --- Couche LOGIQUE / Orchestration batch ---
+# 
+#   - id: FN-LOGIC-MAIN
+#     name: MAIN-PROCESS
+#     programme: EMPLOYEE-LOGIC
+#     layer: logic
+#     entity: EMPLOYEE
+#     description: >
+#       Traitement batch principal : pour chaque employé lu depuis la DAL,
+#       applique la règle métier de calcul du salaire net puis sauvegarde le résultat en base.
+#       S'arrête lorsque la DAL indique qu'il n'y a plus d'employés à traiter.
+#     inputs: []
+#     outputs: []
+#     modifies:
+#       - "EMPLOYEE.*"
+#       - "END-OF-FILE"
+#     preconditions: []
+#     postconditions:
+#       - "Tous les employés éligibles ont un SALARY_NET recalculé en base selon la règle R1."
+#     calls:
+#       - "EMPLOYEE-DAL-DB.OPEN-CURSOR"
+#       - "EMPLOYEE-DAL-DB.READ-EMPLOYEE"
+#       - "CALCULATE-NET"
+#       - "EMPLOYEE-DAL-DB.SAVE-EMPLOYEE"
+#     loop_control:
+#       uses_eof_flag: "END-OF-FILE"
+#       eof_true_value: "Y"
+#       eof_false_value: "N"
+#     errors_flags:
+#       - "Doit gérer les erreurs SQL (SQLCODE != 0) en journalisant les anomalies (R2)."
+#       - "Doit ignorer ou signaler les lignes où SALARY_BRUT est invalide (R3)."
+#     related_exigences: [F1, R1, R2, R3]
+# 
+#   - id: FN-LOGIC-CALC
+#     name: CALCULATE-NET
+#     programme: EMPLOYEE-LOGIC
+#     layer: logic
+#     entity: EMPLOYEE
+#     description: >
+#       Applique la règle métier SALARY_NET = ROUND(SALARY_BRUT * 0.7, 2) à l'employé courant.
+#       Cette fonction ne fait aucun accès base ; elle manipule uniquement la structure EMPLOYEE en mémoire.
+#     inputs:
+#       - "EMPLOYEE.SALARY_BRUT"
+#     outputs:
+#       - "EMPLOYEE.SALARY_NET"
+#     modifies:
+#       - "EMPLOYEE.SALARY_NET"
+#     preconditions:
+#       - "EMPLOYEE.SALARY_BRUT n'est pas NULL."
+#     postconditions:
+#       - "EMPLOYEE.SALARY_NET >= 0."
+#       - "EMPLOYEE.SALARY_NET correspond à SALARY_BRUT * 0.7 arrondi à 2 décimales (logique métier R1)."
+#     errors_flags:
+#       - "Si SALARY_BRUT est invalide, la ligne doit être ignorée ou signalée selon la politique de R3."
+#     related_exigences: [R1, R3]
+#     expression:
+#       target: "EMPLOYEE.SALARY_NET"
+#       formula: "ROUND(EMPLOYEE.SALARY_BRUT * 0.7, 2)"
+#       cobol_hint: "COMPUTE SALARY-NET = SALARY-BRUT * 0.7. * Arrondi à deux décimales si nécessaire"
+# 
+#   # --- Couche MÉTIER / Présentation ---
+# 
+#   - id: FN-BIZ-DISPLAY
+#     name: DISPLAY-EMPLOYEE
+#     programme: EMPLOYEE-BUSINESS
+#     layer: business
+#     entity: EMPLOYEE
+#     description: >
+#       Affiche les informations principales de l'employé (nom, salaire brut, salaire net)
+#       pour contrôle, debug ou restitution simple.
+#     inputs:
+#       - "EMPLOYEE.EMP_NAME"
+#       - "EMPLOYEE.SALARY_BRUT"
+#       - "EMPLOYEE.SALARY_NET"
+#     outputs: []
+#     modifies: []
+#     preconditions:
+#       - "La structure EMPLOYEE contient des données cohérentes pour l'employé à afficher."
+#     postconditions: []
+#     errors_flags: []
+#     related_exigences: [F1]
+#     display_lines:
+#       - 'DISPLAY "Employé:" EMP-NAME'
+#       - 'DISPLAY "Salaire Brut:" SALARY-BRUT'
+#       - 'DISPLAY "Salaire Net:" SALARY-NET'
+# # # Exemple 1 — Salaire net (NET = BRUT * 0.7 arrondi à 2 décimales)
+# # title: CALCUL-SALAIRE
+# # dialecte_cobol: gnucobol
+# # sql_cible: postgres
+# # nommage:
+# #   variables_case: UPPER_SNAKE
+# #   programmes_case: UPPER-KEBAB
+# # 
+# # fonctionnalites:
+# #   - id: F1
+# #     resume: Calculer le salaire net à partir du salaire brut pour chaque employé.
+# # 
+# # exigences:
+# #   - id: R1
+# #     type: regle_metier
+# #     regle: "SALARY_NET = ROUND(SALARY_BRUT * 0.7, 2)"
+# #     notes: "Arrondi bancaire à 2 décimales. SALARY_NET ne doit pas être négatif."
+# #   - id: R2
+# #     type: technique
+# #     regle: "Traitement batch quotidien; journalisation des exécutions."
+# #   - id: R3
+# #     type: validation
+# #     regle: "Si SALARY_BRUT est NULL, ignorer la ligne ou la signaler en anomalie."
+# # 
+# # mcd:
+# #   entites:
+# #     - name: EMPLOYEE
+# #       attrs:
+# #         - name: EMP_ID
+# #           type: INT
+# #           pk: true
+# #           nullable: false
+# #         - name: EMP_NAME
+# #           type: VARCHAR(30)
+# #           nullable: false
+# #         - name: SALARY_BRUT
+# #           type: DECIMAL(10,2)
+# #           nullable: false
+# #         - name: SALARY_NET
+# #           type: DECIMAL(10,2)
+# #           nullable: true
+# #   relations: []
+# # 
+# # diagramme: |
+# #   erDiagram
+# #     EMPLOYEE {
+# #       INT EMP_ID PK
+# #       VARCHAR EMP_NAME
+# #       DECIMAL SALARY_BRUT
+# #       DECIMAL SALARY_NET
+# #     }
+# # 
+# # # (Optionnel) Indices/contraintes SQL additionnels compréhensibles par le générateur
+# # sql:
+# #   indexes:
+# #     - entity: EMPLOYEE
+# #       name: EMPLOYEE_EMP_NAME_IDX
+# #       columns: [EMP_NAME]

@@ -1,0 +1,57 @@
+[system] Expert COBOL. Génère uniquement le code COBOL demandé.
+[user] Reponds uniquement avec du code COBOL compilable, sans Markdown ni texte autour.
+La premiere ligne doit etre IDENTIFICATION DIVISION.
+Un seul PROGRAM-ID, pas de sous-programmes.
+Utilise strictement les identifiants, messages, SQL et sequences definis dans la spec.
+N'invente aucune variable, paragraphe, message ou SQL.
+Respecte exactement les listes de WORKING-STORAGE, LINKAGE et USING.
+
+=== CONTEXT ===
+SGBD: postgres. Dialecte COBOL: gnucobol.
+Table EMPLOYEE: EMP_ID INT PK, EMP_NAME VARCHAR(30), SALARY_BRUT DECIMAL(8,2), SALARY_NET DECIMAL(8,2)
+Role: couche DAL pour EMPLOYEE.
+
+=== ENVIRONMENT ===
+ENVIRONMENT exact (lignes):
+ENVIRONMENT DIVISION.
+CONFIGURATION SECTION.
+REPOSITORY.
+    FUNCTION ALL INTRINSIC.
+
+=== INTERFACE ===
+Interface CALL/USING attendue: LK-OPERATION: X(4) (direction: in); LK-END-OF-FILE: X (direction: inout); LK-EMPLOYEE: groupe EMPLOYEE (direction: inout)
+
+=== STRUCTURE ===
+LINKAGE attendu (exemple exact):
+LINKAGE SECTION.
+01 LK-OPERATION PIC X(4).
+01 LK-END-OF-FILE PIC X.
+01 LK-EMPLOYEE.
+    05 LK-EMP-ID PIC 9(4).
+    05 LK-EMP-NAME PIC A(30).
+    05 LK-SALARY-BRUT PIC S9(6)V99.
+    05 LK-SALARY-NET PIC S9(6)V99.
+
+PROCEDURE DIVISION USING LK-OPERATION LK-END-OF-FILE LK-EMPLOYEE.
+
+=== WORKING_STORAGE ===
+Working-Storage obligatoire (lignes exactes, ordre conseille):
+EXEC SQL INCLUDE SQLCA END-EXEC.
+01  WS-CONNECTED-FLAG      PIC X VALUE 'N'.
+88  WS-CONNECTED           VALUE 'Y'.
+01  WS-CURSOR-OPEN-FLAG    PIC X VALUE 'N'.
+88  WS-CURSOR-OPEN         VALUE 'Y'.
+01  WS-EMP-ID              PIC 9(4).
+01  WS-EMP-NAME            PIC A(30).
+01  WS-SALARY-BRUT         PIC S9(6)V99.
+01  WS-SALARY-NET          PIC S9(6)V99.
+01  WS-DB-NAME.
+05  WS-DB-NAME-TEXT     PIC X(5) VALUE 'empdb'.
+05  WS-DB-NAME-TERM     PIC X VALUE X'00'.
+01  WS-DB-USER.
+05  WS-DB-USER-TEXT     PIC X(7) VALUE 'empuser'.
+05  WS-DB-USER-TERM     PIC X VALUE X'00'.
+01  WS-DB-PASSWORD.
+05  WS-DB-PASSWORD-TEXT PIC X(9) VALUE 'SECRETPWD'.
+05  WS-DB-PASSWORD-TERM PIC X VALUE X'00'.
+01  WS-…
