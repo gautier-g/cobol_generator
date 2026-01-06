@@ -54,7 +54,7 @@ mcd:
         - name: EMP_NAME
           type: VARCHAR(30)
           sql_type: VARCHAR(30)
-          cobol_pic: "A(30)"
+          cobol_pic: "X(30)"
           nullable: false
         - name: SALARY_BRUT
           type: DECIMAL(8,2)
@@ -153,7 +153,7 @@ mapping_types:
   - sql: "INT"
     cobol_pic_default: "9(4)"
   - sql: "VARCHAR(30)"
-    cobol_pic_default: "A(30)"
+    cobol_pic_default: "X(30)"
   - sql: "DECIMAL(8,2)"
     cobol_pic_default: "S9(6)V99"
 
@@ -193,6 +193,7 @@ prompting:
     - "Toute variable utilisee doit etre declaree (WORKING-STORAGE ou LINKAGE)."
     - "Chaque paragraphe DOIT etre declare sur une ligne avec un point (ex: MAIN-ENTRY.)."
     - "Ne termine aucune instruction par un point (sauf EXEC SQL INCLUDE SQLCA END-EXEC.); seul un point sur une ligne seule termine un paragraphe."
+    - "Dans DATA DIVISION (WORKING-STORAGE/LINKAGE), toute ligne 01/05/77/88 avec PIC ou VALUE doit se terminer par un point. Regle non applicable en PROCEDURE DIVISION."
   generation_strategy:
     - "1) Construis d'abord le squelette COBOL complet (DIVISION/SECTION) dans l'ordre."
     - "2) Insere les blocs WORKING-STORAGE/LINKAGE exacts fournis par la spec."
@@ -204,6 +205,7 @@ prompting:
     - "Ne pas utiliser '>>SOURCE FORMAT FREE'."
     - "Terminer chaque paragraphe par une ligne avec un seul point."
     - "Le nom du paragraphe se termine par un point (ex: MAIN-ENTRY.)."
+    - "En DATA DIVISION, chaque ligne 01/05/77/88 avec PIC ou VALUE se termine par un point."
     - "Aucune ligne ne doit depasser 72 colonnes (format FIXED)."
     - "Si une instruction depasse 72 colonnes, la scinder sur plusieurs lignes."
     - "Pour EXEC SQL FETCH/SELECT/UPDATE: mettre chaque variable hote sur sa propre ligne."
@@ -417,7 +419,7 @@ programmes:
       - "01  WS-CURSOR-OPEN-FLAG    PIC X VALUE 'N'."
       - "88  WS-CURSOR-OPEN         VALUE 'Y'."
       - "01  WS-EMP-ID              PIC 9(4)."
-      - "01  WS-EMP-NAME            PIC A(30)."
+      - "01  WS-EMP-NAME            PIC X(30)."
       - "01  WS-SALARY-BRUT         PIC S9(6)V99."
       - "01  WS-SALARY-NET          PIC S9(6)V99."
       - "01  WS-DB-NAME."
@@ -571,7 +573,7 @@ programmes:
       - "77  WS-COUNT               PIC 9(4) VALUE 0."
       - "01  EMPLOYEE."
       - "    05 EMP-ID              PIC 9(4)."
-      - "    05 EMP-NAME            PIC A(30)."
+      - "    05 EMP-NAME            PIC X(30)."
       - "    05 SALARY-BRUT         PIC S9(6)V99."
       - "    05 SALARY-NET          PIC S9(6)V99."
     flow:

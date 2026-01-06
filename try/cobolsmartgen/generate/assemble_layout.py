@@ -203,17 +203,51 @@ def _ensure_dirs(base: Path) -> Dict[str, Path]:
 
 
 def _write_sqlca(copy_dir: Path) -> Path:
-    """Generate SQLCA copybook."""
+    """Generate SQLCA copybook (fixed/free safe) and a sqlca.cbl alias for OCESQL."""
     path = copy_dir / "SQLCA.cpy"
-    if not path.exists():
-        body = """      *> SQLCA - SQL Communication Area
-       01  SQLCA.
-           05 SQLCODE         PIC S9(9) COMP.
-           05 SQLSTATE        PIC X(5).
-           05 SQLERRM         PIC X(70)."""
+    alias = copy_dir / "sqlca.cbl"
+    body = (
+        "       01  SQLCA.\n"
+        "           05  SQLCAID     PIC X(8).\n"
+        "           05  SQLCABC     PIC S9(9) COMP-5.\n"
+        "           05  SQLCODE     PIC S9(9) COMP-5.\n"
+        "           05  SQLERRM.\n"
+        "               49  SQLERRML PIC S9(4) COMP-5.\n"
+        "               49  SQLERRMC PIC X(70).\n"
+        "           05  SQLERRP     PIC X(8).\n"
+        "           05  SQLERRD     OCCURS 6 TIMES PIC S9(9) COMP-5.\n"
+        "           05  SQLWARN.\n"
+        "               10  SQLWARN0 PIC X.\n"
+        "               10  SQLWARN1 PIC X.\n"
+        "               10  SQLWARN2 PIC X.\n"
+        "               10  SQLWARN3 PIC X.\n"
+        "               10  SQLWARN4 PIC X.\n"
+        "               10  SQLWARN5 PIC X.\n"
+        "               10  SQLWARN6 PIC X.\n"
+        "               10  SQLWARN7 PIC X.\n"
+        "           05  SQLSTATE    PIC X(5).\n"
+    )
+
+    def _needs_upgrade(p: Path) -> bool:
+        if not p.exists():
+            return True
+        try:
+            text = p.read_text(encoding="utf-8", errors="ignore")
+        except Exception:
+            return True
+        # Minimal stubs often miss SQLERRMC/SQLERRD/SQLWARN
+        return ("SQLERRMC" not in text) or ("SQLERRD" not in text) or ("SQLWARN0" not in text)
+
+    if _needs_upgrade(path):
         fs.write_text(str(path), body, encoding="utf-8", atomic=True)
         write_sidecar_hash(path)
         write_meta(path, kind="copybook", extra={"name": "SQLCA"})
+
+    if _needs_upgrade(alias):
+        fs.write_text(str(alias), body, encoding="utf-8", atomic=True)
+        write_sidecar_hash(alias)
+        write_meta(alias, kind="copybook", extra={"name": "sqlca"})
+
     return path
 
 

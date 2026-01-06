@@ -479,6 +479,37 @@ def _clean_markdown_cobol(text: str) -> str:
         return m.group(1).strip()
     return text.replace("```", "").strip()
 
+def _wrap_long_lines_fixed(code: str, max_len: int) -> str:
+    """Wrap long PROCEDURE DIVISION lines for FIXED format without touching literals."""
+    out: List[str] = []
+    in_proc = False
+    for line in code.splitlines():
+        stripped = line.rstrip()
+        upper = stripped.strip().upper()
+        if "PROCEDURE DIVISION" in upper:
+            in_proc = True
+        if not in_proc or len(stripped) <= max_len:
+            out.append(stripped)
+            continue
+        # Do not wrap lines with literals or EXEC SQL blocks
+        if "'" in stripped or "\"" in stripped:
+            out.append(stripped)
+            continue
+        if "EXEC SQL" in upper or "END-EXEC" in upper:
+            out.append(stripped)
+            continue
+
+        indent = re.match(r"^\s*", stripped).group(0)
+        content = stripped.strip()
+        while len(indent + content) > max_len:
+            cut = content.rfind(" ", 0, max_len - len(indent))
+            if cut <= 0:
+                break
+            out.append(indent + content[:cut].rstrip())
+            content = content[cut + 1:].lstrip()
+        out.append(indent + content)
+    return "\n".join(out)
+
 
 def _generate_with_validation(prompt_base: str, system: str, program_id: str, layer: str,
                               entity: str, norm: Dict, config: Dict) -> (str, str):
@@ -487,6 +518,11 @@ def _generate_with_validation(prompt_base: str, system: str, program_id: str, la
     for attempt in range(2):
         resp = llm_auto.generate(prompt=last_prompt, system=system, config=config)
         clean = _clean_markdown_cobol(resp)
+        fmt = norm.get("cobol_format", {}) or {}
+        if fmt.get("line_format") == "fixed":
+            max_len = fmt.get("max_line_length")
+            if isinstance(max_len, int) and max_len > 0:
+                clean = _wrap_long_lines_fixed(clean, max_len)
         errors = _validate_program(clean, program_id, layer, entity, norm)
         if not errors:
             return clean, last_prompt
@@ -524,7 +560,7 @@ def _build_strict_prompt(program_id: str, layer: str, entity: str, norm: Dict, i
             elif "VARCHAR" in t:
                 m = re.search(r'VARCHAR\((\d+)\)', t)
                 l = m.group(1) if m else "30"
-                pic = f"A({l})"
+                pic = f"X({l})"
             elif "DECIMAL" in t:
                 pic = "9(6)V99"
             else:
@@ -994,6 +1030,16 @@ def _validate_program(code: str, program_id: str, layer: str, entity: str, norm:
     if allow_sql:
         if "EXEC SQL" not in code.upper():
             errors.append("Le programme doit contenir des EXEC SQL (spec).")
+        # Assure SQLCA si SQL present (OCESQL en depend)
+        if "EXEC SQL" in upper_code:
+            has_sqlca = (
+                "INCLUDE SQLCA" in upper_code
+                or "COPY SQLCA" in upper_code
+                or "COPY \"SQLCA" in upper_code
+                or "01  SQLCA." in upper_code
+            )
+            if not has_sqlca:
+                errors.append("SQLCA manquante: ajouter EXEC SQL INCLUDE SQLCA END-EXEC.")
     else:
         if "EXEC SQL" in code.upper():
             errors.append("EXEC SQL interdit par la spec.")
@@ -1016,10 +1062,40 @@ def _validate_program(code: str, program_id: str, layer: str, entity: str, norm:
             return True
         return False
 
+    def _is_data_entry(line: str) -> bool:
+        return re.match(r"^\s*(01|05|77|88)\b", line) is not None
+
+    in_data = False
+    in_proc = False
     for line in lines:
+        upper = line.strip().upper()
+        if "DATA DIVISION" in upper:
+            in_data = True
+        if "PROCEDURE DIVISION" in upper:
+            in_proc = True
         if line.strip().endswith(".") and not _is_allowed_dot_line(line):
+            if in_data and not in_proc and _is_data_entry(line):
+                continue
             errors.append("Point final interdit sur instruction (utiliser '.' uniquement sur ligne seule).")
             break
+
+    # DATA DIVISION: lignes avec PIC/VALUE doivent finir par un point
+    in_data = False
+    in_proc = False
+    for line in lines:
+        upper = line.strip().upper()
+        if "DATA DIVISION" in upper:
+            in_data = True
+        if "PROCEDURE DIVISION" in upper:
+            in_proc = True
+        if not in_data or in_proc:
+            continue
+        if _is_data_entry(line) and re.search(r"\b(PIC|VALUE)\b", upper):
+            if not line.strip().endswith("."):
+                errors.append(
+                    "Ligne DATA avec PIC/VALUE doit se terminer par un point."
+                )
+                break
 
     # Interdictions explicites (spec globale + programme)
     forbidden_spec: List[str] = []

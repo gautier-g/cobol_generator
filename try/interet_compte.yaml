@@ -1,0 +1,951 @@
+# Exemple 2 - Interet compte (INTEREST_AMOUNT = BALANCE_BRUT * RATE / 100)
+title: CALCUL-INTERET
+dialecte_cobol: gnucobol
+sql_cible: postgres
+
+nommage:
+  variables_case: UPPER_SNAKE      # ex : BALANCE_NET, END-OF-FILE
+  programmes_case: UPPER-KEBAB     # ex : ACCOUNT-DAL-DB, ACCOUNT-LOGIC
+
+cobol_format:
+  line_format: fixed
+  indent_spaces: 7
+  max_line_length: 72
+  comment:
+    column: 7
+    prefix: "*"
+  literal_quotes: single
+  paragraph_terminator: "."
+  allow_source_format_directive: false
+
+naming_rules:
+  prefixes:
+    working_storage: "WS-"
+    linkage: "LK-"
+    flags: "WS-"
+  paragraph_style: "VERB-NOUN"
+
+fonctionnalites:
+  - id: F1
+    resume: "Calculer les interets et le solde net pour chaque compte."
+
+exigences:
+  - id: R1
+    type: regle_metier
+    regle: "INTEREST_AMOUNT = ROUND(BALANCE_BRUT * INTEREST_RATE / 100, 2); BALANCE_NET = BALANCE_BRUT + INTEREST_AMOUNT"
+    notes: "Interet uniquement si BALANCE_BRUT >= 0. Arrondi bancaire a 2 decimales."
+  - id: R2
+    type: technique
+    regle: "Traitement batch journalier; journalisation console."
+  - id: R3
+    type: validation
+    regle: "Si BALANCE_BRUT ou INTEREST_RATE sont NULL ou invalides, signaler une anomalie et ignorer la ligne."
+  - id: R4
+    type: validation
+    regle: "Si BALANCE_BRUT < 0 alors INTEREST_AMOUNT = 0 et BALANCE_NET = BALANCE_BRUT."
+
+mcd:
+  entites:
+    - name: ACCOUNT
+      attrs:
+        - name: ACC_ID
+          type: INT
+          sql_type: INT
+          cobol_pic: "9(6)"
+          pk: true
+          nullable: false
+        - name: ACC_HOLDER
+          type: VARCHAR(40)
+          sql_type: VARCHAR(40)
+          cobol_pic: "X(40)"
+          nullable: false
+        - name: BALANCE_BRUT
+          type: DECIMAL(11,2)
+          sql_type: DECIMAL(11,2)
+          cobol_pic: "S9(9)V99"
+          nullable: false
+        - name: INTEREST_RATE
+          type: DECIMAL(5,2)
+          sql_type: DECIMAL(5,2)
+          cobol_pic: "S9(3)V99"
+          nullable: false
+        - name: INTEREST_AMOUNT
+          type: DECIMAL(11,2)
+          sql_type: DECIMAL(11,2)
+          cobol_pic: "S9(9)V99"
+          nullable: true
+        - name: BALANCE_NET
+          type: DECIMAL(11,2)
+          sql_type: DECIMAL(11,2)
+          cobol_pic: "S9(9)V99"
+          nullable: true
+  relations: []
+
+diagramme: |
+  erDiagram
+    ACCOUNT {
+      INT ACC_ID PK
+      VARCHAR ACC_HOLDER
+      DECIMAL BALANCE_BRUT
+      DECIMAL INTEREST_RATE
+      DECIMAL INTEREST_AMOUNT
+      DECIMAL BALANCE_NET
+    }
+
+sql:
+  ddl:
+    ACCOUNT: |
+      CREATE TABLE ACCOUNT (
+          ACC_ID INT PRIMARY KEY,
+          ACC_HOLDER VARCHAR(40),
+          BALANCE_BRUT DECIMAL(11,2),
+          INTEREST_RATE DECIMAL(5,2),
+          INTEREST_AMOUNT DECIMAL(11,2),
+          BALANCE_NET DECIMAL(11,2)
+      );
+  initial_data:
+    ACCOUNT:
+      - ACC_ID: 10
+        ACC_HOLDER: "Martin"
+        BALANCE_BRUT: 1500.00
+        INTEREST_RATE: 1.50
+        INTEREST_AMOUNT: 0.00
+        BALANCE_NET: 0.00
+      - ACC_ID: 20
+        ACC_HOLDER: "Leroy"
+        BALANCE_BRUT: 2500.00
+        INTEREST_RATE: 2.00
+        INTEREST_AMOUNT: 0.00
+        BALANCE_NET: 0.00
+  indexes:
+    - entity: ACCOUNT
+      name: ACCOUNT_ACC_HOLDER_IDX
+      columns: [ACC_HOLDER]
+  connection:
+    engine: postgres
+    method: ocesql
+    dbname: bankdb
+    user: bankuser
+    password: BANKPWD
+    host: localhost
+    port: 5432
+    env_vars:
+      PGHOST: "localhost"
+      PGPORT: "5432"
+      PGUSER: "bankuser"
+      PGPASSWORD: "BANKPWD"
+      PGDATABASE: "bankdb"
+    env_set_method:
+      - "DISPLAY <ENV_NAME> UPON ENVIRONMENT-NAME"
+      - "DISPLAY <ENV_VALUE> UPON ENVIRONMENT-VALUE"
+    ocesql:
+      start_call: "OCESQLStartSQL"
+      connect_call: "OCESQLConnect"
+      end_call: "OCESQLEndSQL"
+      connect_args:
+        - "SQLCA"
+        - "WS-DB-USER"
+        - "WS-DB-USER-LEN"
+        - "WS-DB-PASSWORD"
+        - "WS-DB-PASSWORD-LEN"
+        - "WS-DB-NAME"
+        - "WS-DB-NAME-LEN"
+      connect_args_order_note: "order: SQLCA, user, user_len, password, password_len, dbname, dbname_len"
+  behavior:
+    check_sqlcode: true
+    check_sqlstate: true
+    sqlcode_success: 0
+    sqlcode_eof: 100
+    rollback_on_error: false
+    commit:
+      mode: "end"
+      statement: "EXEC SQL COMMIT END-EXEC."
+    disconnect:
+      statement: "EXEC SQL DISCONNECT ALL END-EXEC."
+    null_indicators: false
+    cursor_commit_policy: "no_commit_while_open"
+  formatting:
+    max_line_length: 72
+    host_vars_one_per_line: true
+    split_long_exec_sql: true
+
+mapping_types:
+  - sql: "INT"
+    cobol_pic_default: "9(6)"
+  - sql: "VARCHAR(40)"
+    cobol_pic_default: "X(40)"
+  - sql: "DECIMAL(11,2)"
+    cobol_pic_default: "S9(9)V99"
+  - sql: "DECIMAL(5,2)"
+    cobol_pic_default: "S9(3)V99"
+
+technique:
+  cursor_naming:
+    pattern: "C_<ENTITY_UPPER3>"
+    example:
+      ACCOUNT: "C_ACC"
+  eof_flag:
+    name: "END-OF-FILE"
+    pic: "X"
+    initial_value: "N"
+    true_value: "Y"
+    false_value: "N"
+  sqlca_required: true
+  dal_call_pattern:
+    description: "Programme DAL appele avec un code operation court (READ, SAVE, END)."
+    operation_param_name: "OPERATION"
+    operation_pic: "X(4)"
+    eof_param_name: "END-OF-FILE"
+    employee_param_name: "ACCOUNT"
+
+prompting:
+  global_constraints:
+    - "Reponds uniquement avec du code COBOL compilable, sans Markdown ni texte autour."
+    - "La premiere ligne doit etre IDENTIFICATION DIVISION."
+    - "Un seul PROGRAM-ID, pas de sous-programmes."
+  forbidden_items:
+    - "GO TO"
+    - "*>"
+  global_directives:
+    - "Utilise strictement les identifiants, messages, SQL et sequences definis dans la spec."
+    - "N'invente aucune variable, paragraphe, message ou SQL."
+    - "Respecte exactement les listes de WORKING-STORAGE, LINKAGE et USING."
+    - "Toujours utiliser les terminateurs explicites END-IF / END-EVALUATE / END-PERFORM / END-EXEC."
+    - "Pas de GO TO, pas de logique DAL dans LOGIC, pas de SQL hors DAL."
+    - "Toute variable utilisee doit etre declaree (WORKING-STORAGE ou LINKAGE)."
+    - "Chaque paragraphe DOIT etre declare sur une ligne avec un point (ex: MAIN-ENTRY.)."
+    - "Ne termine aucune instruction par un point (sauf EXEC SQL INCLUDE SQLCA END-EXEC.); seul un point sur une ligne seule termine un paragraphe."
+    - "Dans DATA DIVISION (WORKING-STORAGE/LINKAGE), toute ligne 01/05/77/88 avec PIC ou VALUE doit se terminer par un point. Regle non applicable en PROCEDURE DIVISION."
+  generation_strategy:
+    - "1) Construis d'abord le squelette COBOL complet (DIVISION/SECTION) dans l'ordre."
+    - "2) Insere les blocs WORKING-STORAGE/LINKAGE exacts fournis par la spec."
+    - "3) Ecris la PROCEDURE DIVISION en suivant le flow et les fonctions."
+    - "4) Verifie la coherence: aucune variable/paragraphes inventes."
+  formatting_guidelines:
+    - "Format FIXED: instructions commencent en colonne 8 (prefixe de 7 espaces)."
+    - "Commentaires: '*' en colonne 7 (6 espaces + '*'), pas de commentaires '*>'."
+    - "Ne pas utiliser '>>SOURCE FORMAT FREE'."
+    - "Terminer chaque paragraphe par une ligne avec un seul point."
+    - "Le nom du paragraphe se termine par un point (ex: MAIN-ENTRY.)."
+    - "En DATA DIVISION, chaque ligne 01/05/77/88 avec PIC ou VALUE se termine par un point."
+    - "Aucune ligne ne doit depasser 72 colonnes (format FIXED)."
+    - "Si une instruction depasse 72 colonnes, la scinder sur plusieurs lignes."
+    - "Pour EXEC SQL FETCH/SELECT/UPDATE: mettre chaque variable hote sur sa propre ligne."
+    - "Ne pas mettre de point en fin de DISPLAY/GOBACK/STOP RUN/CALL/MOVE/IF (sauf EXEC SQL INCLUDE SQLCA END-EXEC.)."
+    - "Utiliser des guillemets simples pour les messages DISPLAY."
+    - "Respecter l'ordre: IDENTIFICATION -> ENVIRONMENT -> DATA -> PROCEDURE."
+    - "Dans DATA: WORKING-STORAGE puis LINKAGE (si present)."
+  programs:
+    ACCOUNT-DAL-DB:
+      sections_order: [strategy, context, style, format, naming, environment, interface, structure, working_storage, sql, sql_format, sql_behavior, flow, logging, constraints, skeleton, fonctions]
+      context:
+        - "SGBD: {sql_cible}. Dialecte COBOL: {dialecte_cobol}."
+        - "Table {entity}: {table_signature}"
+        - "Role: couche DAL pour {entity}."
+      style:
+        - "Guidelines globales: {formatting_guidelines}"
+        - "Header commentaire (verbatim):"
+        - "{header_comment_lines}"
+        - "Style specifique: {style_lines}"
+      environment:
+        - "ENVIRONMENT exact (lignes):"
+        - "{environment_lines}"
+      interface:
+        - "Interface CALL/USING attendue: {call_interface}"
+      structure:
+        - "LINKAGE attendu (exemple exact):"
+        - "{linkage_struct}"
+      working_storage:
+        - "Working-Storage obligatoire (lignes exactes, ordre conseille):"
+        - "{working_storage_lines}"
+      sql:
+        - "Connexion OCESQL: {connection_details}"
+        - "SQL utilises:"
+        - "{sql_statements}"
+      sql_format:
+        - "Format SQL en FIXED:"
+        - "{sql_formatting_details}"
+      flow:
+        - "Flux principal DAL:"
+        - "{flow_notes}"
+      logging:
+        - "Messages (verbatim) a afficher:"
+        - "{logging_lines}"
+      constraints:
+        - "Interdictions: {forbidden_items}"
+        - "Paragraphes publics attendus: {public_paragraphs}"
+        - "Paragraphes internes autorises: {internal_paragraphs}"
+        - "Entry paragraph: {entry_paragraph}"
+        - "Regles de bloc MAIN-ENTRY: {entry_block_rules}"
+        - "Sequence de sortie MAIN-ENTRY: {entry_exit_sequence}"
+        - "Contraintes par paragraphe: {paragraph_constraints}"
+        - "Statements obligatoires: {required_statements}"
+      skeleton:
+        - "Squelette attendu (rappel structure):"
+        - "IDENTIFICATION DIVISION."
+        - "PROGRAM-ID. {program_id}."
+        - "{header_comment_lines}"
+        - "ENVIRONMENT DIVISION."
+        - "CONFIGURATION SECTION."
+        - "REPOSITORY."
+        - "    FUNCTION ALL INTRINSIC."
+        - "DATA DIVISION."
+        - "WORKING-STORAGE SECTION."
+        - "{working_storage_lines}"
+        - "LINKAGE/USING exacts:"
+        - "{linkage_struct}"
+        - "{entry_paragraph}."
+      fonctions:
+        - "{function_details}"
+    ACCOUNT-LOGIC:
+      sections_order: [strategy, context, style, format, naming, environment, interface, working_storage, flow, logging, constraints, skeleton, fonctions]
+      context:
+        - "Regles metier: {business_rules}"
+        - "Batch: traiter tous les comptes."
+      style:
+        - "Guidelines globales: {formatting_guidelines}"
+        - "Header commentaire (verbatim):"
+        - "{header_comment_lines}"
+        - "Style specifique: {style_lines}"
+      environment:
+        - "ENVIRONMENT exact (lignes):"
+        - "{environment_lines}"
+      interface:
+        - "Programme DAL: {dal_program}"
+        - "Programme BUSINESS: {business_program}"
+        - "Interface DAL (CALL USING): {call_interface}"
+      working_storage:
+        - "Working-Storage obligatoire (lignes exactes):"
+        - "{working_storage_lines}"
+      flow:
+        - "Flux principal LOGIC:"
+        - "{flow_notes}"
+      logging:
+        - "Messages (verbatim) a afficher:"
+        - "{logging_lines}"
+      constraints:
+        - "Interdictions: {forbidden_items}"
+        - "Paragraphes publics attendus: {public_paragraphs}"
+        - "Entry paragraph: {entry_paragraph}"
+        - "Statements obligatoires: {required_statements}"
+      skeleton:
+        - "Squelette attendu (rappel structure):"
+        - "IDENTIFICATION DIVISION."
+        - "PROGRAM-ID. {program_id}."
+        - "{header_comment_lines}"
+        - "ENVIRONMENT DIVISION."
+        - "CONFIGURATION SECTION."
+        - "REPOSITORY."
+        - "    FUNCTION ALL INTRINSIC."
+        - "DATA DIVISION."
+        - "WORKING-STORAGE SECTION."
+        - "{working_storage_lines}"
+        - "PROCEDURE DIVISION."
+        - "{entry_paragraph}."
+      fonctions:
+        - "{function_details}"
+    ACCOUNT-BUSINESS:
+      sections_order: [strategy, context, style, format, naming, environment, interface, working_storage, logging, constraints, skeleton, fonctions]
+      context:
+        - "Role: couche presentation simple, affiche les valeurs."
+        - "Structure ACCOUNT: {entity_fields_list}"
+      style:
+        - "Guidelines globales: {formatting_guidelines}"
+        - "Header commentaire (verbatim):"
+        - "{header_comment_lines}"
+        - "Style specifique: {style_lines}"
+      environment:
+        - "ENVIRONMENT exact (lignes):"
+        - "{environment_lines}"
+      interface:
+        - "LINKAGE attendu (exemple exact):"
+        - "{linkage_struct}"
+      working_storage:
+        - "Working-Storage obligatoire (lignes exactes):"
+        - "{working_storage_lines}"
+      logging:
+        - "Lignes DISPLAY (verbatim):"
+        - "{display_lines}"
+      constraints:
+        - "Interdictions: {forbidden_items}"
+        - "Paragraphes publics attendus: {public_paragraphs}"
+        - "Entry paragraph: {entry_paragraph}"
+        - "Statements obligatoires: {required_statements}"
+      skeleton:
+        - "Squelette attendu (rappel structure):"
+        - "IDENTIFICATION DIVISION."
+        - "PROGRAM-ID. {program_id}."
+        - "{header_comment_lines}"
+        - "ENVIRONMENT DIVISION."
+        - "DATA DIVISION."
+        - "WORKING-STORAGE SECTION."
+        - "LINKAGE/USING exacts:"
+        - "{linkage_struct}"
+        - "{entry_paragraph}."
+      fonctions:
+        - "{function_details}"
+
+sources:
+  cobol:
+    - programme: ACCOUNT-DAL-DB
+      fichier: "account_dal_db.cob"
+    - programme: ACCOUNT-LOGIC
+      fichier: "account_logic.cob"
+    - programme: ACCOUNT-BUSINESS
+      fichier: "account_business.cob"
+  sql:
+    - logical_name: "ACCOUNT-INIT"
+      fichier: "account_init.sql"
+      entity: ACCOUNT
+
+programmes:
+  - name: ACCOUNT-DAL-DB
+    layer: dal
+    role: "Couche d'acces a la base pour ACCOUNT (lecture via curseur et mise a jour des interets)."
+    entities: [ACCOUNT]
+    allowed_sql: true
+    allowed_business_logic: false
+    allow_display: true
+    header_comment_lines:
+      - "      *****************************************************************"
+      - "      * Programme: ACCOUNT-DAL-DB                                      *"
+      - "      * Couche: DAL (Data Access Layer)                                *"
+      - "      * Role: Acces a la base PostgreSQL pour ACCOUNT                  *"
+      - "      *       Operations: READ, SAVE, END                              *"
+      - "      *****************************************************************"
+    style_lines:
+      - "CALL OCESQL avec guillemets doubles et END-CALL."
+      - "OCESQLConnect avec BY REFERENCE/ BY VALUE (ordre exact)."
+      - "EXIT PARAGRAPH sur erreur OPEN du curseur."
+      - "EVALUATE SQLCODE apres FETCH."
+      - "Apres DAL-CONNECT, si NOT WS-CONNECTED:"
+      - "MOVE 'Y' TO LK-END-OF-FILE puis GOBACK."
+      - "MAIN-ENTRY finit par END-EVALUATE, puis GOBACK, puis '.'"
+    required_lines:
+      - "      *****************************************************************"
+      - "      * Programme: ACCOUNT-DAL-DB                                      *"
+      - "      * Couche: DAL (Data Access Layer)                                *"
+      - "      * Role: Acces a la base PostgreSQL pour ACCOUNT                  *"
+      - "      *       Operations: READ, SAVE, END                              *"
+      - "      *****************************************************************"
+    environment_lines:
+      - "ENVIRONMENT DIVISION."
+      - "CONFIGURATION SECTION."
+      - "REPOSITORY."
+      - "    FUNCTION ALL INTRINSIC."
+    main_cursor: "C_ACC"
+    internal_paragraphs: ["DAL-CONNECT", "DAL-SET-ENV"]
+    working_storage_lines:
+      - "EXEC SQL INCLUDE SQLCA END-EXEC."
+      - "01  WS-CONNECTED-FLAG      PIC X VALUE 'N'."
+      - "88  WS-CONNECTED           VALUE 'Y'."
+      - "01  WS-CURSOR-OPEN-FLAG    PIC X VALUE 'N'."
+      - "88  WS-CURSOR-OPEN         VALUE 'Y'."
+      - "01  WS-ACC-ID              PIC 9(6)."
+      - "01  WS-ACC-HOLDER          PIC X(40)."
+      - "01  WS-BALANCE-BRUT        PIC S9(9)V99."
+      - "01  WS-INTEREST-RATE       PIC S9(3)V99."
+      - "01  WS-INTEREST-AMOUNT     PIC S9(9)V99."
+      - "01  WS-BALANCE-NET         PIC S9(9)V99."
+      - "01  WS-DB-NAME."
+      - "05  WS-DB-NAME-TEXT     PIC X(6) VALUE 'bankdb'."
+      - "05  WS-DB-NAME-TERM     PIC X VALUE X'00'."
+      - "01  WS-DB-USER."
+      - "05  WS-DB-USER-TEXT     PIC X(8) VALUE 'bankuser'."
+      - "05  WS-DB-USER-TERM     PIC X VALUE X'00'."
+      - "01  WS-DB-PASSWORD."
+      - "05  WS-DB-PASSWORD-TEXT PIC X(7) VALUE 'BANKPWD'."
+      - "05  WS-DB-PASSWORD-TERM PIC X VALUE X'00'."
+      - "01  WS-DB-NAME-LEN         PIC S9(4) COMP-5 VALUE 6."
+      - "01  WS-DB-USER-LEN         PIC S9(4) COMP-5 VALUE 8."
+      - "01  WS-DB-PASSWORD-LEN     PIC S9(4) COMP-5 VALUE 7."
+      - "01  WS-PGHOST-NAME         PIC X(6) VALUE 'PGHOST'."
+      - "01  WS-PGHOST-VALUE        PIC X(64) VALUE 'localhost'."
+      - "01  WS-PGPORT-NAME         PIC X(6) VALUE 'PGPORT'."
+      - "01  WS-PGPORT-VALUE        PIC X(5) VALUE '5432'."
+      - "01  WS-PGUSER-NAME         PIC X(6) VALUE 'PGUSER'."
+      - "01  WS-PGUSER-VALUE        PIC X(64) VALUE 'bankuser'."
+      - "01  WS-PGPASSWORD-NAME     PIC X(10) VALUE 'PGPASSWORD'."
+      - "01  WS-PGPASSWORD-VALUE    PIC X(64) VALUE 'BANKPWD'."
+      - "01  WS-PGDATABASE-NAME     PIC X(10) VALUE 'PGDATABASE'."
+      - "01  WS-PGDATABASE-VALUE    PIC X(64) VALUE 'bankdb'."
+    flow:
+      - "MAIN-ENTRY: IF LK-OPERATION NOT = 'END ' THEN PERFORM DAL-CONNECT; IF NOT WS-CONNECTED THEN MOVE 'Y' TO LK-END-OF-FILE, GOBACK; END-IF; END-IF"
+      - "EVALUATE LK-OPERATION: READ->DAL-READ-ACCOUNT, SAVE->DAL-SAVE-ACCOUNT, END->DAL-END, OTHER->DISPLAY erreur"
+      - "GOBACK apres EVALUATE"
+      - "DAL-READ-ACCOUNT: ouverture curseur paresseuse, FETCH, mise a jour EOF"
+      - "DAL-SAVE-ACCOUNT: UPDATE INTEREST_AMOUNT et BALANCE_NET"
+      - "DAL-END: CLOSE cursor, COMMIT, DISCONNECT, reset flags"
+    entry_block_rules:
+      - condition_regex: "^\\s*IF\\s+LK-OPERATION\\s+NOT\\s+(=|EQUAL)\\s+'END '\\s*$"
+        must_contain:
+          - "PERFORM DAL-CONNECT"
+          - "IF NOT WS-CONNECTED"
+          - "MOVE 'Y' TO LK-END-OF-FILE"
+          - "GOBACK"
+    entry_exit_sequence:
+      paragraph: "MAIN-ENTRY"
+      must_follow_order:
+        - "END-EVALUATE"
+        - "GOBACK"
+        - "."
+    paragraph_constraints:
+      - paragraph: "DAL-READ-ACCOUNT"
+        forbid_contains:
+          - "PERFORM DAL-CONNECT"
+          - "IF NOT WS-CONNECTED"
+    required_statements:
+      - "GOBACK"
+      - "END-CALL"
+      - "BY REFERENCE"
+      - "BY VALUE"
+      - "EXIT PARAGRAPH"
+      - "EVALUATE SQLCODE"
+    allow_procedure_sections: false
+    require_working_storage_section: true
+    logging_lines:
+      - "Connexion DB reussie: bankdb"
+      - "ERREUR CONNECT: SQLCODE="
+      - "SQLSTATE="
+      - "SQLERRMC="
+      - "Curseur C_ACC ouvert"
+      - "ERREUR OPEN: SQLCODE="
+      - "ERREUR FETCH: SQLCODE="
+      - "ERREUR UPDATE: SQLCODE="
+      - "ERREUR CLOSE: SQLCODE="
+      - "ERREUR COMMIT: SQLCODE="
+      - "ERREUR DISCONNECT: SQLCODE="
+      - "ERREUR: Operation inconnue: "
+      - "Fermeture connexion"
+    call_interface:
+      type: "CALL USING"
+      description: "CALL 'ACCOUNT-DAL-DB' USING OPERATION, END-OF-FILE, ACCOUNT."
+      linkage_parameters:
+        - name: "LK-OPERATION"
+          pic: "X(4)"
+          direction: in
+        - name: "LK-END-OF-FILE"
+          pic: "X"
+          direction: inout
+        - name: "LK-ACCOUNT"
+          pic: "groupe ACCOUNT"
+          direction: inout
+      operations:
+        read: "READ"
+        save: "SAVE"
+        end: "END "
+    cobol_sections:
+      identification_division: required
+      environment_division: required
+      data_division:
+        working_storage: required
+        linkage: required
+      procedure_division:
+        using_clause: ["LK-OPERATION", "LK-END-OF-FILE", "LK-ACCOUNT"]
+        entry_paragraph: "MAIN-ENTRY"
+
+  - name: ACCOUNT-LOGIC
+    layer: logic
+    role: "Traitement batch principal : boucle sur les comptes, calcul des interets, sauvegarde, affichage."
+    entities: [ACCOUNT]
+    allowed_sql: false
+    allowed_business_logic: true
+    allow_display: true
+    header_comment_lines:
+      - "      *****************************************************************"
+      - "      * Programme: ACCOUNT-LOGIC                                       *"
+      - "      * Couche: LOGIC (Orchestration)                                  *"
+      - "      * Role: Traitement batch principal                               *"
+      - "      *       - Boucle sur les comptes                                 *"
+      - "      *       - Calcul des interets et solde net                       *"
+      - "      *       - Sauvegarde en base                                     *"
+      - "      *       - Affichage des resultats                                *"
+      - "      *****************************************************************"
+    style_lines:
+      - "Utiliser commentaires de bloc pour les sections majeures."
+      - "Afficher les bandeaux debut et fin."
+      - "Bloc commentaire CALCULATE-INTEREST (verbatim):"
+      - "      *****************************************************************"
+      - "      * Regle metier R1: INTEREST_AMOUNT = ROUND(BALANCE_BRUT * RATE  *"
+      - "      * / 100, 2) et BALANCE_NET = BALANCE_BRUT + INTEREST_AMOUNT     *"
+      - "      *****************************************************************"
+    required_lines:
+      - "      *****************************************************************"
+      - "      * Programme: ACCOUNT-LOGIC                                       *"
+      - "      * Couche: LOGIC (Orchestration)                                  *"
+      - "      * Role: Traitement batch principal                               *"
+      - "      *       - Boucle sur les comptes                                 *"
+      - "      *       - Calcul des interets et solde net                       *"
+      - "      *       - Sauvegarde en base                                     *"
+      - "      *       - Affichage des resultats                                *"
+      - "      *****************************************************************"
+      - "      *****************************************************************"
+      - "      * Regle metier R1: INTEREST_AMOUNT = ROUND(BALANCE_BRUT * RATE  *"
+      - "      * / 100, 2) et BALANCE_NET = BALANCE_BRUT + INTEREST_AMOUNT     *"
+      - "      *****************************************************************"
+    environment_lines:
+      - "ENVIRONMENT DIVISION."
+      - "CONFIGURATION SECTION."
+      - "REPOSITORY."
+      - "    FUNCTION ALL INTRINSIC."
+    working_storage_lines:
+      - "01  END-OF-FILE            PIC X VALUE 'N'."
+      - "88  EOF-REACHED        VALUE 'Y'."
+      - "88  NOT-EOF            VALUE 'N'."
+      - "77  OPERATION              PIC X(4)."
+      - "77  WS-COUNT               PIC 9(4) VALUE 0."
+      - "01  ACCOUNT."
+      - "    05 ACC-ID              PIC 9(6)."
+      - "    05 ACC-HOLDER          PIC X(40)."
+      - "    05 BALANCE-BRUT        PIC S9(9)V99."
+      - "    05 INTEREST-RATE       PIC S9(3)V99."
+      - "    05 INTEREST-AMOUNT     PIC S9(9)V99."
+      - "    05 BALANCE-NET         PIC S9(9)V99."
+    flow:
+      - "Afficher le bandeau de debut"
+      - "READ initial via DAL (OPERATION='READ')"
+      - "Boucle jusqu'a EOF: incrementer WS-COUNT, CALCULATE-INTEREST, SAVE, BUSINESS display, READ suivant"
+      - "Appeler DAL avec OPERATION='END '"
+      - "Afficher le bandeau de fin avec le compteur"
+      - "STOP RUN"
+    logging_lines:
+      - "=========================================="
+      - "DEBUT TRAITEMENT BATCH CALCUL INTERET"
+      - "=========================================="
+      - "=========================================="
+      - "FIN TRAITEMENT BATCH"
+      - "Nombre comptes traites: "
+      - "=========================================="
+      - "ANOMALIE: Solde negatif, interet a 0"
+      - "ANOMALIE: BALANCE_BRUT invalide"
+      - "ANOMALIE: INTEREST_RATE invalide"
+    required_statements:
+      - "STOP RUN"
+      - "CALL 'ACCOUNT-DAL-DB' USING OPERATION, END-OF-FILE, ACCOUNT"
+      - "CALL 'ACCOUNT-BUSINESS' USING ACCOUNT"
+    allow_procedure_sections: false
+    require_working_storage_section: true
+    cobol_sections:
+      identification_division: required
+      environment_division: required
+      data_division:
+        working_storage: required
+        linkage: none
+      procedure_division:
+        entry_paragraph: "MAIN-PROCESS"
+
+  - name: ACCOUNT-BUSINESS
+    layer: business
+    role: "Affichage simple des informations d'un compte (titulaire, solde, interet)."
+    entities: [ACCOUNT]
+    allowed_sql: false
+    allowed_business_logic: "lecture_seule"
+    allow_display: true
+    header_comment_lines:
+      - "      *****************************************************************"
+      - "      * Programme: ACCOUNT-BUSINESS                                    *"
+      - "      * Couche: BUSINESS (Presentation)                                *"
+      - "      * Role: Affichage simple des informations compte                 *"
+      - "      *       - Titulaire, solde, interet, net                   *"
+      - "      *****************************************************************"
+    style_lines:
+      - "GOBACK en fin de paragraphe DISPLAY-ACCOUNT."
+    required_lines:
+      - "      *****************************************************************"
+      - "      * Programme: ACCOUNT-BUSINESS                                    *"
+      - "      * Couche: BUSINESS (Presentation)                                *"
+      - "      * Role: Affichage simple des informations compte                 *"
+      - "      *       - Titulaire, solde, interet, net                   *"
+      - "      *****************************************************************"
+    environment_lines:
+      - "ENVIRONMENT DIVISION."
+    working_storage_lines:
+      - "WORKING-STORAGE SECTION."
+    logging_lines:
+      - "----------------------------------------"
+      - "COMPTE : "
+      - "ID      : "
+      - "TITULAIRE: "
+      - "BRUT    : "
+      - "TAUX    : "
+      - "INTERET : "
+      - "NET     : "
+    required_statements:
+      - "GOBACK"
+    allow_procedure_sections: false
+    require_working_storage_section: true
+    call_interface:
+      type: "CALL USING"
+      description: "CALL 'ACCOUNT-BUSINESS' USING LK-ACCOUNT."
+      linkage_parameters:
+        - name: "LK-ACCOUNT"
+          pic: "groupe ACCOUNT"
+          direction: in
+    cobol_sections:
+      identification_division: required
+      environment_division: required
+      data_division:
+        working_storage: required
+        linkage: required
+      procedure_division:
+        using_clause: ["LK-ACCOUNT"]
+        entry_paragraph: "DISPLAY-ACCOUNT"
+
+fonctions:
+  - id: FN-DAL-CONNECT
+    name: DAL-CONNECT
+    programme: ACCOUNT-DAL-DB
+    layer: dal
+    visibility: internal
+    required: true
+    entity: ACCOUNT
+    description: >
+      Connexion paresseuse a la base via OCESQL. Initialise les variables
+      d'environnement PostgreSQL, puis execute OCESQLStartSQL/OCESQLConnect/OCESQLEndSQL.
+    inputs: []
+    outputs:
+      - "SQLCODE"
+      - "SQLSTATE"
+    modifies:
+      - "WS-CONNECTED"
+      - "SQLCODE"
+    steps:
+      - "IF NOT WS-CONNECTED"
+      - "  PERFORM DAL-SET-ENV"
+      - "  CALL \"OCESQLStartSQL\" END-CALL"
+      - "  CALL \"OCESQLConnect\" USING"
+      - "       BY REFERENCE SQLCA"
+      - "       BY REFERENCE WS-DB-USER"
+      - "       BY VALUE WS-DB-USER-LEN"
+      - "       BY REFERENCE WS-DB-PASSWORD"
+      - "       BY VALUE WS-DB-PASSWORD-LEN"
+      - "       BY REFERENCE WS-DB-NAME"
+      - "       BY VALUE WS-DB-NAME-LEN"
+      - "  END-CALL"
+      - "  CALL \"OCESQLEndSQL\" END-CALL"
+      - "SQLCODE=0: SET WS-CONNECTED TO TRUE, DISPLAY 'Connexion DB reussie: bankdb'"
+      - "Sinon: DISPLAY 'ERREUR CONNECT: SQLCODE=' SQLCODE, DISPLAY 'SQLSTATE=' SQLSTATE, DISPLAY 'SQLERRMC=' SQLERRMC"
+      - "END-IF"
+    related_exigences: [R2]
+    sql:
+      connection_method: "OCESQL (voir sql.connection)"
+      connection_calls:
+        - "CALL \"OCESQLStartSQL\" END-CALL"
+        - "CALL \"OCESQLConnect\" USING BY REFERENCE SQLCA BY REFERENCE WS-DB-USER BY VALUE WS-DB-USER-LEN BY REFERENCE WS-DB-PASSWORD BY VALUE WS-DB-PASSWORD-LEN BY REFERENCE WS-DB-NAME BY VALUE WS-DB-NAME-LEN END-CALL"
+        - "CALL \"OCESQLEndSQL\" END-CALL"
+    cobol_location:
+      fichier: "account_dal_db.cob"
+      programme: "ACCOUNT-DAL-DB"
+      division: "PROCEDURE DIVISION"
+      paragraph: "DAL-CONNECT"
+      section: "couche_dal"
+
+  - id: FN-DAL-SET-ENV
+    name: DAL-SET-ENV
+    programme: ACCOUNT-DAL-DB
+    layer: dal
+    visibility: internal
+    required: true
+    entity: ACCOUNT
+    description: >
+      Force les variables d'environnement PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDATABASE.
+    inputs: []
+    outputs: []
+    modifies: []
+    steps:
+      - "DISPLAY WS-PGHOST-NAME UPON ENVIRONMENT-NAME"
+      - "DISPLAY WS-PGHOST-VALUE UPON ENVIRONMENT-VALUE"
+      - "DISPLAY WS-PGPORT-NAME UPON ENVIRONMENT-NAME"
+      - "DISPLAY WS-PGPORT-VALUE UPON ENVIRONMENT-VALUE"
+      - "DISPLAY WS-PGUSER-NAME UPON ENVIRONMENT-NAME"
+      - "DISPLAY WS-PGUSER-VALUE UPON ENVIRONMENT-VALUE"
+      - "DISPLAY WS-PGPASSWORD-NAME UPON ENVIRONMENT-NAME"
+      - "DISPLAY WS-PGPASSWORD-VALUE UPON ENVIRONMENT-VALUE"
+      - "DISPLAY WS-PGDATABASE-NAME UPON ENVIRONMENT-NAME"
+      - "DISPLAY WS-PGDATABASE-VALUE UPON ENVIRONMENT-VALUE"
+    related_exigences: [R2]
+    cobol_location:
+      fichier: "account_dal_db.cob"
+      programme: "ACCOUNT-DAL-DB"
+      division: "PROCEDURE DIVISION"
+      paragraph: "DAL-SET-ENV"
+      section: "couche_dal"
+
+  - id: FN-DAL-READ
+    name: DAL-READ-ACCOUNT
+    programme: ACCOUNT-DAL-DB
+    layer: dal
+    visibility: public
+    required: true
+    entity: ACCOUNT
+    description: >
+      Ouvre le curseur C_ACC si necessaire, fait un FETCH et remplit la structure
+      ACCOUNT. Met END-OF-FILE a 'Y' en cas de fin de donnees ou d'erreur.
+    operation_code: "READ"
+    inputs:
+      - "OPERATION = 'READ'"
+      - "Connexion deja etablie par MAIN-ENTRY (sauf OPERATION='END ')."
+      - "Curseur non garanti ouvert (ouverture paresseuse)."
+    outputs:
+      - "ACCOUNT.ACC_ID"
+      - "ACCOUNT.ACC_HOLDER"
+      - "ACCOUNT.BALANCE_BRUT"
+      - "ACCOUNT.INTEREST_RATE"
+      - "ACCOUNT.INTEREST_AMOUNT"
+      - "ACCOUNT.BALANCE_NET"
+      - "END-OF-FILE"
+      - "SQLCODE"
+    modifies:
+      - "ACCOUNT.*"
+      - "END-OF-FILE"
+      - "WS-CONNECTED"
+      - "WS-CURSOR-OPEN"
+      - "SQLCODE"
+    preconditions: []
+    postconditions:
+      - "Si SQLCODE = 0 : ACCOUNT contient un enregistrement valide et END-OF-FILE = 'N'."
+      - "Si SQLCODE = 100 : fin de donnees, END-OF-FILE = 'Y'."
+      - "Si SQLCODE != 0 et != 100 : message d'erreur affiche et END-OF-FILE = 'Y'."
+    errors_flags:
+      - "SQLCODE = 0 : succes, une ligne lue."
+      - "SQLCODE = 100 : fin de curseur."
+      - "SQLCODE != 0 et != 100 : erreur SQL, le batch s'arrete logiquement."
+    steps:
+      - "Si curseur non ouvert: DECLARE C_ACC, OPEN C_ACC"
+      - "Sur erreur OPEN: DISPLAY 'ERREUR OPEN: SQLCODE=' SQLCODE, EOF='Y', EXIT PARAGRAPH"
+      - "Sur succes OPEN: SET WS-CURSOR-OPEN TO TRUE, SET WS-CONNECTED TO TRUE, DISPLAY 'Curseur C_ACC ouvert'"
+      - "FETCH C_ACC INTO WS-ACC-ID, WS-ACC-HOLDER, WS-BALANCE-BRUT, WS-INTEREST-RATE, WS-INTEREST-AMOUNT, WS-BALANCE-NET"
+      - "EVALUATE SQLCODE"
+      - "  WHEN 0: EOF='N', MOVE WS-* vers LK-*"
+      - "  WHEN 100: EOF='Y'"
+      - "  WHEN OTHER: DISPLAY 'ERREUR FETCH: SQLCODE=' SQLCODE, DISPLAY SQLSTATE, EOF='Y'"
+      - "END-EVALUATE"
+    related_exigences: [R2, R3]
+    sql:
+      declare_cursor: |
+        DECLARE C_ACC CURSOR FOR
+        SELECT ACC_ID, ACC_HOLDER, BALANCE_BRUT, INTEREST_RATE, INTEREST_AMOUNT, BALANCE_NET
+        FROM ACCOUNT
+        ORDER BY ACC_ID
+      open_cursor: "OPEN C_ACC"
+      fetch_cursor: "FETCH C_ACC INTO :WS-ACC-ID, :WS-ACC-HOLDER, :WS-BALANCE-BRUT, :WS-INTEREST-RATE, :WS-INTEREST-AMOUNT, :WS-BALANCE-NET"
+
+  - id: FN-DAL-SAVE
+    name: DAL-SAVE-ACCOUNT
+    programme: ACCOUNT-DAL-DB
+    layer: dal
+    visibility: public
+    required: true
+    entity: ACCOUNT
+    description: "Met a jour INTEREST_AMOUNT et BALANCE_NET pour le compte courant."
+    operation_code: "SAVE"
+    inputs:
+      - "OPERATION = 'SAVE'"
+      - "ACCOUNT.*"
+    outputs:
+      - "SQLCODE"
+    steps:
+      - "EXEC SQL UPDATE ACCOUNT SET INTEREST_AMOUNT = :WS-INTEREST-AMOUNT, BALANCE_NET = :WS-BALANCE-NET WHERE ACC_ID = :WS-ACC-ID END-EXEC"
+      - "IF SQLCODE != 0 THEN DISPLAY 'ERREUR UPDATE: SQLCODE=' SQLCODE"
+    related_exigences: [R1, R2]
+    sql:
+      update: |
+        UPDATE ACCOUNT
+        SET INTEREST_AMOUNT = :WS-INTEREST-AMOUNT,
+            BALANCE_NET = :WS-BALANCE-NET
+        WHERE ACC_ID = :WS-ACC-ID
+
+  - id: FN-DAL-END
+    name: DAL-END
+    programme: ACCOUNT-DAL-DB
+    layer: dal
+    visibility: public
+    required: true
+    entity: ACCOUNT
+    description: "Ferme le curseur, commit, disconnect."
+    operation_code: "END"
+    steps:
+      - "IF WS-CURSOR-OPEN THEN CLOSE C_ACC"
+      - "EXEC SQL COMMIT END-EXEC"
+      - "EXEC SQL DISCONNECT ALL END-EXEC"
+      - "MOVE 'N' TO WS-CONNECTED-FLAG"
+      - "MOVE 'N' TO WS-CURSOR-OPEN-FLAG"
+      - "DISPLAY 'Fermeture connexion'"
+
+  - id: FN-LOGIC-MAIN
+    name: MAIN-PROCESS
+    programme: ACCOUNT-LOGIC
+    layer: logic
+    visibility: public
+    required: true
+    entity: ACCOUNT
+    description: "Orchestre le batch: lecture, calcul, sauvegarde, affichage."
+    steps:
+      - "DISPLAY bandeau debut"
+      - "MOVE 'READ' TO OPERATION"
+      - "CALL 'ACCOUNT-DAL-DB' USING OPERATION, END-OF-FILE, ACCOUNT"
+      - "PERFORM UNTIL END-OF-FILE = 'Y'"
+      - "  ADD 1 TO WS-COUNT"
+      - "  PERFORM CALCULATE-INTEREST"
+      - "  MOVE 'SAVE' TO OPERATION"
+      - "  CALL 'ACCOUNT-DAL-DB' USING OPERATION, END-OF-FILE, ACCOUNT"
+      - "  CALL 'ACCOUNT-BUSINESS' USING ACCOUNT"
+      - "  MOVE 'READ' TO OPERATION"
+      - "  CALL 'ACCOUNT-DAL-DB' USING OPERATION, END-OF-FILE, ACCOUNT"
+      - "END-PERFORM"
+      - "MOVE 'END ' TO OPERATION"
+      - "CALL 'ACCOUNT-DAL-DB' USING OPERATION, END-OF-FILE, ACCOUNT"
+      - "DISPLAY bandeau fin"
+      - "STOP RUN"
+    related_exigences: [R1, R2]
+
+  - id: FN-LOGIC-CALC
+    name: CALCULATE-INTEREST
+    programme: ACCOUNT-LOGIC
+    layer: logic
+    visibility: public
+    required: true
+    entity: ACCOUNT
+    description: "Calcule INTEREST_AMOUNT et BALANCE_NET avec controle des anomalies."
+    steps:
+      - "IF BALANCE-BRUT < 0"
+      - "  MOVE 0 TO INTEREST-AMOUNT"
+      - "  MOVE BALANCE-BRUT TO BALANCE-NET"
+      - "  DISPLAY 'ANOMALIE: Solde negatif, interet a 0'"
+      - "ELSE"
+      - "  COMPUTE INTEREST-AMOUNT ROUNDED = BALANCE-BRUT * INTEREST-RATE / 100"
+      - "  COMPUTE BALANCE-NET ROUNDED = BALANCE-BRUT + INTEREST-AMOUNT"
+      - "END-IF"
+    related_exigences: [R1, R4]
+    cobol_location:
+      programme: "ACCOUNT-LOGIC"
+      paragraph: "CALCULATE-INTEREST"
+
+  - id: FN-BUSINESS-DISPLAY
+    name: DISPLAY-ACCOUNT
+    programme: ACCOUNT-BUSINESS
+    layer: business
+    visibility: public
+    required: true
+    entity: ACCOUNT
+    description: "Affiche le compte (id, titulaire, solde, taux, interet, net)."
+    display_lines:
+      - "DISPLAY '----------------------------------------'"
+      - "DISPLAY 'COMPTE : '"
+      - "DISPLAY 'ID      : ' ACC-ID"
+      - "DISPLAY 'TITULAIRE: ' ACC-HOLDER"
+      - "DISPLAY 'BRUT    : ' BALANCE-BRUT"
+      - "DISPLAY 'TAUX    : ' INTEREST-RATE"
+      - "DISPLAY 'INTERET : ' INTEREST-AMOUNT"
+      - "DISPLAY 'NET     : ' BALANCE-NET"
+    steps:
+      - "DISPLAY '----------------------------------------'"
+      - "DISPLAY 'COMPTE : '"
+      - "DISPLAY 'ID      : ' ACC-ID"
+      - "DISPLAY 'TITULAIRE: ' ACC-HOLDER"
+      - "DISPLAY 'BRUT    : ' BALANCE-BRUT"
+      - "DISPLAY 'TAUX    : ' INTEREST-RATE"
+      - "DISPLAY 'INTERET : ' INTEREST-AMOUNT"
+      - "DISPLAY 'NET     : ' BALANCE-NET"
+      - "GOBACK"
+    related_exigences: [R2]

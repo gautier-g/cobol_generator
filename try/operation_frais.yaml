@@ -1,0 +1,1004 @@
+# Exemple 3 - Frais operation (FEE_AMOUNT = AMOUNT_BRUT * FEE_RATE / 100)
+title: CALCUL-FRAIS-OPERATION
+dialecte_cobol: gnucobol
+sql_cible: postgres
+
+nommage:
+  variables_case: UPPER_SNAKE      # ex : AMOUNT_NET, END-OF-FILE
+  programmes_case: UPPER-KEBAB     # ex : OPERATION-DAL-DB, OPERATION-LOGIC
+
+cobol_format:
+  line_format: fixed
+  indent_spaces: 7
+  max_line_length: 72
+  comment:
+    column: 7
+    prefix: "*"
+  literal_quotes: single
+  paragraph_terminator: "."
+  allow_source_format_directive: false
+
+naming_rules:
+  prefixes:
+    working_storage: "WS-"
+    linkage: "LK-"
+    flags: "WS-"
+  paragraph_style: "VERB-NOUN"
+
+fonctionnalites:
+  - id: F1
+    resume: "Calculer les frais et le montant net pour chaque operation bancaire."
+
+exigences:
+  - id: R1
+    type: regle_metier
+    regle: "FEE_AMOUNT = ROUND(AMOUNT_BRUT * FEE_RATE / 100, 2); AMOUNT_NET = AMOUNT_BRUT +/- FEE_AMOUNT; OP_STATUS = 'OK'"
+    notes: "Si OP_TYPE = 'DEBIT' alors AMOUNT_NET = AMOUNT_BRUT + FEE_AMOUNT; si OP_TYPE = 'CREDIT' alors AMOUNT_NET = AMOUNT_BRUT - FEE_AMOUNT."
+  - id: R2
+    type: technique
+    regle: "Traitement batch journalier; journalisation console."
+  - id: R3
+    type: validation
+    regle: "Si AMOUNT_BRUT <= 0 alors FEE_AMOUNT = 0, AMOUNT_NET = 0, OP_STATUS = 'ERR' et signaler une anomalie."
+  - id: R4
+    type: validation
+    regle: "Si OP_TYPE n'est pas 'DEBIT' ni 'CREDIT', OP_STATUS = 'ERR', FEE_AMOUNT = 0, AMOUNT_NET = 0, signaler une anomalie."
+  - id: R5
+    type: validation
+    regle: "Si FEE_RATE < 0, OP_STATUS = 'ERR', FEE_AMOUNT = 0, AMOUNT_NET = 0, signaler une anomalie."
+
+mcd:
+  entites:
+    - name: OPERATION
+      attrs:
+        - name: OP_ID
+          type: INT
+          sql_type: INT
+          cobol_pic: "9(6)"
+          pk: true
+          nullable: false
+        - name: ACC_ID
+          type: INT
+          sql_type: INT
+          cobol_pic: "9(6)"
+          nullable: false
+        - name: OP_TYPE
+          type: VARCHAR(6)
+          sql_type: VARCHAR(6)
+          cobol_pic: "X(6)"
+          nullable: false
+        - name: AMOUNT_BRUT
+          type: DECIMAL(11,2)
+          sql_type: DECIMAL(11,2)
+          cobol_pic: "S9(9)V99"
+          nullable: false
+        - name: FEE_RATE
+          type: DECIMAL(5,2)
+          sql_type: DECIMAL(5,2)
+          cobol_pic: "S9(3)V99"
+          nullable: false
+        - name: FEE_AMOUNT
+          type: DECIMAL(11,2)
+          sql_type: DECIMAL(11,2)
+          cobol_pic: "S9(9)V99"
+          nullable: true
+        - name: AMOUNT_NET
+          type: DECIMAL(11,2)
+          sql_type: DECIMAL(11,2)
+          cobol_pic: "S9(9)V99"
+          nullable: true
+        - name: OP_STATUS
+          type: VARCHAR(10)
+          sql_type: VARCHAR(10)
+          cobol_pic: "X(10)"
+          nullable: true
+  relations: []
+
+diagramme: |
+  erDiagram
+    OPERATION {
+      INT OP_ID PK
+      INT ACC_ID
+      VARCHAR OP_TYPE
+      DECIMAL AMOUNT_BRUT
+      DECIMAL FEE_RATE
+      DECIMAL FEE_AMOUNT
+      DECIMAL AMOUNT_NET
+      VARCHAR OP_STATUS
+    }
+
+sql:
+  ddl:
+    OPERATION: |
+      CREATE TABLE OPERATION (
+          OP_ID INT PRIMARY KEY,
+          ACC_ID INT,
+          OP_TYPE VARCHAR(6),
+          AMOUNT_BRUT DECIMAL(11,2),
+          FEE_RATE DECIMAL(5,2),
+          FEE_AMOUNT DECIMAL(11,2),
+          AMOUNT_NET DECIMAL(11,2),
+          OP_STATUS VARCHAR(10)
+      );
+  initial_data:
+    OPERATION:
+      - OP_ID: 100
+        ACC_ID: 10
+        OP_TYPE: "DEBIT"
+        AMOUNT_BRUT: 1000.00
+        FEE_RATE: 1.50
+        FEE_AMOUNT: 0.00
+        AMOUNT_NET: 0.00
+        OP_STATUS: "NEW"
+      - OP_ID: 200
+        ACC_ID: 20
+        OP_TYPE: "CREDIT"
+        AMOUNT_BRUT: 500.00
+        FEE_RATE: 1.00
+        FEE_AMOUNT: 0.00
+        AMOUNT_NET: 0.00
+        OP_STATUS: "NEW"
+  indexes:
+    - entity: OPERATION
+      name: OPERATION_ACC_ID_IDX
+      columns: [ACC_ID]
+  connection:
+    engine: postgres
+    method: ocesql
+    dbname: opdb
+    user: opuser
+    password: OPPWD
+    host: localhost
+    port: 5432
+    env_vars:
+      PGHOST: "localhost"
+      PGPORT: "5432"
+      PGUSER: "opuser"
+      PGPASSWORD: "OPPWD"
+      PGDATABASE: "opdb"
+    env_set_method:
+      - "DISPLAY <ENV_NAME> UPON ENVIRONMENT-NAME"
+      - "DISPLAY <ENV_VALUE> UPON ENVIRONMENT-VALUE"
+    ocesql:
+      start_call: "OCESQLStartSQL"
+      connect_call: "OCESQLConnect"
+      end_call: "OCESQLEndSQL"
+      connect_args:
+        - "SQLCA"
+        - "WS-DB-USER"
+        - "WS-DB-USER-LEN"
+        - "WS-DB-PASSWORD"
+        - "WS-DB-PASSWORD-LEN"
+        - "WS-DB-NAME"
+        - "WS-DB-NAME-LEN"
+      connect_args_order_note: "order: SQLCA, user, user_len, password, password_len, dbname, dbname_len"
+  behavior:
+    check_sqlcode: true
+    check_sqlstate: true
+    sqlcode_success: 0
+    sqlcode_eof: 100
+    rollback_on_error: false
+    commit:
+      mode: "end"
+      statement: "EXEC SQL COMMIT END-EXEC."
+    disconnect:
+      statement: "EXEC SQL DISCONNECT ALL END-EXEC."
+    null_indicators: false
+    cursor_commit_policy: "no_commit_while_open"
+  formatting:
+    max_line_length: 72
+    host_vars_one_per_line: true
+    split_long_exec_sql: true
+
+mapping_types:
+  - sql: "INT"
+    cobol_pic_default: "9(6)"
+  - sql: "VARCHAR(6)"
+    cobol_pic_default: "X(6)"
+  - sql: "VARCHAR(10)"
+    cobol_pic_default: "X(10)"
+  - sql: "DECIMAL(11,2)"
+    cobol_pic_default: "S9(9)V99"
+  - sql: "DECIMAL(5,2)"
+    cobol_pic_default: "S9(3)V99"
+
+technique:
+  cursor_naming:
+    pattern: "C_<ENTITY_UPPER3>"
+    example:
+      OPERATION: "C_OPE"
+  eof_flag:
+    name: "END-OF-FILE"
+    pic: "X"
+    initial_value: "N"
+    true_value: "Y"
+    false_value: "N"
+  sqlca_required: true
+  dal_call_pattern:
+    description: "Programme DAL appele avec un code operation court (READ, SAVE, END)."
+    operation_param_name: "OP-CODE"
+    operation_pic: "X(4)"
+    eof_param_name: "END-OF-FILE"
+    employee_param_name: "OPERATION"
+
+prompting:
+  global_constraints:
+    - "Reponds uniquement avec du code COBOL compilable, sans Markdown ni texte autour."
+    - "La premiere ligne doit etre IDENTIFICATION DIVISION."
+    - "Un seul PROGRAM-ID, pas de sous-programmes."
+  forbidden_items:
+    - "GO TO"
+    - "*>"
+  global_directives:
+    - "Utilise strictement les identifiants, messages, SQL et sequences definis dans la spec."
+    - "N'invente aucune variable, paragraphe, message ou SQL."
+    - "Respecte exactement les listes de WORKING-STORAGE, LINKAGE et USING."
+    - "Toujours utiliser les terminateurs explicites END-IF / END-EVALUATE / END-PERFORM / END-EXEC."
+    - "Pas de GO TO, pas de logique DAL dans LOGIC, pas de SQL hors DAL."
+    - "Toute variable utilisee doit etre declaree (WORKING-STORAGE ou LINKAGE)."
+    - "Chaque paragraphe DOIT etre declare sur une ligne avec un point (ex: MAIN-ENTRY.)."
+    - "Ne termine aucune instruction par un point (sauf EXEC SQL INCLUDE SQLCA END-EXEC.); seul un point sur une ligne seule termine un paragraphe."
+    - "Dans DATA DIVISION (WORKING-STORAGE/LINKAGE), toute ligne 01/05/77/88 avec PIC ou VALUE doit se terminer par un point. Regle non applicable en PROCEDURE DIVISION."
+  generation_strategy:
+    - "1) Construis d'abord le squelette COBOL complet (DIVISION/SECTION) dans l'ordre."
+    - "2) Insere les blocs WORKING-STORAGE/LINKAGE exacts fournis par la spec."
+    - "3) Ecris la PROCEDURE DIVISION en suivant le flow et les fonctions."
+    - "4) Verifie la coherence: aucune variable/paragraphes inventes."
+  formatting_guidelines:
+    - "Format FIXED: instructions commencent en colonne 8 (prefixe de 7 espaces)."
+    - "Commentaires: '*' en colonne 7 (6 espaces + '*'), pas de commentaires '*>'."
+    - "Ne pas utiliser '>>SOURCE FORMAT FREE'."
+    - "Terminer chaque paragraphe par une ligne avec un seul point."
+    - "Le nom du paragraphe se termine par un point (ex: MAIN-ENTRY.)."
+    - "En DATA DIVISION, chaque ligne 01/05/77/88 avec PIC ou VALUE se termine par un point."
+    - "Aucune ligne ne doit depasser 72 colonnes (format FIXED)."
+    - "Si une instruction depasse 72 colonnes, la scinder sur plusieurs lignes."
+    - "Pour EXEC SQL FETCH/SELECT/UPDATE: mettre chaque variable hote sur sa propre ligne."
+    - "Ne pas mettre de point en fin de DISPLAY/GOBACK/STOP RUN/CALL/MOVE/IF (sauf EXEC SQL INCLUDE SQLCA END-EXEC.)."
+    - "Utiliser des guillemets simples pour les messages DISPLAY."
+    - "Respecter l'ordre: IDENTIFICATION -> ENVIRONMENT -> DATA -> PROCEDURE."
+    - "Dans DATA: WORKING-STORAGE puis LINKAGE (si present)."
+  programs:
+    OPERATION-DAL-DB:
+      sections_order: [strategy, context, style, format, naming, environment, interface, structure, working_storage, sql, sql_format, sql_behavior, flow, logging, constraints, skeleton, fonctions]
+      context:
+        - "SGBD: {sql_cible}. Dialecte COBOL: {dialecte_cobol}."
+        - "Table {entity}: {table_signature}"
+        - "Role: couche DAL pour {entity}."
+      style:
+        - "Guidelines globales: {formatting_guidelines}"
+        - "Header commentaire (verbatim):"
+        - "{header_comment_lines}"
+        - "Style specifique: {style_lines}"
+      environment:
+        - "ENVIRONMENT exact (lignes):"
+        - "{environment_lines}"
+      interface:
+        - "Interface CALL/USING attendue: {call_interface}"
+      structure:
+        - "LINKAGE attendu (exemple exact):"
+        - "{linkage_struct}"
+      working_storage:
+        - "Working-Storage obligatoire (lignes exactes, ordre conseille):"
+        - "{working_storage_lines}"
+      sql:
+        - "Connexion OCESQL: {connection_details}"
+        - "SQL utilises:"
+        - "{sql_statements}"
+      sql_format:
+        - "Format SQL en FIXED:"
+        - "{sql_formatting_details}"
+      flow:
+        - "Flux principal DAL:"
+        - "{flow_notes}"
+      logging:
+        - "Messages (verbatim) a afficher:"
+        - "{logging_lines}"
+      constraints:
+        - "Interdictions: {forbidden_items}"
+        - "Paragraphes publics attendus: {public_paragraphs}"
+        - "Paragraphes internes autorises: {internal_paragraphs}"
+        - "Entry paragraph: {entry_paragraph}"
+        - "Regles de bloc MAIN-ENTRY: {entry_block_rules}"
+        - "Sequence de sortie MAIN-ENTRY: {entry_exit_sequence}"
+        - "Contraintes par paragraphe: {paragraph_constraints}"
+        - "Statements obligatoires: {required_statements}"
+      skeleton:
+        - "Squelette attendu (rappel structure):"
+        - "IDENTIFICATION DIVISION."
+        - "PROGRAM-ID. {program_id}."
+        - "{header_comment_lines}"
+        - "ENVIRONMENT DIVISION."
+        - "CONFIGURATION SECTION."
+        - "REPOSITORY."
+        - "    FUNCTION ALL INTRINSIC."
+        - "DATA DIVISION."
+        - "WORKING-STORAGE SECTION."
+        - "{working_storage_lines}"
+        - "LINKAGE/USING exacts:"
+        - "{linkage_struct}"
+        - "{entry_paragraph}."
+      fonctions:
+        - "{function_details}"
+    OPERATION-LOGIC:
+      sections_order: [strategy, context, style, format, naming, environment, interface, working_storage, flow, logging, constraints, skeleton, fonctions]
+      context:
+        - "Regles metier: {business_rules}"
+        - "Batch: traiter toutes les operations."
+      style:
+        - "Guidelines globales: {formatting_guidelines}"
+        - "Header commentaire (verbatim):"
+        - "{header_comment_lines}"
+        - "Style specifique: {style_lines}"
+      environment:
+        - "ENVIRONMENT exact (lignes):"
+        - "{environment_lines}"
+      interface:
+        - "Programme DAL: {dal_program}"
+        - "Programme BUSINESS: {business_program}"
+        - "Interface DAL (CALL USING): {call_interface}"
+      working_storage:
+        - "Working-Storage obligatoire (lignes exactes):"
+        - "{working_storage_lines}"
+      flow:
+        - "Flux principal LOGIC:"
+        - "{flow_notes}"
+      logging:
+        - "Messages (verbatim) a afficher:"
+        - "{logging_lines}"
+      constraints:
+        - "Interdictions: {forbidden_items}"
+        - "Paragraphes publics attendus: {public_paragraphs}"
+        - "Entry paragraph: {entry_paragraph}"
+        - "Statements obligatoires: {required_statements}"
+      skeleton:
+        - "Squelette attendu (rappel structure):"
+        - "IDENTIFICATION DIVISION."
+        - "PROGRAM-ID. {program_id}."
+        - "{header_comment_lines}"
+        - "ENVIRONMENT DIVISION."
+        - "CONFIGURATION SECTION."
+        - "REPOSITORY."
+        - "    FUNCTION ALL INTRINSIC."
+        - "DATA DIVISION."
+        - "WORKING-STORAGE SECTION."
+        - "{working_storage_lines}"
+        - "PROCEDURE DIVISION."
+        - "{entry_paragraph}."
+      fonctions:
+        - "{function_details}"
+    OPERATION-BUSINESS:
+      sections_order: [strategy, context, style, format, naming, environment, interface, working_storage, logging, constraints, skeleton, fonctions]
+      context:
+        - "Role: couche presentation simple, affiche les valeurs."
+        - "Structure OPERATION: {entity_fields_list}"
+      style:
+        - "Guidelines globales: {formatting_guidelines}"
+        - "Header commentaire (verbatim):"
+        - "{header_comment_lines}"
+        - "Style specifique: {style_lines}"
+      environment:
+        - "ENVIRONMENT exact (lignes):"
+        - "{environment_lines}"
+      interface:
+        - "LINKAGE attendu (exemple exact):"
+        - "{linkage_struct}"
+      working_storage:
+        - "Working-Storage obligatoire (lignes exactes):"
+        - "{working_storage_lines}"
+      logging:
+        - "Lignes DISPLAY (verbatim):"
+        - "{display_lines}"
+      constraints:
+        - "Interdictions: {forbidden_items}"
+        - "Paragraphes publics attendus: {public_paragraphs}"
+        - "Entry paragraph: {entry_paragraph}"
+        - "Statements obligatoires: {required_statements}"
+      skeleton:
+        - "Squelette attendu (rappel structure):"
+        - "IDENTIFICATION DIVISION."
+        - "PROGRAM-ID. {program_id}."
+        - "{header_comment_lines}"
+        - "ENVIRONMENT DIVISION."
+        - "DATA DIVISION."
+        - "WORKING-STORAGE SECTION."
+        - "LINKAGE/USING exacts:"
+        - "{linkage_struct}"
+        - "{entry_paragraph}."
+      fonctions:
+        - "{function_details}"
+
+sources:
+  cobol:
+    - programme: OPERATION-DAL-DB
+      fichier: "operation_dal_db.cob"
+    - programme: OPERATION-LOGIC
+      fichier: "operation_logic.cob"
+    - programme: OPERATION-BUSINESS
+      fichier: "operation_business.cob"
+  sql:
+    - logical_name: "OPERATION-INIT"
+      fichier: "operation_init.sql"
+      entity: OPERATION
+
+programmes:
+  - name: OPERATION-DAL-DB
+    layer: dal
+    role: "Couche d'acces a la base pour OPERATION (lecture via curseur et mise a jour des frais)."
+    entities: [OPERATION]
+    allowed_sql: true
+    allowed_business_logic: false
+    allow_display: true
+    header_comment_lines:
+      - "      *****************************************************************"
+      - "      * Programme: OPERATION-DAL-DB                                   *"
+      - "      * Couche: DAL (Data Access Layer)                               *"
+      - "      * Role: Acces a la base PostgreSQL pour OPERATION               *"
+      - "      *       Operations: READ, SAVE, END                             *"
+      - "      *****************************************************************"
+    style_lines:
+      - "CALL OCESQL avec guillemets doubles et END-CALL."
+      - "OCESQLConnect avec BY REFERENCE/ BY VALUE (ordre exact)."
+      - "EXIT PARAGRAPH sur erreur OPEN du curseur."
+      - "EVALUATE SQLCODE apres FETCH."
+      - "Apres DAL-CONNECT, si NOT WS-CONNECTED:"
+      - "MOVE 'Y' TO LK-END-OF-FILE puis GOBACK."
+      - "MAIN-ENTRY finit par END-EVALUATE, puis GOBACK, puis '.'"
+    required_lines:
+      - "      *****************************************************************"
+      - "      * Programme: OPERATION-DAL-DB                                   *"
+      - "      * Couche: DAL (Data Access Layer)                               *"
+      - "      * Role: Acces a la base PostgreSQL pour OPERATION               *"
+      - "      *       Operations: READ, SAVE, END                             *"
+      - "      *****************************************************************"
+    environment_lines:
+      - "ENVIRONMENT DIVISION."
+      - "CONFIGURATION SECTION."
+      - "REPOSITORY."
+      - "    FUNCTION ALL INTRINSIC."
+    main_cursor: "C_OPE"
+    internal_paragraphs: ["DAL-CONNECT", "DAL-SET-ENV"]
+    working_storage_lines:
+      - "EXEC SQL INCLUDE SQLCA END-EXEC."
+      - "01  WS-CONNECTED-FLAG      PIC X VALUE 'N'."
+      - "88  WS-CONNECTED           VALUE 'Y'."
+      - "01  WS-CURSOR-OPEN-FLAG    PIC X VALUE 'N'."
+      - "88  WS-CURSOR-OPEN         VALUE 'Y'."
+      - "01  WS-OP-ID               PIC 9(6)."
+      - "01  WS-ACC-ID              PIC 9(6)."
+      - "01  WS-OP-TYPE             PIC X(6)."
+      - "01  WS-AMOUNT-BRUT         PIC S9(9)V99."
+      - "01  WS-FEE-RATE            PIC S9(3)V99."
+      - "01  WS-FEE-AMOUNT          PIC S9(9)V99."
+      - "01  WS-AMOUNT-NET          PIC S9(9)V99."
+      - "01  WS-OP-STATUS           PIC X(10)."
+      - "01  WS-DB-NAME."
+      - "05  WS-DB-NAME-TEXT     PIC X(4) VALUE 'opdb'."
+      - "05  WS-DB-NAME-TERM     PIC X VALUE X'00'."
+      - "01  WS-DB-USER."
+      - "05  WS-DB-USER-TEXT     PIC X(6) VALUE 'opuser'."
+      - "05  WS-DB-USER-TERM     PIC X VALUE X'00'."
+      - "01  WS-DB-PASSWORD."
+      - "05  WS-DB-PASSWORD-TEXT PIC X(5) VALUE 'OPPWD'."
+      - "05  WS-DB-PASSWORD-TERM PIC X VALUE X'00'."
+      - "01  WS-DB-NAME-LEN         PIC S9(4) COMP-5 VALUE 4."
+      - "01  WS-DB-USER-LEN         PIC S9(4) COMP-5 VALUE 6."
+      - "01  WS-DB-PASSWORD-LEN     PIC S9(4) COMP-5 VALUE 5."
+      - "01  WS-PGHOST-NAME         PIC X(6) VALUE 'PGHOST'."
+      - "01  WS-PGHOST-VALUE        PIC X(64) VALUE 'localhost'."
+      - "01  WS-PGPORT-NAME         PIC X(6) VALUE 'PGPORT'."
+      - "01  WS-PGPORT-VALUE        PIC X(5) VALUE '5432'."
+      - "01  WS-PGUSER-NAME         PIC X(6) VALUE 'PGUSER'."
+      - "01  WS-PGUSER-VALUE        PIC X(64) VALUE 'opuser'."
+      - "01  WS-PGPASSWORD-NAME     PIC X(10) VALUE 'PGPASSWORD'."
+      - "01  WS-PGPASSWORD-VALUE    PIC X(64) VALUE 'OPPWD'."
+      - "01  WS-PGDATABASE-NAME     PIC X(10) VALUE 'PGDATABASE'."
+      - "01  WS-PGDATABASE-VALUE    PIC X(64) VALUE 'opdb'."
+    flow:
+      - "MAIN-ENTRY: IF LK-OP-CODE NOT = 'END ' THEN PERFORM DAL-CONNECT; IF NOT WS-CONNECTED THEN MOVE 'Y' TO LK-END-OF-FILE, GOBACK; END-IF; END-IF"
+      - "EVALUATE LK-OP-CODE: READ->DAL-READ-OPERATION, SAVE->DAL-SAVE-OPERATION, END->DAL-END, OTHER->DISPLAY erreur"
+      - "GOBACK apres EVALUATE"
+      - "DAL-READ-OPERATION: ouverture curseur paresseuse, FETCH, mise a jour EOF"
+      - "DAL-SAVE-OPERATION: UPDATE FEE_AMOUNT, AMOUNT_NET, OP_STATUS"
+      - "DAL-END: CLOSE cursor, COMMIT, DISCONNECT, reset flags"
+    entry_block_rules:
+      - condition_regex: "^\\s*IF\\s+LK-OP-CODE\\s+NOT\\s+(=|EQUAL)\\s+'END '\\s*$"
+        must_contain:
+          - "PERFORM DAL-CONNECT"
+          - "IF NOT WS-CONNECTED"
+          - "MOVE 'Y' TO LK-END-OF-FILE"
+          - "GOBACK"
+    entry_exit_sequence:
+      paragraph: "MAIN-ENTRY"
+      must_follow_order:
+        - "END-EVALUATE"
+        - "GOBACK"
+        - "."
+    paragraph_constraints:
+      - paragraph: "DAL-READ-OPERATION"
+        forbid_contains:
+          - "PERFORM DAL-CONNECT"
+          - "IF NOT WS-CONNECTED"
+    required_statements:
+      - "GOBACK"
+      - "END-CALL"
+      - "BY REFERENCE"
+      - "BY VALUE"
+      - "EXIT PARAGRAPH"
+      - "EVALUATE SQLCODE"
+    allow_procedure_sections: false
+    require_working_storage_section: true
+    logging_lines:
+      - "Connexion DB reussie: opdb"
+      - "ERREUR CONNECT: SQLCODE="
+      - "SQLSTATE="
+      - "SQLERRMC="
+      - "Curseur C_OPE ouvert"
+      - "ERREUR OPEN: SQLCODE="
+      - "ERREUR FETCH: SQLCODE="
+      - "ERREUR UPDATE: SQLCODE="
+      - "ERREUR CLOSE: SQLCODE="
+      - "ERREUR COMMIT: SQLCODE="
+      - "ERREUR DISCONNECT: SQLCODE="
+      - "ERREUR: Operation inconnue: "
+      - "Fermeture connexion"
+    call_interface:
+      type: "CALL USING"
+      description: "CALL 'OPERATION-DAL-DB' USING OP-CODE, END-OF-FILE, OPERATION."
+      linkage_parameters:
+        - name: "LK-OP-CODE"
+          pic: "X(4)"
+          direction: in
+        - name: "LK-END-OF-FILE"
+          pic: "X"
+          direction: inout
+        - name: "LK-OPERATION"
+          pic: "groupe OPERATION"
+          direction: inout
+      operations:
+        read: "READ"
+        save: "SAVE"
+        end: "END "
+    cobol_sections:
+      identification_division: required
+      environment_division: required
+      data_division:
+        working_storage: required
+        linkage: required
+      procedure_division:
+        using_clause: ["LK-OP-CODE", "LK-END-OF-FILE", "LK-OPERATION"]
+        entry_paragraph: "MAIN-ENTRY"
+
+  - name: OPERATION-LOGIC
+    layer: logic
+    role: "Traitement batch principal : boucle sur les operations, calcul des frais, sauvegarde, affichage."
+    entities: [OPERATION]
+    allowed_sql: false
+    allowed_business_logic: true
+    allow_display: true
+    header_comment_lines:
+      - "      *****************************************************************"
+      - "      * Programme: OPERATION-LOGIC                                    *"
+      - "      * Couche: LOGIC (Orchestration)                                 *"
+      - "      * Role: Traitement batch principal                              *"
+      - "      *       - Boucle sur les operations                             *"
+      - "      *       - Calcul des frais et montant net                       *"
+      - "      *       - Sauvegarde en base                                    *"
+      - "      *       - Affichage des resultats                               *"
+      - "      *****************************************************************"
+    style_lines:
+      - "Utiliser commentaires de bloc pour les sections majeures."
+      - "Afficher les bandeaux debut et fin."
+      - "Bloc commentaire CALCULATE-FEES (verbatim):"
+      - "      *****************************************************************"
+      - "      * Regle metier R1: FEE_AMOUNT = ROUND(AMOUNT_BRUT * RATE / 100, *"
+      - "      * 2) et AMOUNT_NET = AMOUNT_BRUT +/- FEE_AMOUNT                 *"
+      - "      *****************************************************************"
+    required_lines:
+      - "      *****************************************************************"
+      - "      * Programme: OPERATION-LOGIC                                    *"
+      - "      * Couche: LOGIC (Orchestration)                                 *"
+      - "      * Role: Traitement batch principal                              *"
+      - "      *       - Boucle sur les operations                             *"
+      - "      *       - Calcul des frais et montant net                       *"
+      - "      *       - Sauvegarde en base                                    *"
+      - "      *       - Affichage des resultats                               *"
+      - "      *****************************************************************"
+      - "      *****************************************************************"
+      - "      * Regle metier R1: FEE_AMOUNT = ROUND(AMOUNT_BRUT * RATE / 100, *"
+      - "      * 2) et AMOUNT_NET = AMOUNT_BRUT +/- FEE_AMOUNT                 *"
+      - "      *****************************************************************"
+    environment_lines:
+      - "ENVIRONMENT DIVISION."
+      - "CONFIGURATION SECTION."
+      - "REPOSITORY."
+      - "    FUNCTION ALL INTRINSIC."
+    working_storage_lines:
+      - "01  END-OF-FILE            PIC X VALUE 'N'."
+      - "88  EOF-REACHED        VALUE 'Y'."
+      - "88  NOT-EOF            VALUE 'N'."
+      - "77  OP-CODE                PIC X(4)."
+      - "77  WS-COUNT               PIC 9(4) VALUE 0."
+      - "01  OPERATION."
+      - "    05 OP-ID               PIC 9(6)."
+      - "    05 ACC-ID              PIC 9(6)."
+      - "    05 OP-TYPE             PIC X(6)."
+      - "    05 AMOUNT-BRUT         PIC S9(9)V99."
+      - "    05 FEE-RATE            PIC S9(3)V99."
+      - "    05 FEE-AMOUNT          PIC S9(9)V99."
+      - "    05 AMOUNT-NET          PIC S9(9)V99."
+      - "    05 OP-STATUS           PIC X(10)."
+    flow:
+      - "Afficher le bandeau de debut"
+      - "READ initial via DAL (OP-CODE='READ')"
+      - "Boucle jusqu'a EOF: incrementer WS-COUNT, CALCULATE-FEES, SAVE, BUSINESS display, READ suivant"
+      - "Appeler DAL avec OPERATION='END '"
+      - "Afficher le bandeau de fin avec le compteur"
+      - "STOP RUN"
+    logging_lines:
+      - "=========================================="
+      - "DEBUT TRAITEMENT BATCH CALCUL FRAIS"
+      - "=========================================="
+      - "=========================================="
+      - "FIN TRAITEMENT BATCH"
+      - "Nombre operations traitees: "
+      - "=========================================="
+      - "ANOMALIE: Montant invalide"
+      - "ANOMALIE: Type operation invalide"
+      - "ANOMALIE: Taux frais invalide"
+    required_statements:
+      - "STOP RUN"
+      - "CALL 'OPERATION-DAL-DB' USING OP-CODE, END-OF-FILE, OPERATION"
+      - "CALL 'OPERATION-BUSINESS' USING OPERATION"
+    allow_procedure_sections: false
+    require_working_storage_section: true
+    cobol_sections:
+      identification_division: required
+      environment_division: required
+      data_division:
+        working_storage: required
+        linkage: none
+      procedure_division:
+        entry_paragraph: "MAIN-PROCESS"
+
+  - name: OPERATION-BUSINESS
+    layer: business
+    role: "Affichage simple des informations d'une operation."
+    entities: [OPERATION]
+    allowed_sql: false
+    allowed_business_logic: "lecture_seule"
+    allow_display: true
+    header_comment_lines:
+      - "      *****************************************************************"
+      - "      * Programme: OPERATION-BUSINESS                                 *"
+      - "      * Couche: BUSINESS (Presentation)                               *"
+      - "      * Role: Affichage simple des informations operation             *"
+      - "      *       - Type, montant, frais, net, statut                     *"
+      - "      *****************************************************************"
+    style_lines:
+      - "GOBACK en fin de paragraphe DISPLAY-OPERATION."
+    required_lines:
+      - "      *****************************************************************"
+      - "      * Programme: OPERATION-BUSINESS                                 *"
+      - "      * Couche: BUSINESS (Presentation)                               *"
+      - "      * Role: Affichage simple des informations operation             *"
+      - "      *       - Type, montant, frais, net, statut                     *"
+      - "      *****************************************************************"
+    environment_lines:
+      - "ENVIRONMENT DIVISION."
+    working_storage_lines:
+      - "WORKING-STORAGE SECTION."
+    logging_lines:
+      - "----------------------------------------"
+      - "OPERATION : "
+      - "OP_ID   : "
+      - "ACC_ID  : "
+      - "TYPE    : "
+      - "BRUT    : "
+      - "TAUX    : "
+      - "FRAIS   : "
+      - "NET     : "
+      - "STATUT  : "
+    required_statements:
+      - "GOBACK"
+    allow_procedure_sections: false
+    require_working_storage_section: true
+    call_interface:
+      type: "CALL USING"
+      description: "CALL 'OPERATION-BUSINESS' USING LK-OPERATION."
+      linkage_parameters:
+        - name: "LK-OPERATION"
+          pic: "groupe OPERATION"
+          direction: in
+    cobol_sections:
+      identification_division: required
+      environment_division: required
+      data_division:
+        working_storage: required
+        linkage: required
+      procedure_division:
+        using_clause: ["LK-OPERATION"]
+        entry_paragraph: "DISPLAY-OPERATION"
+
+fonctions:
+  - id: FN-DAL-CONNECT
+    name: DAL-CONNECT
+    programme: OPERATION-DAL-DB
+    layer: dal
+    visibility: internal
+    required: true
+    entity: OPERATION
+    description: >
+      Connexion paresseuse a la base via OCESQL. Initialise les variables
+      d'environnement PostgreSQL, puis execute OCESQLStartSQL/OCESQLConnect/OCESQLEndSQL.
+    inputs: []
+    outputs:
+      - "SQLCODE"
+      - "SQLSTATE"
+    modifies:
+      - "WS-CONNECTED"
+      - "SQLCODE"
+    steps:
+      - "IF NOT WS-CONNECTED"
+      - "  PERFORM DAL-SET-ENV"
+      - "  CALL \"OCESQLStartSQL\" END-CALL"
+      - "  CALL \"OCESQLConnect\" USING"
+      - "       BY REFERENCE SQLCA"
+      - "       BY REFERENCE WS-DB-USER"
+      - "       BY VALUE WS-DB-USER-LEN"
+      - "       BY REFERENCE WS-DB-PASSWORD"
+      - "       BY VALUE WS-DB-PASSWORD-LEN"
+      - "       BY REFERENCE WS-DB-NAME"
+      - "       BY VALUE WS-DB-NAME-LEN"
+      - "  END-CALL"
+      - "  CALL \"OCESQLEndSQL\" END-CALL"
+      - "SQLCODE=0: SET WS-CONNECTED TO TRUE, DISPLAY 'Connexion DB reussie: opdb'"
+      - "Sinon: DISPLAY 'ERREUR CONNECT: SQLCODE=' SQLCODE, DISPLAY 'SQLSTATE=' SQLSTATE, DISPLAY 'SQLERRMC=' SQLERRMC"
+      - "END-IF"
+    related_exigences: [R2]
+    sql:
+      connection_method: "OCESQL (voir sql.connection)"
+      connection_calls:
+        - "CALL \"OCESQLStartSQL\" END-CALL"
+        - "CALL \"OCESQLConnect\" USING BY REFERENCE SQLCA BY REFERENCE WS-DB-USER BY VALUE WS-DB-USER-LEN BY REFERENCE WS-DB-PASSWORD BY VALUE WS-DB-PASSWORD-LEN BY REFERENCE WS-DB-NAME BY VALUE WS-DB-NAME-LEN END-CALL"
+        - "CALL \"OCESQLEndSQL\" END-CALL"
+    cobol_location:
+      fichier: "operation_dal_db.cob"
+      programme: "OPERATION-DAL-DB"
+      division: "PROCEDURE DIVISION"
+      paragraph: "DAL-CONNECT"
+      section: "couche_dal"
+
+  - id: FN-DAL-SET-ENV
+    name: DAL-SET-ENV
+    programme: OPERATION-DAL-DB
+    layer: dal
+    visibility: internal
+    required: true
+    entity: OPERATION
+    description: >
+      Force les variables d'environnement PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDATABASE.
+    inputs: []
+    outputs: []
+    modifies: []
+    steps:
+      - "DISPLAY WS-PGHOST-NAME UPON ENVIRONMENT-NAME"
+      - "DISPLAY WS-PGHOST-VALUE UPON ENVIRONMENT-VALUE"
+      - "DISPLAY WS-PGPORT-NAME UPON ENVIRONMENT-NAME"
+      - "DISPLAY WS-PGPORT-VALUE UPON ENVIRONMENT-VALUE"
+      - "DISPLAY WS-PGUSER-NAME UPON ENVIRONMENT-NAME"
+      - "DISPLAY WS-PGUSER-VALUE UPON ENVIRONMENT-VALUE"
+      - "DISPLAY WS-PGPASSWORD-NAME UPON ENVIRONMENT-NAME"
+      - "DISPLAY WS-PGPASSWORD-VALUE UPON ENVIRONMENT-VALUE"
+      - "DISPLAY WS-PGDATABASE-NAME UPON ENVIRONMENT-NAME"
+      - "DISPLAY WS-PGDATABASE-VALUE UPON ENVIRONMENT-VALUE"
+    related_exigences: [R2]
+    cobol_location:
+      fichier: "operation_dal_db.cob"
+      programme: "OPERATION-DAL-DB"
+      division: "PROCEDURE DIVISION"
+      paragraph: "DAL-SET-ENV"
+      section: "couche_dal"
+
+  - id: FN-DAL-READ
+    name: DAL-READ-OPERATION
+    programme: OPERATION-DAL-DB
+    layer: dal
+    visibility: public
+    required: true
+    entity: OPERATION
+    description: >
+      Ouvre le curseur C_OPE si necessaire, fait un FETCH et remplit la structure
+      OPERATION. Met END-OF-FILE a 'Y' en cas de fin de donnees ou d'erreur.
+    operation_code: "READ"
+    inputs:
+      - "OPERATION = 'READ'"
+      - "Connexion deja etablie par MAIN-ENTRY (sauf OPERATION='END ')."
+      - "Curseur non garanti ouvert (ouverture paresseuse)."
+    outputs:
+      - "OPERATION.OP_ID"
+      - "OPERATION.ACC_ID"
+      - "OPERATION.OP_TYPE"
+      - "OPERATION.AMOUNT_BRUT"
+      - "OPERATION.FEE_RATE"
+      - "OPERATION.FEE_AMOUNT"
+      - "OPERATION.AMOUNT_NET"
+      - "OPERATION.OP_STATUS"
+      - "END-OF-FILE"
+      - "SQLCODE"
+    modifies:
+      - "OPERATION.*"
+      - "END-OF-FILE"
+      - "WS-CONNECTED"
+      - "WS-CURSOR-OPEN"
+      - "SQLCODE"
+    preconditions: []
+    postconditions:
+      - "Si SQLCODE = 0 : OPERATION contient un enregistrement valide et END-OF-FILE = 'N'."
+      - "Si SQLCODE = 100 : fin de donnees, END-OF-FILE = 'Y'."
+      - "Si SQLCODE != 0 et != 100 : message d'erreur affiche et END-OF-FILE = 'Y'."
+    errors_flags:
+      - "SQLCODE = 0 : succes, une ligne lue."
+      - "SQLCODE = 100 : fin de curseur."
+      - "SQLCODE != 0 et != 100 : erreur SQL, le batch s'arrete logiquement."
+    steps:
+      - "Si curseur non ouvert: DECLARE C_OPE, OPEN C_OPE"
+      - "Sur erreur OPEN: DISPLAY 'ERREUR OPEN: SQLCODE=' SQLCODE, EOF='Y', EXIT PARAGRAPH"
+      - "Sur succes OPEN: SET WS-CURSOR-OPEN TO TRUE, SET WS-CONNECTED TO TRUE, DISPLAY 'Curseur C_OPE ouvert'"
+      - "FETCH C_OPE INTO WS-OP-ID, WS-ACC-ID, WS-OP-TYPE, WS-AMOUNT-BRUT, WS-FEE-RATE, WS-FEE-AMOUNT, WS-AMOUNT-NET, WS-OP-STATUS"
+      - "EVALUATE SQLCODE"
+      - "  WHEN 0: EOF='N', MOVE WS-* vers LK-*"
+      - "  WHEN 100: EOF='Y'"
+      - "  WHEN OTHER: DISPLAY 'ERREUR FETCH: SQLCODE=' SQLCODE, DISPLAY SQLSTATE, EOF='Y'"
+      - "END-EVALUATE"
+    related_exigences: [R2, R3, R4, R5]
+    sql:
+      declare_cursor: |
+        DECLARE C_OPE CURSOR FOR
+        SELECT OP_ID, ACC_ID, OP_TYPE, AMOUNT_BRUT, FEE_RATE,
+               FEE_AMOUNT, AMOUNT_NET, OP_STATUS
+        FROM OPERATION
+        ORDER BY OP_ID
+      open_cursor: "OPEN C_OPE"
+      fetch_cursor: "FETCH C_OPE INTO :WS-OP-ID, :WS-ACC-ID, :WS-OP-TYPE, :WS-AMOUNT-BRUT, :WS-FEE-RATE, :WS-FEE-AMOUNT, :WS-AMOUNT-NET, :WS-OP-STATUS"
+
+  - id: FN-DAL-SAVE
+    name: DAL-SAVE-OPERATION
+    programme: OPERATION-DAL-DB
+    layer: dal
+    visibility: public
+    required: true
+    entity: OPERATION
+    description: "Met a jour FEE_AMOUNT, AMOUNT_NET et OP_STATUS pour l'operation courante."
+    operation_code: "SAVE"
+    inputs:
+      - "OPERATION = 'SAVE'"
+      - "OPERATION.*"
+    outputs:
+      - "SQLCODE"
+    steps:
+      - "EXEC SQL UPDATE OPERATION SET FEE_AMOUNT = :WS-FEE-AMOUNT, AMOUNT_NET = :WS-AMOUNT-NET, OP_STATUS = :WS-OP-STATUS WHERE OP_ID = :WS-OP-ID END-EXEC"
+      - "IF SQLCODE != 0 THEN DISPLAY 'ERREUR UPDATE: SQLCODE=' SQLCODE"
+    related_exigences: [R1, R2]
+    sql:
+      update: |
+        UPDATE OPERATION
+        SET FEE_AMOUNT = :WS-FEE-AMOUNT,
+            AMOUNT_NET = :WS-AMOUNT-NET,
+            OP_STATUS = :WS-OP-STATUS
+        WHERE OP_ID = :WS-OP-ID
+
+  - id: FN-DAL-END
+    name: DAL-END
+    programme: OPERATION-DAL-DB
+    layer: dal
+    visibility: public
+    required: true
+    entity: OPERATION
+    description: "Ferme le curseur, commit, disconnect."
+    operation_code: "END"
+    steps:
+      - "IF WS-CURSOR-OPEN THEN CLOSE C_OPE"
+      - "EXEC SQL COMMIT END-EXEC"
+      - "EXEC SQL DISCONNECT ALL END-EXEC"
+      - "MOVE 'N' TO WS-CONNECTED-FLAG"
+      - "MOVE 'N' TO WS-CURSOR-OPEN-FLAG"
+      - "DISPLAY 'Fermeture connexion'"
+
+  - id: FN-LOGIC-MAIN
+    name: MAIN-PROCESS
+    programme: OPERATION-LOGIC
+    layer: logic
+    visibility: public
+    required: true
+    entity: OPERATION
+    description: "Orchestre le batch: lecture, calcul, sauvegarde, affichage."
+    steps:
+      - "DISPLAY bandeau debut"
+      - "MOVE 'READ' TO OP-CODE"
+      - "CALL 'OPERATION-DAL-DB' USING OP-CODE, END-OF-FILE, OPERATION"
+      - "PERFORM UNTIL END-OF-FILE = 'Y'"
+      - "  ADD 1 TO WS-COUNT"
+      - "  PERFORM CALCULATE-FEES"
+      - "  MOVE 'SAVE' TO OP-CODE"
+      - "  CALL 'OPERATION-DAL-DB' USING OP-CODE, END-OF-FILE, OPERATION"
+      - "  CALL 'OPERATION-BUSINESS' USING OPERATION"
+      - "  MOVE 'READ' TO OP-CODE"
+      - "  CALL 'OPERATION-DAL-DB' USING OP-CODE, END-OF-FILE, OPERATION"
+      - "END-PERFORM"
+      - "MOVE 'END ' TO OP-CODE"
+      - "CALL 'OPERATION-DAL-DB' USING OP-CODE, END-OF-FILE, OPERATION"
+      - "DISPLAY bandeau fin"
+      - "STOP RUN"
+    related_exigences: [R1, R2]
+
+  - id: FN-LOGIC-CALC
+    name: CALCULATE-FEES
+    programme: OPERATION-LOGIC
+    layer: logic
+    visibility: public
+    required: true
+    entity: OPERATION
+    description: "Calcule FEE_AMOUNT et AMOUNT_NET avec controles d'anomalies."
+    steps:
+      - "IF AMOUNT-BRUT <= 0"
+      - "  MOVE 0 TO FEE-AMOUNT"
+      - "  MOVE 0 TO AMOUNT-NET"
+      - "  MOVE 'ERR' TO OP-STATUS"
+      - "  DISPLAY 'ANOMALIE: Montant invalide'"
+      - "ELSE IF FEE-RATE < 0"
+      - "  MOVE 0 TO FEE-AMOUNT"
+      - "  MOVE 0 TO AMOUNT-NET"
+      - "  MOVE 'ERR' TO OP-STATUS"
+      - "  DISPLAY 'ANOMALIE: Taux frais invalide'"
+      - "ELSE IF OP-TYPE = 'DEBIT'"
+      - "  COMPUTE FEE-AMOUNT ROUNDED = AMOUNT-BRUT * FEE-RATE / 100"
+      - "  COMPUTE AMOUNT-NET ROUNDED = AMOUNT-BRUT + FEE-AMOUNT"
+      - "  MOVE 'OK' TO OP-STATUS"
+      - "ELSE IF OP-TYPE = 'CREDIT'"
+      - "  COMPUTE FEE-AMOUNT ROUNDED = AMOUNT-BRUT * FEE-RATE / 100"
+      - "  COMPUTE AMOUNT-NET ROUNDED = AMOUNT-BRUT - FEE-AMOUNT"
+      - "  MOVE 'OK' TO OP-STATUS"
+      - "ELSE"
+      - "  MOVE 0 TO FEE-AMOUNT"
+      - "  MOVE 0 TO AMOUNT-NET"
+      - "  MOVE 'ERR' TO OP-STATUS"
+      - "  DISPLAY 'ANOMALIE: Type operation invalide'"
+      - "END-IF"
+    related_exigences: [R1, R3, R4, R5]
+    cobol_location:
+      programme: "OPERATION-LOGIC"
+      paragraph: "CALCULATE-FEES"
+
+  - id: FN-BUSINESS-DISPLAY
+    name: DISPLAY-OPERATION
+    programme: OPERATION-BUSINESS
+    layer: business
+    visibility: public
+    required: true
+    entity: OPERATION
+    description: "Affiche l'operation (id, type, montant, frais, net, statut)."
+    display_lines:
+      - "DISPLAY '----------------------------------------'"
+      - "DISPLAY 'OPERATION : '"
+      - "DISPLAY 'OP_ID   : ' OP-ID"
+      - "DISPLAY 'ACC_ID  : ' ACC-ID"
+      - "DISPLAY 'TYPE    : ' OP-TYPE"
+      - "DISPLAY 'BRUT    : ' AMOUNT-BRUT"
+      - "DISPLAY 'TAUX    : ' FEE-RATE"
+      - "DISPLAY 'FRAIS   : ' FEE-AMOUNT"
+      - "DISPLAY 'NET     : ' AMOUNT-NET"
+      - "DISPLAY 'STATUT  : ' OP-STATUS"
+    steps:
+      - "DISPLAY '----------------------------------------'"
+      - "DISPLAY 'OPERATION : '"
+      - "DISPLAY 'OP_ID   : ' OP-ID"
+      - "DISPLAY 'ACC_ID  : ' ACC-ID"
+      - "DISPLAY 'TYPE    : ' OP-TYPE"
+      - "DISPLAY 'BRUT    : ' AMOUNT-BRUT"
+      - "DISPLAY 'TAUX    : ' FEE-RATE"
+      - "DISPLAY 'FRAIS   : ' FEE-AMOUNT"
+      - "DISPLAY 'NET     : ' AMOUNT-NET"
+      - "DISPLAY 'STATUT  : ' OP-STATUS"
+      - "GOBACK"
+    related_exigences: [R2]
