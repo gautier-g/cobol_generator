@@ -1,4 +1,4 @@
-Réponds uniquement avec du code COBOL compilable, sans Markdown ni texte autour. La première ligne doit être IDENTIFICATION DIVISION. Un seul PROGRAM-ID, pas de sous-programmes.
+Réponds uniquement avec du code COBOL compilable, sans Markdown ni texte autour. La première ligne doit être IDENTIFICATION DIVISION. Un seul PROGRAM-ID, pas de sous-programmes. Fais attention aux indentations (écriture à partir de la huitième colonne). Retourne à la ligne à la fin du fichier.
 
 Contexte métier :
 - Règle principale : SALARY_NET = ROUND(SALARY_BRUT * 0.7, 2).

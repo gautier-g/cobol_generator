@@ -1,0 +1,23 @@
+{
+  "created_dirs": [
+    "/home/gapial/Bureau/cobol_generator/try/out/business",
+    "/home/gapial/Bureau/cobol_generator/try/out/logic",
+    "/home/gapial/Bureau/cobol_generator/try/out/dal",
+    "/home/gapial/Bureau/cobol_generator/try/out/copy",
+    "/home/gapial/Bureau/cobol_generator/try/out/sql/ddl",
+    "/home/gapial/Bureau/cobol_generator/try/out/sql/dml",
+    "/home/gapial/Bureau/cobol_generator/try/out/tests",
+    "/home/gapial/Bureau/cobol_generator/try/out/reports",
+    "/home/gapial/Bureau/cobol_generator/try/out/trace",
+    "/home/gapial/Bureau/cobol_generator/try/out/bin"
+  ],
+  "tests": [
+    "/home/gapial/Bureau/cobol_generator/try/out/tests/compile_EMPLOYEE-DAL.sh",
+    "/home/gapial/Bureau/cobol_generator/try/out/tests/compile_EMPLOYEE-LOGIC.sh",
+    "/home/gapial/Bureau/cobol_generator/try/out/tests/compile_EMPLOYEE-BUSINESS.sh",
+    "/home/gapial/Bureau/cobol_generator/try/out/tests/compile_EMPLOYEE-DAL-DB.sh",
+    "/home/gapial/Bureau/cobol_generator/try/out/tests/compile_EMPLOYEE-LOGIC.sh",
+    "/home/gapial/Bureau/cobol_generator/try/out/tests/compile_EMPLOYEE-BUSINESS.sh",
+    "/home/gapial/Bureau/cobol_generator/try/out/tests/compile_EMPLOYEE.sh"
+  ]
+}

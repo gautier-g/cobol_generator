@@ -1,0 +1,18 @@
+Je vais te demander un code écrit en COBOL.
+Je ne veux aucun caractère en plus du code COBOL dans ta réponse.
+Je veux que tu mettes un retour chariot à la fin du code COBOL pour éviter les avertissements d'erreur.
+N'ajoute aucune fonctionnalité qui n'est pas demandée.
+
+Explication du code à rédiger:
+    Voici un diagramme de classes plantuml:
+    @startuml
+    class Employee {
+        EMP_ID : integer (needed)
+        EMP_NAME : varchar(30) (needed)
+        SALARY_BRUT : numeric(8,2) (needed)
+        SALARY_NET : numeric(8,2) (optional)
+    }
+    @enduml
+
+Donne moi un programme COBOL qui permet d'afficher un élément EMPLOYEE.
+Ce programme est destiné à être appelé par un fichier parent.

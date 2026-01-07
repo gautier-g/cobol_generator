@@ -1,4 +1,4 @@
-Réponds uniquement avec du code COBOL compilable, sans Markdown ni texte autour. La première ligne doit être IDENTIFICATION DIVISION. Un seul PROGRAM-ID, pas de sous-programmes.
+Réponds uniquement avec du code COBOL compilable, sans Markdown ni texte autour. La première ligne doit être IDENTIFICATION DIVISION. Un seul PROGRAM-ID, pas de sous-programmes. Fais attention aux indentations (écriture à partir de la huitième colonne). Retourne à la ligne à la fin du fichier.
 
 Contexte :
 - Structure EMPLOYEE : 4 champs (EMP-ID, EMP-NAME, SALARY-BRUT, SALARY-NET).
@@ -33,6 +33,3 @@ DISPLAY "BRUT    : " SALARY-BRUT
 DISPLAY "NET     : " SALARY-NET
 
 Tâche : génère le programme COBOL complet respectant ces contraintes (code seulement).
-
-Les erreurs suivantes ont été détectées, corrige-les strictement sans ajouter de texte explicatif:
-- Paragraphes en trop: GOBACK.

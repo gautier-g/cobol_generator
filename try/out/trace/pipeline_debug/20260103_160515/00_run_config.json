@@ -1,0 +1,14 @@
+{
+  "run_id": "20260103_160515",
+  "timestamp": "2026-01-03T16:05:15.779198",
+  "environment": {
+    "OPENAI_BASE_URL": null,
+    "LLM_MODEL": null,
+    "CSG_LLM_USE_COMPLETIONS": null,
+    "LLM_TEMPERATURE": null,
+    "LLM_MAX_TOKENS": null,
+    "GROQ_TIMEOUT_S": null,
+    "CSG_USE_LLM_HEADERS": "0",
+    "CSG_USE_LLM_PROCS": "1"
+  }
+}

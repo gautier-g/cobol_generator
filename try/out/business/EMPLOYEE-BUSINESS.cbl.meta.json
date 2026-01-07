@@ -1,13 +1,13 @@
 {
-  "created_utc": "2025-12-08T15:58:24Z",
+  "created_utc": "2026-01-03T15:14:28Z",
   "extra": {
     "layer": "business",
     "program_id": "EMPLOYEE-BUSINESS"
   },
   "kind": "program_full_llm_strict",
-  "mtime_utc": "2025-12-08T15:58:24Z",
+  "mtime_utc": "2026-01-03T15:14:28Z",
   "name": "EMPLOYEE-BUSINESS.cbl",
   "path": "/home/gapial/Bureau/cobol_generator/try/out/business/EMPLOYEE-BUSINESS.cbl",
-  "sha256": "99d8e8d9fd1cac2cc31eda6feeac3e109d973e681ba825f5cb0ba14094d78ff8",
-  "size": 480
+  "sha256": "627de074028a691b5e3b5098e24dfbb97dd3a348f65e985ff024dfb6e7269dd5",
+  "size": 624
 }

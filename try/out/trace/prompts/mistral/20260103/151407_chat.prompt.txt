@@ -1,0 +1,15 @@
+[system] Expert COBOL. Génère uniquement le code COBOL demandé.
+[user] renvoie: 'bonjour'
+
+Les erreurs suivantes ont été détectées, corrige-les strictement sans ajouter de texte explicatif:
+- PROGRAM-ID doit être exactement EMPLOYEE-DAL-DB.
+- PROGRAM-ID manquant ou incorrect.
+- Paragraphes manquants: DAL-READ, DAL-SAVE, DAL-END.
+- Le champ EMP-ID doit utiliser PIC 9(4).
+- Le champ EMP-NAME doit utiliser PIC A(30).
+- Le champ SALARY-BRUT doit utiliser PIC 9(6)V99.
+- Le champ SALARY-NET doit utiliser PIC 9(6)V99.
+- Le flag EOF END-OF-FILE doit être déclaré.
+- Le flag EOF doit utiliser PIC X.
+- Aucun DISPLAY autorisé dans la DAL.
+- La DAL doit contenir des EXEC SQL (curseur/maj).

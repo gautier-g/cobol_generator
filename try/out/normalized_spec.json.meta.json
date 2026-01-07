@@ -1,12 +1,12 @@
 {
-  "created_utc": "2025-12-08T15:57:23Z",
+  "created_utc": "2026-01-03T15:14:05Z",
   "extra": {
     "source_file": "/home/gapial/Bureau/cobol_generator/try/salaire_net.yaml"
   },
   "kind": "normalized_spec",
-  "mtime_utc": "2025-12-08T15:57:23Z",
+  "mtime_utc": "2026-01-03T15:14:04Z",
   "name": "normalized_spec.json",
   "path": "/home/gapial/Bureau/cobol_generator/try/out/normalized_spec.json",
-  "sha256": "ce72b08ef4c63e55b494f467834785fd14d1cd59f3841faaa8ea7f6c90075bd7",
+  "sha256": "670a6a44015b0163c443f450b24828e969a42a5e0767cf81ae0e46a4e43ca62f",
   "size": 17289
 }

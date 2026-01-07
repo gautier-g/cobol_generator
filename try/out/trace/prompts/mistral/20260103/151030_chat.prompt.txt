@@ -1,0 +1,38 @@
+[system] Expert COBOL. Génère uniquement le code COBOL demandé.
+[user] Réponds uniquement avec du code COBOL compilable, sans Markdown ni texte autour. La première ligne doit être IDENTIFICATION DIVISION. Un seul PROGRAM-ID, pas de sous-programmes. Fais attention aux indentations (écriture à partir de la huitième colonne). Retourne à la ligne à la fin du fichier.
+
+Contexte métier/SQL:
+- Table EMPLOYEE (issue du MCD) : EMP_ID INT PK, EMP_NAME VARCHAR(30), SALARY_BRUT DECIMAL(8,2), SALARY_NET DECIMAL(8,2).
+- SGBD: PostgreSQL. Dialecte COBOL: gnucobol.
+- Règle: ce programme est la couche DAL pour EMPLOYEE.
+- OCESQL: Utilise les règles de nomenclature d'Ocesql quand tu interragis avec la base de données.
+Sections requises : environment_division: optional, identification_division: required
+
+Structure imposée (LINKAGE uniquement) :
+- Le flag EOF et la structure EMPLOYEE sont reçus en paramètres (LINKAGE SECTION / USING).
+- Exemple de forme attendue :
+LINKAGE SECTION.
+01 END-OF-FILE PIC X.
+01 EMPLOYEE.
+    05 EMP-ID          PIC 9(4).
+    05 EMP-NAME        PIC A(30).
+    05 SALARY-BRUT     PIC 9(6)V99.
+    05 SALARY-NET      PIC 9(6)V99.
+
+PROCEDURE DIVISION USING END-OF-FILE EMPLOYEE.
+
+Contraintes de conception (pas de code donné) :
+- PROGRAM-ID doit être exactement : EMPLOYEE-DAL-DB.
+- Ne redéclare pas END-OF-FILE ni EMPLOYEE en WORKING-STORAGE. WORKING-STORAGE doit contenir uniquement les variables internes (SQLCA, WS-CONNECTED, WS-CURSOR-OPEN, etc.).
+- Inclure SQLCA car SQLCODE est utilisé (obligatoire).
+- Utiliser un curseur SQL pour lire EMPLOYEE (DECLARE/OPEN/FETCH/CLOSE). Nom du curseur : C_EMP.
+- Flag EOF : END-OF-FILE PIC X, valeurs Y/N.
+- Paragraphes attendus (exhaustif) : DAL-READ, DAL-SAVE, DAL-END et aucun autre paragraphe public.
+- Interdictions : aucun DISPLAY, aucun autre PROGRAM-ID, pas de sous-programmes.
+- Interface CALL/USING (si besoin) :
+Interface CALL/USING attendue:
+    LK-OPERATION: X(4) (direction: in)
+    LK-END-OF-FILE: X (direction: inout)
+    LK-EMPLOYEE: groupe EMPLOYEE (direction: inout)
+
+Fonctions (depuis YAM…

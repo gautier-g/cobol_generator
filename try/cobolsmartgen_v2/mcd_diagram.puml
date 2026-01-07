@@ -1,0 +1,8 @@
+@startuml
+class Employee {
+  EMP_ID : Integer (needed)
+  EMP_NAME : String (needed)
+  SALARY_BRUT : Float (needed)
+  SALARY_NET : Float (optional)
+}
+@enduml
