@@ -48,9 +48,6 @@
                EXEC SQL
                    CONNECT :USERNAME IDENTIFIED BY :PASSWD USING :DBNAME
                END-EXEC
-               EXEC SQL
-                   SET client_encoding TO 'LATIN1'
-               END-EXEC
                IF SQLCODE NOT = 0
                    MOVE 'Y' TO LK-EOF
                    EXIT PARAGRAPH
@@ -82,15 +79,15 @@
            IF SQLCODE NOT = 0
                MOVE 'Y' TO LK-EOF
            ELSE
-               MOVE WS-EMPID     TO LK-EMPID
-               MOVE WS-EMPNAME   TO LK-EMPNAME
-               MOVE WS-SALBRUT   TO LK-SALBRUT
-               MOVE WS-SALNET    TO LK-SALNET
+               MOVE WS-EMPID      TO LK-EMPID
+               MOVE WS-EMPNAME    TO LK-EMPNAME
+               MOVE WS-SALBRUT    TO LK-SALBRUT
+               MOVE WS-SALNET     TO LK-SALNET
            END-IF.
 
        SAVE-EMP.
-           MOVE LK-EMPID         TO WS-EMPID.
-           MOVE LK-SALNET        TO WS-SALNET.
+           MOVE LK-EMPID      TO WS-EMPID.
+           MOVE LK-SALNET     TO WS-SALNET.
 
            EXEC SQL
                UPDATE EMPLOYEE

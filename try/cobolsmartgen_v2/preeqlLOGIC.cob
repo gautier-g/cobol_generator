@@ -1,5 +1,5 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. PROCESS-EMPLOYEES.
+       PROGRAM-ID. CALCULSALAIRE.
        DATA DIVISION.
        WORKING-STORAGE SECTION.
        01 WS-EOF                 PIC X VALUE 'N'.
@@ -8,7 +8,6 @@
            05 WS-EMPNAME         PIC X(30).
            05 WS-SALBRUT         PIC 9(6)V99.
            05 WS-SALNET          PIC 9(6)V99.
-
 OCESQL*
        PROCEDURE DIVISION.
        MAIN.
@@ -16,10 +15,10 @@ OCESQL*
                CALL 'EMPLOYEEDAL' USING 'READ' WS-EOF WS-EMPLOYEE
                IF WS-EOF NOT = 'Y'
                    COMPUTE WS-SALNET = WS-SALBRUT * 0.8
-                   CALL 'EMPLOYEEDAL' USING 'SAVE' WS-EOF WS-EMPLOYEE
+                   MOVE WS-EMPLOYEE TO WS-EMPLOYEE
                    CALL 'DISPLAYEMP' USING WS-EMPLOYEE
+                   CALL 'EMPLOYEEDAL' USING 'SAVE' WS-EOF WS-EMPLOYEE
                END-IF
-           END-PERFORM
-
-           CALL 'EMPLOYEEDAL' USING 'END ' WS-EOF WS-EMPLOYEE
+           END-PERFORM.
+           CALL 'EMPLOYEEDAL' USING 'END ' WS-EOF WS-EMPLOYEE.
            STOP RUN.

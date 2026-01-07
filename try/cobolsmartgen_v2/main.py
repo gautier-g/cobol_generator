@@ -1,56 +1,163 @@
-import os
 import argparse
+import subprocess
 from mistralai import Mistral
 
-def ask_and_save(file_in, file_out):
-    api_key = 'Y4rxXqqWMv6m5haItVW1IpagkcHoyYdb'
+def generate_cobol(puml_filename, database_operations_string, display_operations_string, basic_functionality_string):
+    api_key = 'Y4rxXqqWMv6m5haItVW1IpagkcHoyYdb' # next we'll use Mixtral 8x22B locally
     
     if not api_key:
-        raise ValueError("La clé API MISTRAL_API_KEY n'est pas définie dans les variables d'environnement")
+        raise ValueError("La clé API MISTRAL n'est pas valide.")
     
-    print(f"Lecture du fichier '{file_in}'...")
-    with open(file_in, "r", encoding="utf-8") as f:
-        prompt = f.read()
-    
+    print(f"Initialisation du client mistral...")
     client = Mistral(api_key=api_key)
     
-    print("Envoi de la requête à l'API Mistral...")
-    response = client.chat.complete(
+    # OUVERTURE DES TEMPLATES
+    print(f"Ouverture du fichier input-dal.txt...")
+    with open('input-dal.txt', "r", encoding="utf-8") as f:
+        dal_input = f.read()
+        
+    print(f"Ouverture du fichier input-business.txt...")
+    with open('input-business.txt', "r", encoding="utf-8") as f:
+        business_input = f.read()
+        
+    print(f"Ouverture du fichier input-logic.txt...")
+    with open('input-logic.txt', "r", encoding="utf-8") as f:
+        logic_input = f.read()    
+    
+    print(f"Ouverture du fichier '{puml_filename}'...")
+    with open(puml_filename, "r", encoding="utf-8") as f:
+        class_diagram_string = f.read()
+    
+    
+    # CRÉATION DU FICHIER DAL
+    dal_input = dal_input.replace("puml_diagram", class_diagram_string)
+    dal_input = dal_input.replace("database_operations", database_operations_string)
+    
+    print("Envoi de la requête pour la couche physique...")
+    dal_response = client.chat.complete(
         model="mistral-large-latest",
         messages=[
             {
                 "role": "user",
-                "content": prompt
+                "content": dal_input
             }
         ]
-    )
+    ).choices[0].message.content
     
-    contenu_reponse = response.choices[0].message.content
+    print(f"✓ Création du fichier DAL.cbl...")
+    with open('DAL.cbl', "w", encoding="utf-8") as f:
+        f.write(dal_response)
+        
+    with open('DAL.cbl', "r", encoding="utf-8") as f:    
+        dal_data = f.read()
     
-    with open(file_out, "w", encoding="utf-8") as f:
-        f.write(contenu_reponse)
     
-    print(f"✓ Réponse sauvegardée dans '{file_out}'")
-    return contenu_reponse
+    # CRÉATION DU FICHIER BUSINESS
+    business_input = business_input.replace("physical_layer", dal_data)
+    business_input = business_input.replace("display_operations", display_operations_string)
+    
+    print("Envoi de la requête pour la couche business...")
+    business_response = client.chat.complete(
+        model="mistral-large-latest",
+        messages=[
+            {
+                "role": "user",
+                "content": business_input
+            }
+        ]
+    ).choices[0].message.content
+    
+    print(f"✓ Création du fichier BUSINESS.cbl...")
+    with open('BUSINESS.cbl', "w", encoding="utf-8") as f:
+        f.write(business_response)
+    
+    with open('BUSINESS.cbl', "r", encoding="utf-8") as f:
+        business_data = f.read()
+    
+    
+    # CRÉATION DU FICHIER LOGIC
+    logic_input = logic_input.replace("business_layer", business_data)
+    logic_input = logic_input.replace("physical_layer", dal_data)
+    logic_input = logic_input.replace("basic_functionality", basic_functionality_string)
+    
+    print("Envoi de la requête pour la couche logique...")
+    business_response = client.chat.complete(
+        model="mistral-large-latest",
+        messages=[
+            {
+                "role": "user",
+                "content": logic_input
+            }
+        ]
+    ).choices[0].message.content
+    
+    print(f"✓ Création du fichier LOGIC.cbl...")
+    with open('LOGIC.cbl', "w", encoding="utf-8") as f:
+        f.write(business_response)
+    
+    
+    #EXÉCUTION DE LA PRÉCOMPILATION
+    compute_bash_command(['ocesql', 'DAL.cbl'])
+    compute_bash_command(['ocesql', 'BUSINESS.cbl'])
+    compute_bash_command(['ocesql', 'LOGIC.cbl'])
+    
+    
+    #EXÉCUTION DE LA COMPILATION
+    compute_bash_command(["cobc",
+                          "-x",
+                          "-o",
+                          "EMPLOYEE",
+                          "preeqlLOGIC.cob",
+                          "preeqlBUSINESS.cob",
+                          "preeqlDAL.cob",
+                          "-I/usr/local/share/open-cobol-esql/copy",
+                          "-L/usr/local/lib",
+                          "-locesql",
+                          "-lpq"])
+    
+    return
+
+def compute_bash_command(cmd_array):
+    try:
+        result = subprocess.run(
+            cmd_array,
+            capture_output=True,  
+            text=True,            
+            check=True,           
+            timeout=10            
+        )
+        
+        print("✅ Succès!")
+        print(result.stdout)
+        
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Erreur (code {e.returncode}):")
+        print(e.stderr)
+    except subprocess.TimeoutExpired:
+        print("⏱️ Timeout dépassé")
+    
+    return
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Envoie le contenu d'un fichier à l'API Mistral et sauvegarde la réponse"
-    )
-    parser.add_argument(
-        "input_file",
-        help="Chemin du fichier contenant le prompt"
-    )
-    parser.add_argument(
-        "output_file",
-        help="Chemin du fichier où sauvegarder la réponse"
-    )
-    
-    args = parser.parse_args()
-    
     try:
-        ask_and_save(args.input_file, args.output_file)
-    except FileNotFoundError:
-        print(f"Erreur: Le fichier '{args.input_file}' n'existe pas")
+        parser = argparse.ArgumentParser()
+        parser.add_argument('puml_filename')
+        parser.add_argument('database_operations')
+        parser.add_argument('display_operations')
+        parser.add_argument('basic_functionality')
+        
+        args = parser.parse_args()
+        
+        generate_cobol(args.puml_filename, 
+                       args.database_operations, 
+                       args.display_operations, 
+                       args.basic_functionality)
+        
+    except SystemExit as e:
+        # argparse appelle sys.exit() en cas d'erreur
+        if e.code != 0:
+            print("\n❌ Arguments invalides. Utilisez --help pour voir l'usage.")
+        raise
     except Exception as e:
-        print(f"Erreur: {e}")
+        print(f"❌ Erreur inattendue: {e}")
+        sys.exit(1)

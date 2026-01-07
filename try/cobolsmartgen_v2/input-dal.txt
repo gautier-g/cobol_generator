@@ -4,16 +4,9 @@ N'ajoute aucune fonctionnalité qui n'est pas demandée.
 
 Explication du code à rédiger:
     Voici un diagramme de classes plantuml:
-    @startuml
-    class employee {
-        EMP_ID : integer (needed)
-        EMP_NAME : varchar(30) (needed)
-        SALARY_BRUT : numeric(8,2) (needed)
-        SALARY_NET : numeric(8,2) (optional)
-    }
-    @enduml
+puml_diagram
 
-Donne moi un programme COBOL qui permet de parcourir une telle table et qui fournit des procédures pour sauvegarder un élément ou lire un élément.
+database_operations
 Ce programme est destiné à être appelé par un fichier parent.
 Ce programme doit utiliser OCESQL pour manipuler SQL.
 La base de données est nommée 'postgres', et il faut s'y connecter avec l'utilisateur 'postgres' et le mot de passe 'postgres'.
