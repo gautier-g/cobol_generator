@@ -9,6 +9,7 @@
            05 WS-SALBRUT         PIC 9(6)V99.
            05 WS-SALNET          PIC 9(6)V99.
 
+OCESQL*
        PROCEDURE DIVISION.
        MAIN.
            PERFORM UNTIL WS-EOF = 'Y'

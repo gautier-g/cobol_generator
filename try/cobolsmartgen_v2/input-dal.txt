@@ -145,3 +145,4 @@ Voici un exemple de code fonctionnel pour que tu comprennes la syntaxe d'OCESQL:
            
 Ne dépasse jamais la colonne 72!
 Ne mets pas de tiret dans le nom du curseur OCESQL.
+Ce programme est destiné à être appelé par un fichier parent.

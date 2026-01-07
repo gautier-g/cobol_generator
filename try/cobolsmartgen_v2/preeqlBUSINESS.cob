@@ -12,6 +12,7 @@
            05 FILLER              PIC X(5) VALUE SPACES.
            05 WS-DISP-SALNET      PIC ZZZZZ9.99.
 
+OCESQL*
        LINKAGE SECTION.
        01 LK-EMPLOYEE.
            05 LK-EMPID            PIC 9(4).

@@ -1,5 +1,5 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. EMPLOYEE-DAL.
+       PROGRAM-ID. EMPLOYEEDAL.
        ENVIRONMENT DIVISION.
        CONFIGURATION SECTION.
        SOURCE-COMPUTER. IBM-PC.
@@ -14,112 +14,94 @@
        01 DBNAME                 PIC X(30) VALUE 'postgres'.
        01 USERNAME               PIC X(30) VALUE 'postgres'.
        01 PASSWD                 PIC X(30) VALUE 'postgres'.
-       01 WS-EMP-ID              PIC 9(4).
-       01 WS-EMP-NAME            PIC X(30).
-       01 WS-SALARY-BRUT         PIC 9(6)V99.
-       01 WS-SALARY-NET          PIC 9(6)V99.
+       01 WS-EMPID               PIC 9(4).
+       01 WS-EMPNAME             PIC X(30).
+       01 WS-SALBRUT             PIC 9(6)V99.
+       01 WS-SALNET              PIC 9(6)V99.
        EXEC SQL END DECLARE SECTION END-EXEC.
 
        EXEC SQL INCLUDE SQLCA END-EXEC.
 
        LINKAGE SECTION.
        01 LK-OPERATION           PIC X(4).
-       01 LK-END-OF-FILE         PIC X.
+       01 LK-EOF                 PIC X.
        01 LK-EMPLOYEE.
-           05 LK-EMP-ID          PIC 9(4).
-           05 LK-EMP-NAME        PIC X(30).
-           05 LK-SALARY-BRUT     PIC 9(6)V99.
-           05 LK-SALARY-NET      PIC 9(6)V99.
+           05 LK-EMPID           PIC 9(4).
+           05 LK-EMPNAME         PIC X(30).
+           05 LK-SALBRUT         PIC 9(6)V99.
+           05 LK-SALNET          PIC 9(6)V99.
 
-       PROCEDURE DIVISION USING LK-OPERATION LK-END-OF-FILE
-           LK-EMPLOYEE.
-       MAIN-LOGIC.
+       PROCEDURE DIVISION USING LK-OPERATION LK-EOF LK-EMPLOYEE.
+       MAIN.
            EVALUATE LK-OPERATION
                WHEN 'READ'
-                   PERFORM DAL-READ
+                   PERFORM READ-EMP
                WHEN 'SAVE'
-                   PERFORM DAL-SAVE
-               WHEN 'INIT'
-                   PERFORM DAL-INIT
+                   PERFORM SAVE-EMP
                WHEN 'END '
-                   PERFORM DAL-END
+                   PERFORM END-DAL
            END-EVALUATE.
            EXIT PROGRAM.
 
-       DAL-INIT.
+       READ-EMP.
            IF WS-CONNECTED = 'N'
                EXEC SQL
                    CONNECT :USERNAME IDENTIFIED BY :PASSWD USING :DBNAME
                END-EXEC
+               EXEC SQL
+                   SET client_encoding TO 'LATIN1'
+               END-EXEC
                IF SQLCODE NOT = 0
-                   MOVE 'Y' TO LK-END-OF-FILE
+                   MOVE 'Y' TO LK-EOF
                    EXIT PARAGRAPH
                END-IF
                MOVE 'Y' TO WS-CONNECTED
            END-IF.
 
-       DAL-READ.
            IF WS-CURSOR-OPEN = 'N'
                EXEC SQL
-                   DECLARE C-EMP CURSOR FOR
+                   DECLARE CEMP CURSOR FOR
                    SELECT EMP_ID, EMP_NAME, SALARY_BRUT, SALARY_NET
                    FROM EMPLOYEE
                END-EXEC
                EXEC SQL
-                   OPEN C-EMP
+                   OPEN CEMP
                END-EXEC
                IF SQLCODE NOT = 0
-                   MOVE 'Y' TO LK-END-OF-FILE
+                   MOVE 'Y' TO LK-EOF
                    EXIT PARAGRAPH
                END-IF
                MOVE 'Y' TO WS-CURSOR-OPEN
            END-IF.
 
            EXEC SQL
-               FETCH C-EMP INTO
-                   :WS-EMP-ID,
-                   :WS-EMP-NAME,
-                   :WS-SALARY-BRUT,
-                   :WS-SALARY-NET
+               FETCH CEMP INTO
+                   :WS-EMPID, :WS-EMPNAME, :WS-SALBRUT, :WS-SALNET
            END-EXEC.
 
            IF SQLCODE NOT = 0
-               MOVE 'Y' TO LK-END-OF-FILE
+               MOVE 'Y' TO LK-EOF
            ELSE
-               MOVE WS-EMP-ID        TO LK-EMP-ID
-               MOVE WS-EMP-NAME      TO LK-EMP-NAME
-               MOVE WS-SALARY-BRUT   TO LK-SALARY-BRUT
-               MOVE WS-SALARY-NET    TO LK-SALARY-NET
+               MOVE WS-EMPID     TO LK-EMPID
+               MOVE WS-EMPNAME   TO LK-EMPNAME
+               MOVE WS-SALBRUT   TO LK-SALBRUT
+               MOVE WS-SALNET    TO LK-SALNET
            END-IF.
 
-       DAL-SAVE.
-           MOVE LK-EMP-ID        TO WS-EMP-ID.
-           MOVE LK-EMP-NAME      TO WS-EMP-NAME.
-           MOVE LK-SALARY-BRUT   TO WS-SALARY-BRUT.
-           MOVE LK-SALARY-NET    TO WS-SALARY-NET.
+       SAVE-EMP.
+           MOVE LK-EMPID         TO WS-EMPID.
+           MOVE LK-SALNET        TO WS-SALNET.
 
            EXEC SQL
-               INSERT INTO EMPLOYEE
-               (EMP_ID, EMP_NAME, SALARY_BRUT, SALARY_NET)
-               VALUES
-               (:WS-EMP-ID, :WS-EMP-NAME, :WS-SALARY-BRUT,
-               :WS-SALARY-NET)
+               UPDATE EMPLOYEE
+               SET SALARY_NET = :WS-SALNET
+               WHERE EMP_ID = :WS-EMPID
            END-EXEC.
 
-           IF SQLCODE NOT = 0
-               EXEC SQL
-                   UPDATE EMPLOYEE
-                   SET EMP_NAME = :WS-EMP-NAME,
-                       SALARY_BRUT = :WS-SALARY-BRUT,
-                       SALARY_NET = :WS-SALARY-NET
-                   WHERE EMP_ID = :WS-EMP-ID
-               END-EXEC
-           END-IF.
-
-       DAL-END.
+       END-DAL.
            IF WS-CURSOR-OPEN = 'Y'
                EXEC SQL
-                   CLOSE C-EMP
+                   CLOSE CEMP
                END-EXEC
                MOVE 'N' TO WS-CURSOR-OPEN
            END-IF.
