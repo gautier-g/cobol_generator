@@ -1,37 +1,44 @@
 import argparse
 import subprocess
+import yaml
 from mistralai import Mistral
 
-def generate_cobol(puml_filename, database_operations_string, display_operations_string, basic_functionality_string):
+def generate_cobol(yaml_filename):
     api_key = 'Y4rxXqqWMv6m5haItVW1IpagkcHoyYdb' # next we'll use Mixtral 8x22B locally
     
     if not api_key:
         raise ValueError("La clé API MISTRAL n'est pas valide.")
     
+    # INITIALISATION DES VARIABLES ET DE MISTRAL
+    with open("input.yaml", "r", encoding="utf-8") as file:
+        input_data = yaml.safe_load(file)
+
+    class_diagram_string = input_data["puml_diagram"]
+    database_operations_string = input_data["database_operations_string"]
+    display_operations_string = input_data["layer_operations_string"]
+    basic_functionality_string = input_data["basic_functionality_string"]
+    
     print(f"Initialisation du client mistral...")
     client = Mistral(api_key=api_key)
     
+    
     # OUVERTURE DES TEMPLATES
     print(f"Ouverture du fichier input-dal.txt...")
-    with open('input-dal.txt', "r", encoding="utf-8") as f:
-        dal_input = f.read()
+    with open('dal-template.txt', "r", encoding="utf-8") as f:
+        dal_template = f.read()
         
     print(f"Ouverture du fichier input-business.txt...")
-    with open('input-business.txt', "r", encoding="utf-8") as f:
-        business_input = f.read()
+    with open('business-template.txt', "r", encoding="utf-8") as f:
+        business_template = f.read()
         
     print(f"Ouverture du fichier input-logic.txt...")
-    with open('input-logic.txt', "r", encoding="utf-8") as f:
-        logic_input = f.read()    
-    
-    print(f"Ouverture du fichier '{puml_filename}'...")
-    with open(puml_filename, "r", encoding="utf-8") as f:
-        class_diagram_string = f.read()
+    with open('logic-template.txt', "r", encoding="utf-8") as f:
+        logic_template = f.read()
     
     
     # CRÉATION DU FICHIER DAL
-    dal_input = dal_input.replace("puml_diagram", class_diagram_string)
-    dal_input = dal_input.replace("database_operations", database_operations_string)
+    dal_template = dal_template.replace("puml_diagram", class_diagram_string)
+    dal_template = dal_template.replace("database_operations", database_operations_string)
     
     print("Envoi de la requête pour la couche physique...")
     dal_response = client.chat.complete(
@@ -39,7 +46,7 @@ def generate_cobol(puml_filename, database_operations_string, display_operations
         messages=[
             {
                 "role": "user",
-                "content": dal_input
+                "content": dal_template
             }
         ]
     ).choices[0].message.content
@@ -53,8 +60,8 @@ def generate_cobol(puml_filename, database_operations_string, display_operations
     
     
     # CRÉATION DU FICHIER BUSINESS
-    business_input = business_input.replace("physical_layer", dal_data)
-    business_input = business_input.replace("display_operations", display_operations_string)
+    business_template = business_template.replace("physical_layer", dal_data)
+    business_template = business_template.replace("display_operations", display_operations_string)
     
     print("Envoi de la requête pour la couche business...")
     business_response = client.chat.complete(
@@ -62,7 +69,7 @@ def generate_cobol(puml_filename, database_operations_string, display_operations
         messages=[
             {
                 "role": "user",
-                "content": business_input
+                "content": business_template
             }
         ]
     ).choices[0].message.content
@@ -76,9 +83,9 @@ def generate_cobol(puml_filename, database_operations_string, display_operations
     
     
     # CRÉATION DU FICHIER LOGIC
-    logic_input = logic_input.replace("business_layer", business_data)
-    logic_input = logic_input.replace("physical_layer", dal_data)
-    logic_input = logic_input.replace("basic_functionality", basic_functionality_string)
+    logic_template = logic_template.replace("business_layer", business_data)
+    logic_template = logic_template.replace("physical_layer", dal_data)
+    logic_template = logic_template.replace("basic_functionality", basic_functionality_string)
     
     print("Envoi de la requête pour la couche logique...")
     business_response = client.chat.complete(
@@ -86,7 +93,7 @@ def generate_cobol(puml_filename, database_operations_string, display_operations
         messages=[
             {
                 "role": "user",
-                "content": logic_input
+                "content": logic_template
             }
         ]
     ).choices[0].message.content
@@ -141,17 +148,11 @@ def compute_bash_command(cmd_array):
 if __name__ == "__main__":
     try:
         parser = argparse.ArgumentParser()
-        parser.add_argument('puml_filename')
-        parser.add_argument('database_operations')
-        parser.add_argument('display_operations')
-        parser.add_argument('basic_functionality')
+        parser.add_argument('yaml_filename')
         
         args = parser.parse_args()
         
-        generate_cobol(args.puml_filename, 
-                       args.database_operations, 
-                       args.display_operations, 
-                       args.basic_functionality)
+        generate_cobol(args.yaml_filename)
         
     except SystemExit as e:
         # argparse appelle sys.exit() en cas d'erreur

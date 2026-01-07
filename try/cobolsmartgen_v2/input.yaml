@@ -1,0 +1,23 @@
+puml_diagram: |
+  @startuml
+  class Employee {
+    EMP_ID : Integer (needed)
+    EMP_NAME : String (needed)
+    SALARY_BRUT : Float (needed)
+    SALARY_NET : Float (optional)
+  }
+  @enduml
+
+database_operations_string: |
+  Donne moi un programme COBOL qui permet de parcourir une telle table
+  et qui fournit des procédures pour sauvegarder un élément
+  ou lire un élément.
+
+layer_operations_string: |
+  Donne moi un programme COBOL qui permet d'afficher un élément EMPLOYEE.
+
+basic_functionality_string: |
+  Donne moi un programme COBOL qui parcours les éléments de la table employee
+  et qui calculent la valeur du salaire net pour chaque
+  puis sauvegarde dans la base de données
+  (avec un affichage pour chaque employé itéré).

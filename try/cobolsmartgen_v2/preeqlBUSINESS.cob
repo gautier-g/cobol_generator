@@ -8,12 +8,12 @@ OCESQL*
        01 LK-EMPLOYEE.
            05 LK-EMPID           PIC 9(4).
            05 LK-EMPNAME         PIC X(30).
-           05 LK-SALBRUT         PIC 9(6)V99.
-           05 LK-SALNET          PIC 9(6)V99.
+           05 LK-SALARYBRUT      PIC 9(6)V99.
+           05 LK-SALARYNET       PIC 9(6)V99.
        PROCEDURE DIVISION USING LK-EMPLOYEE.
        MAIN.
            DISPLAY "ID: " LK-EMPID.
            DISPLAY "NOM: " LK-EMPNAME.
-           DISPLAY "SALAIRE BRUT: " LK-SALBRUT.
-           DISPLAY "SALAIRE NET: " LK-SALNET.
+           DISPLAY "SALAIRE BRUT: " LK-SALARYBRUT.
+           DISPLAY "SALAIRE NET: " LK-SALARYNET.
            EXIT PROGRAM.
