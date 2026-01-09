@@ -10,4 +10,5 @@ business_layer
         Couche physique:
 physical_layer
 
-basic_functionality
+basic_functionality Ne dépasse jamais la colonne 72 c'est vraiment indispensable.
+Ce programme doit utiliser les deux autres et il ne doit pas avoir de LINKAGE SECTION.

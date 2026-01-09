@@ -7,7 +7,7 @@
        DATA DIVISION.
        WORKING-STORAGE SECTION.
        01 WS-CONNECTED           PIC X VALUE 'N'.
-       01 WS-CURSOROPEN          PIC X VALUE 'N'.
+       01 WS-CURSOR-OPEN         PIC X VALUE 'N'.
        01 WS-SQLCODE             PIC S9(9) COMP-5.
 
 OCESQL*EXEC SQL BEGIN DECLARE SECTION END-EXEC.
@@ -80,7 +80,7 @@ OCESQL     END-CALL
                MOVE 'Y' TO WS-CONNECTED
            END-IF.
 
-           IF WS-CURSOROPEN = 'N'
+           IF WS-CURSOR-OPEN = 'N'
 OCESQL*        EXEC SQL
 OCESQL*            DECLARE CEMP CURSOR FOR
 OCESQL*            SELECT EMP_ID, EMP_NAME, SALARY_BRUT, SALARY_NET
@@ -102,15 +102,12 @@ OCESQL     END-CALL
                    MOVE 'Y' TO LK-EOF
                    EXIT PARAGRAPH
                END-IF
-               MOVE 'Y' TO WS-CURSOROPEN
+               MOVE 'Y' TO WS-CURSOR-OPEN
            END-IF.
 
 OCESQL*    EXEC SQL
 OCESQL*        FETCH CEMP INTO
-OCESQL*            :WS-EMPID,
-OCESQL*            :WS-EMPNAME,
-OCESQL*            :WS-SALARYBRUT,
-OCESQL*            :WS-SALARYNET
+OCESQL*            :WS-EMPID, :WS-EMPNAME, :WS-SALARYBRUT, :WS-SALARYNET
 OCESQL*    END-EXEC.
 OCESQL     CALL "OCESQLStartSQL"
 OCESQL     END-CALL
@@ -186,7 +183,7 @@ OCESQL     CALL "OCESQLEndSQL"
 OCESQL     END-CALL.
 
        END-DAL.
-           IF WS-CURSOROPEN = 'Y'
+           IF WS-CURSOR-OPEN = 'Y'
 OCESQL*        EXEC SQL
 OCESQL*            CLOSE CEMP
 OCESQL*        END-EXEC
@@ -194,7 +191,7 @@ OCESQL     CALL "OCESQLCursorClose"  USING
 OCESQL          BY REFERENCE SQLCA
 OCESQL          BY REFERENCE "DAL_CEMP" & x"00"
 OCESQL     END-CALL
-               MOVE 'N' TO WS-CURSOROPEN
+               MOVE 'N' TO WS-CURSOR-OPEN
            END-IF.
 
 OCESQL*    EXEC SQL

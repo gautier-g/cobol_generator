@@ -8,4 +8,5 @@ Explication du code à rédiger:
 physical_layer
 
 display_operations
+Ne dépasse jamais la colonne 72!
 Ce programme est destiné à être appelé par un fichier parent.

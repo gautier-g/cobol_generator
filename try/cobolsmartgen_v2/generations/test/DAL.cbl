@@ -7,7 +7,7 @@
        DATA DIVISION.
        WORKING-STORAGE SECTION.
        01 WS-CONNECTED           PIC X VALUE 'N'.
-       01 WS-CURSOROPEN          PIC X VALUE 'N'.
+       01 WS-CURSOR-OPEN         PIC X VALUE 'N'.
        01 WS-SQLCODE             PIC S9(9) COMP-5.
 
        EXEC SQL BEGIN DECLARE SECTION END-EXEC.
@@ -55,7 +55,7 @@
                MOVE 'Y' TO WS-CONNECTED
            END-IF.
 
-           IF WS-CURSOROPEN = 'N'
+           IF WS-CURSOR-OPEN = 'N'
                EXEC SQL
                    DECLARE CEMP CURSOR FOR
                    SELECT EMP_ID, EMP_NAME, SALARY_BRUT, SALARY_NET
@@ -68,15 +68,12 @@
                    MOVE 'Y' TO LK-EOF
                    EXIT PARAGRAPH
                END-IF
-               MOVE 'Y' TO WS-CURSOROPEN
+               MOVE 'Y' TO WS-CURSOR-OPEN
            END-IF.
 
            EXEC SQL
                FETCH CEMP INTO
-                   :WS-EMPID,
-                   :WS-EMPNAME,
-                   :WS-SALARYBRUT,
-                   :WS-SALARYNET
+                   :WS-EMPID, :WS-EMPNAME, :WS-SALARYBRUT, :WS-SALARYNET
            END-EXEC.
 
            IF SQLCODE NOT = 0
@@ -99,11 +96,11 @@
            END-EXEC.
 
        END-DAL.
-           IF WS-CURSOROPEN = 'Y'
+           IF WS-CURSOR-OPEN = 'Y'
                EXEC SQL
                    CLOSE CEMP
                END-EXEC
-               MOVE 'N' TO WS-CURSOROPEN
+               MOVE 'N' TO WS-CURSOR-OPEN
            END-IF.
 
            EXEC SQL

@@ -1,10 +1,12 @@
+generation_name: test
+
 puml_diagram: |
   @startuml
   class Employee {
-    EMP_ID : Integer (needed)
-    EMP_NAME : String (needed)
-    SALARY_BRUT : Float (needed)
-    SALARY_NET : Float (optional)
+    EMP_ID : integer (needed)
+    EMP_NAME : varchar(30) (needed)
+    SALARY_BRUT : numeric(8,2) (needed)
+    SALARY_NET : numeric(8,2) (optional)
   }
   @enduml
 
