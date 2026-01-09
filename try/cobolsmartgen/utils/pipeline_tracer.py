@@ -33,6 +33,7 @@ def init_trace(out_dir: str, run_id: Optional[str] = None):
             "GROQ_TIMEOUT_S": os.getenv("GROQ_TIMEOUT_S"),
             "CSG_USE_LLM_HEADERS": os.getenv("CSG_USE_LLM_HEADERS"),
             "CSG_USE_LLM_PROCS": os.getenv("CSG_USE_LLM_PROCS"),
+            "CSG_USE_LLM_STEPS": os.getenv("CSG_USE_LLM_STEPS"),
         }
     }
     

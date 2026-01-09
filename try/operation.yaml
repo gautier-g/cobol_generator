@@ -1,0 +1,1406 @@
+# Exemple - Gestion de stock et reapprovisionnement
+title: GESTION-STOCK
+dialecte_cobol: gnucobol
+sql_cible: postgres
+
+nommage:
+  variables_case: UPPER_SNAKE      # ex : REORDER_QTY, END-OF-FILE
+  programmes_case: UPPER-KEBAB     # ex : PRODUCT-DAL-DB, PRODUCT-LOGIC
+
+cobol_format:
+  line_format: fixed
+  indent_spaces: 7
+  max_line_length: 72
+  comment:
+    column: 7
+    prefix: "*"
+  literal_quotes: single
+  paragraph_terminator: "."
+  allow_source_format_directive: false
+
+naming_rules:
+  prefixes:
+    working_storage: "WS-"
+    linkage: "LK-"
+    flags: "WS-"
+  paragraph_style: "VERB-NOUN"
+
+fonctionnalites:
+  - id: F1
+    resume: "Calculer les quantites de reapprovisionnement necessaires pour chaque produit en fonction du stock actuel, du stock minimum et du delai de livraison."
+
+exigences:
+  - id: R1
+    type: regle_metier
+    regle: "Si STOCK_CURRENT < STOCK_MIN alors REORDER_QTY = (STOCK_MAX - STOCK_CURRENT) * LEAD_TIME_FACTOR et REORDER_STATUS = 'URGENT'; sinon si STOCK_CURRENT <= (STOCK_MIN * 1.2) alors REORDER_QTY = (STOCK_MAX - STOCK_CURRENT) et REORDER_STATUS = 'NORMAL'; sinon REORDER_QTY = 0 et REORDER_STATUS = 'OK'."
+    notes: "LEAD_TIME_FACTOR est un multiplicateur base sur le delai de livraison (1 pour livraison rapide, 1.5 pour livraison standard, 2 pour livraison lente). REORDER_QTY doit etre arrondi a l'entier superieur et ne peut pas etre negatif."
+  - id: R2
+    type: regle_metier
+    regle: "REORDER_COST = REORDER_QTY * UNIT_COST"
+    notes: "Calcul du cout total de reapprovisionnement. Arrondi a 2 decimales."
+  - id: R3
+    type: technique
+    regle: "Traitement batch quotidien; journalisation des operations sur console avec compteurs (produits OK, produits a reapprovisionner normalement, produits urgents)."
+  - id: R4
+    type: validation
+    regle: "Si STOCK_CURRENT < 0 alors REORDER_STATUS = 'ERROR', REORDER_QTY = 0, REORDER_COST = 0 et signaler une anomalie (stock negatif impossible)."
+  - id: R5
+    type: validation
+    regle: "Si STOCK_MIN >= STOCK_MAX alors REORDER_STATUS = 'ERROR', REORDER_QTY = 0, REORDER_COST = 0 et signaler une anomalie (configuration invalide)."
+  - id: R6
+    type: validation
+    regle: "Si UNIT_COST <= 0 alors REORDER_STATUS = 'ERROR', REORDER_QTY = 0, REORDER_COST = 0 et signaler une anomalie (cout unitaire invalide)."
+  - id: R7
+    type: validation
+    regle: "Si LEAD_TIME_DAYS n'est pas dans [1, 365] alors utiliser valeur par defaut 7 et signaler un avertissement."
+
+mcd:
+  entites:
+    - name: PRODUCT
+      attrs:
+        - name: PROD_ID
+          type: INT
+          sql_type: INT
+          cobol_pic: "9(6)"
+          pk: true
+          nullable: false
+        - name: PROD_NAME
+          type: VARCHAR(50)
+          sql_type: VARCHAR(50)
+          cobol_pic: "X(50)"
+          nullable: false
+        - name: CATEGORY
+          type: VARCHAR(20)
+          sql_type: VARCHAR(20)
+          cobol_pic: "X(20)"
+          nullable: false
+        - name: STOCK_CURRENT
+          type: INT
+          sql_type: INT
+          cobol_pic: "S9(6)"
+          nullable: false
+        - name: STOCK_MIN
+          type: INT
+          sql_type: INT
+          cobol_pic: "9(6)"
+          nullable: false
+        - name: STOCK_MAX
+          type: INT
+          sql_type: INT
+          cobol_pic: "9(6)"
+          nullable: false
+        - name: UNIT_COST
+          type: DECIMAL(10,2)
+          sql_type: DECIMAL(10,2)
+          cobol_pic: "S9(8)V99"
+          nullable: false
+        - name: LEAD_TIME_DAYS
+          type: INT
+          sql_type: INT
+          cobol_pic: "9(3)"
+          nullable: false
+        - name: REORDER_QTY
+          type: INT
+          sql_type: INT
+          cobol_pic: "S9(6)"
+          nullable: true
+        - name: REORDER_COST
+          type: DECIMAL(12,2)
+          sql_type: DECIMAL(12,2)
+          cobol_pic: "S9(10)V99"
+          nullable: true
+        - name: REORDER_STATUS
+          type: VARCHAR(10)
+          sql_type: VARCHAR(10)
+          cobol_pic: "X(10)"
+          nullable: true
+  relations: []
+
+diagramme: |
+  erDiagram
+    PRODUCT {
+      INT PROD_ID PK
+      VARCHAR PROD_NAME
+      VARCHAR CATEGORY
+      INT STOCK_CURRENT
+      INT STOCK_MIN
+      INT STOCK_MAX
+      DECIMAL UNIT_COST
+      INT LEAD_TIME_DAYS
+      INT REORDER_QTY
+      DECIMAL REORDER_COST
+      VARCHAR REORDER_STATUS
+    }
+
+sql:
+  ddl:
+    PRODUCT: |
+      CREATE TABLE PRODUCT (
+          PROD_ID INT PRIMARY KEY,
+          PROD_NAME VARCHAR(50) NOT NULL,
+          CATEGORY VARCHAR(20) NOT NULL,
+          STOCK_CURRENT INT NOT NULL,
+          STOCK_MIN INT NOT NULL,
+          STOCK_MAX INT NOT NULL,
+          UNIT_COST DECIMAL(10,2) NOT NULL,
+          LEAD_TIME_DAYS INT NOT NULL,
+          REORDER_QTY INT,
+          REORDER_COST DECIMAL(12,2),
+          REORDER_STATUS VARCHAR(10)
+      );
+  initial_data:
+    PRODUCT:
+      - PROD_ID: 1001
+        PROD_NAME: "Clavier mecanique RGB"
+        CATEGORY: "PERIPHERIQUE"
+        STOCK_CURRENT: 5
+        STOCK_MIN: 20
+        STOCK_MAX: 100
+        UNIT_COST: 79.99
+        LEAD_TIME_DAYS: 7
+        REORDER_QTY: 0
+        REORDER_COST: 0.00
+        REORDER_STATUS: "PENDING"
+      - PROD_ID: 1002
+        PROD_NAME: "Souris sans fil"
+        CATEGORY: "PERIPHERIQUE"
+        STOCK_CURRENT: 45
+        STOCK_MIN: 30
+        STOCK_MAX: 80
+        UNIT_COST: 29.99
+        LEAD_TIME_DAYS: 3
+        REORDER_QTY: 0
+        REORDER_COST: 0.00
+        REORDER_STATUS: "PENDING"
+      - PROD_ID: 1003
+        PROD_NAME: "Casque audio Bluetooth"
+        CATEGORY: "AUDIO"
+        STOCK_CURRENT: 2
+        STOCK_MIN: 15
+        STOCK_MAX: 50
+        UNIT_COST: 149.99
+        LEAD_TIME_DAYS: 14
+        REORDER_QTY: 0
+        REORDER_COST: 0.00
+        REORDER_STATUS: "PENDING"
+  indexes:
+    - entity: PRODUCT
+      name: PRODUCT_CATEGORY_IDX
+      columns: [CATEGORY]
+    - entity: PRODUCT
+      name: PRODUCT_STATUS_IDX
+      columns: [REORDER_STATUS]
+  connection:
+    engine: postgres
+    method: ocesql
+    dbname: stockdb
+    user: stockuser
+    password: STOCKPWD
+    host: localhost
+    port: 5432
+    env_vars:
+      PGHOST: "localhost"
+      PGPORT: "5432"
+      PGUSER: "stockuser"
+      PGPASSWORD: "STOCKPWD"
+      PGDATABASE: "stockdb"
+    env_set_method:
+      - "DISPLAY <ENV_NAME> UPON ENVIRONMENT-NAME"
+      - "DISPLAY <ENV_VALUE> UPON ENVIRONMENT-VALUE"
+    ocesql:
+      start_call: "OCESQLStartSQL"
+      connect_call: "OCESQLConnect"
+      end_call: "OCESQLEndSQL"
+      connect_args:
+        - "SQLCA"
+        - "WS-DB-USER"
+        - "WS-DB-USER-LEN"
+        - "WS-DB-PASSWORD"
+        - "WS-DB-PASSWORD-LEN"
+        - "WS-DB-NAME"
+        - "WS-DB-NAME-LEN"
+      connect_args_order_note: "order: SQLCA, user, user_len, password, password_len, dbname, dbname_len"
+  behavior:
+    check_sqlcode: true
+    check_sqlstate: true
+    sqlcode_success: 0
+    sqlcode_eof: 100
+    rollback_on_error: false
+    commit:
+      mode: "end"
+      statement: "EXEC SQL COMMIT END-EXEC."
+    disconnect:
+      statement: "EXEC SQL DISCONNECT ALL END-EXEC."
+    null_indicators: false
+    cursor_commit_policy: "no_commit_while_open"
+  formatting:
+    max_line_length: 72
+    host_vars_one_per_line: true
+    split_long_exec_sql: true
+
+mapping_types:
+  - sql: "INT"
+    cobol_pic_default: "9(6)"
+  - sql: "VARCHAR(50)"
+    cobol_pic_default: "X(50)"
+  - sql: "VARCHAR(20)"
+    cobol_pic_default: "X(20)"
+  - sql: "VARCHAR(10)"
+    cobol_pic_default: "X(10)"
+  - sql: "DECIMAL(10,2)"
+    cobol_pic_default: "S9(8)V99"
+  - sql: "DECIMAL(12,2)"
+    cobol_pic_default: "S9(10)V99"
+
+technique:
+  cursor_naming:
+    pattern: "C_<ENTITY_UPPER3>"
+    example:
+      PRODUCT: "C_PRD"
+  eof_flag:
+    name: "END-OF-FILE"
+    pic: "X"
+    initial_value: "N"
+    true_value: "Y"
+    false_value: "N"
+  sqlca_required: true
+  dal_call_pattern:
+    description: "Programme DAL appele avec un code operation court (READ, SAVE, END)."
+    operation_param_name: "OPERATION"
+    operation_pic: "X(4)"
+    eof_param_name: "END-OF-FILE"
+    product_param_name: "PRODUCT"
+
+prompting:
+  global_constraints:
+    - "Reponds uniquement avec du code COBOL compilable, sans Markdown ni texte autour."
+    - "La premiere ligne doit etre IDENTIFICATION DIVISION."
+    - "Un seul PROGRAM-ID, pas de sous-programmes."
+  forbidden_items:
+    - "GO TO"
+    - "*>"
+  global_directives:
+    - "Utilise strictement les identifiants, messages, SQL et sequences definis dans la spec."
+    - "N'invente aucune variable, paragraphe, message ou SQL."
+    - "Respecte exactement les listes de WORKING-STORAGE, LINKAGE et USING."
+    - "Toujours utiliser les terminateurs explicites END-IF / END-EVALUATE / END-PERFORM / END-EXEC."
+    - "Pas de GO TO, pas de logique DAL dans LOGIC, pas de SQL hors DAL."
+    - "Toute variable utilisee doit etre declaree (WORKING-STORAGE ou LINKAGE)."
+    - "Chaque paragraphe DOIT etre declare sur une ligne avec un point (ex: MAIN-ENTRY.)."
+    - "Ne termine aucune instruction par un point (sauf EXEC SQL INCLUDE SQLCA END-EXEC.); seul un point sur une ligne seule termine un paragraphe."
+    - "Dans DATA DIVISION (WORKING-STORAGE/LINKAGE), toute ligne 01/05/77/88 avec PIC ou VALUE doit se terminer par un point. Regle non applicable en PROCEDURE DIVISION."
+  generation_strategy:
+    - "1) Construis d'abord le squelette COBOL complet (DIVISION/SECTION) dans l'ordre."
+    - "2) Insere les blocs WORKING-STORAGE/LINKAGE exacts fournis par la spec."
+    - "3) Ecris la PROCEDURE DIVISION en suivant le flow et les fonctions."
+    - "4) Verifie la coherence: aucune variable/paragraphes inventes."
+  formatting_guidelines:
+    - "Format FIXED: instructions commencent en colonne 8 (prefixe de 7 espaces)."
+    - "Commentaires: '*' en colonne 7 (6 espaces + '*'), pas de commentaires '*>'."
+    - "Ne pas utiliser '>>SOURCE FORMAT FREE'."
+    - "Terminer chaque paragraphe par une ligne avec un seul point."
+    - "Le nom du paragraphe se termine par un point (ex: MAIN-ENTRY.)."
+    - "En DATA DIVISION, chaque ligne 01/05/77/88 avec PIC ou VALUE se termine par un point."
+    - "Aucune ligne ne doit depasser 72 colonnes (format FIXED)."
+    - "Si une instruction depasse 72 colonnes, la scinder sur plusieurs lignes."
+    - "Pour EXEC SQL FETCH/SELECT/UPDATE: mettre chaque variable hote sur sa propre ligne."
+    - "Ne pas mettre de point en fin de DISPLAY/GOBACK/STOP RUN/CALL/MOVE/IF (sauf EXEC SQL INCLUDE SQLCA END-EXEC.)."
+    - "Utiliser des guillemets simples pour les messages DISPLAY."
+    - "Respecter l'ordre: IDENTIFICATION -> ENVIRONMENT -> DATA -> PROCEDURE."
+    - "Dans DATA: WORKING-STORAGE puis LINKAGE (si present)."
+  programs:
+    PRODUCT-DAL-DB:
+      sections_order: [strategy, context, style, format, naming, environment, interface, structure, working_storage, sql, sql_format, sql_behavior, flow, logging, constraints, skeleton, fonctions]
+      context:
+        - "SGBD: {sql_cible}. Dialecte COBOL: {dialecte_cobol}."
+        - "Table {entity}: {table_signature}"
+        - "Role: couche DAL pour {entity}."
+      style:
+        - "Guidelines globales: {formatting_guidelines}"
+        - "Header commentaire (verbatim):"
+        - "{header_comment_lines}"
+        - "Style specifique: {style_lines}"
+      environment:
+        - "ENVIRONMENT exact (lignes):"
+        - "{environment_lines}"
+      interface:
+        - "Interface CALL/USING attendue: {call_interface}"
+      structure:
+        - "LINKAGE attendu (exemple exact):"
+        - "{linkage_struct}"
+      working_storage:
+        - "Working-Storage obligatoire (lignes exactes, ordre conseille):"
+        - "{working_storage_lines}"
+      sql:
+        - "Connexion OCESQL: {connection_details}"
+        - "SQL utilises:"
+        - "{sql_statements}"
+      sql_format:
+        - "Format SQL en FIXED:"
+        - "{sql_formatting_details}"
+      flow:
+        - "Flux principal DAL:"
+        - "{flow_notes}"
+      logging:
+        - "Messages (verbatim) a afficher:"
+        - "{logging_lines}"
+      constraints:
+        - "Interdictions: {forbidden_items}"
+        - "Paragraphes publics attendus: {public_paragraphs}"
+        - "Paragraphes internes autorises: {internal_paragraphs}"
+        - "Entry paragraph: {entry_paragraph}"
+        - "Regles de bloc MAIN-ENTRY: {entry_block_rules}"
+        - "Sequence de sortie MAIN-ENTRY: {entry_exit_sequence}"
+        - "Contraintes par paragraphe: {paragraph_constraints}"
+        - "Statements obligatoires: {required_statements}"
+      skeleton:
+        - "Squelette attendu (rappel structure):"
+        - "IDENTIFICATION DIVISION."
+        - "PROGRAM-ID. {program_id}."
+        - "{header_comment_lines}"
+        - "ENVIRONMENT DIVISION."
+        - "CONFIGURATION SECTION."
+        - "REPOSITORY."
+        - "    FUNCTION ALL INTRINSIC."
+        - "DATA DIVISION."
+        - "WORKING-STORAGE SECTION."
+        - "{working_storage_lines}"
+        - "LINKAGE/USING exacts:"
+        - "{linkage_struct}"
+        - "{entry_paragraph}."
+      fonctions:
+        - "{function_details}"
+    PRODUCT-LOGIC:
+      sections_order: [strategy, context, style, format, naming, environment, interface, working_storage, flow, logging, constraints, skeleton, fonctions]
+      context:
+        - "Regles metier: {business_rules}"
+        - "Batch: traiter tous les produits."
+      style:
+        - "Guidelines globales: {formatting_guidelines}"
+        - "Header commentaire (verbatim):"
+        - "{header_comment_lines}"
+        - "Style specifique: {style_lines}"
+      environment:
+        - "ENVIRONMENT exact (lignes):"
+        - "{environment_lines}"
+      interface:
+        - "Programme DAL: {dal_program}"
+        - "Programme BUSINESS: {business_program}"
+        - "Interface DAL (CALL USING): {call_interface}"
+      working_storage:
+        - "Working-Storage obligatoire (lignes exactes):"
+        - "{working_storage_lines}"
+      flow:
+        - "Flux principal LOGIC:"
+        - "{flow_notes}"
+      logging:
+        - "Messages (verbatim) a afficher:"
+        - "{logging_lines}"
+      constraints:
+        - "Interdictions: {forbidden_items}"
+        - "Paragraphes publics attendus: {public_paragraphs}"
+        - "Entry paragraph: {entry_paragraph}"
+        - "Statements obligatoires: {required_statements}"
+      skeleton:
+        - "Squelette attendu (rappel structure):"
+        - "IDENTIFICATION DIVISION."
+        - "PROGRAM-ID. {program_id}."
+        - "{header_comment_lines}"
+        - "ENVIRONMENT DIVISION."
+        - "CONFIGURATION SECTION."
+        - "REPOSITORY."
+        - "    FUNCTION ALL INTRINSIC."
+        - "DATA DIVISION."
+        - "WORKING-STORAGE SECTION."
+        - "{working_storage_lines}"
+        - "PROCEDURE DIVISION."
+        - "{entry_paragraph}."
+      fonctions:
+        - "{function_details}"
+    PRODUCT-BUSINESS:
+      sections_order: [strategy, context, style, format, naming, environment, interface, working_storage, logging, constraints, skeleton, fonctions]
+      context:
+        - "Role: couche presentation simple, affiche les valeurs."
+        - "Structure OPERATION: {entity_fields_list}"
+      style:
+        - "Guidelines globales: {formatting_guidelines}"
+        - "Header commentaire (verbatim):"
+        - "{header_comment_lines}"
+        - "Style specifique: {style_lines}"
+      environment:
+        - "ENVIRONMENT exact (lignes):"
+        - "{environment_lines}"
+      interface:
+        - "LINKAGE attendu (exemple exact):"
+        - "{linkage_struct}"
+      working_storage:
+        - "Working-Storage obligatoire (lignes exactes):"
+        - "{working_storage_lines}"
+      logging:
+        - "Lignes DISPLAY (verbatim):"
+        - "{display_lines}"
+      constraints:
+        - "Interdictions: {forbidden_items}"
+        - "Paragraphes publics attendus: {public_paragraphs}"
+        - "Entry paragraph: {entry_paragraph}"
+        - "Statements obligatoires: {required_statements}"
+      skeleton:
+        - "Squelette attendu (rappel structure):"
+        - "IDENTIFICATION DIVISION."
+        - "PROGRAM-ID. {program_id}."
+        - "{header_comment_lines}"
+        - "ENVIRONMENT DIVISION."
+        - "DATA DIVISION."
+        - "WORKING-STORAGE SECTION."
+        - "LINKAGE/USING exacts:"
+        - "{linkage_struct}"
+        - "{entry_paragraph}."
+      fonctions:
+        - "{function_details}"
+
+sources:
+  cobol:
+    - programme: PRODUCT-DAL-DB
+      fichier: "product_dal_db.cob"
+    - programme: PRODUCT-LOGIC
+      fichier: "product_logic.cob"
+    - programme: PRODUCT-BUSINESS
+      fichier: "product_business.cob"
+  sql:
+    - logical_name: "PRODUCT-INIT"
+      fichier: "product_init.sql"
+      entity: PRODUCT
+
+programmes:
+  - name: PRODUCT-DAL-DB
+    layer: dal
+    role: "Couche d'acces a la base pour PRODUCT (lecture via curseur et mise a jour quantites reapprovisionnement)."
+    entities: [PRODUCT]
+    allowed_sql: true
+    allowed_business_logic: false
+    allow_display: true
+    header_comment_lines:
+      - "      *****************************************************************"
+      - "      * Programme: PRODUCT-DAL-DB                                     *"
+      - "      * Couche: DAL (Data Access Layer)                               *"
+      - "      * Role: Acces a la base PostgreSQL pour PRODUCT                 *"
+      - "      *       Operations: READ, SAVE, END                             *"
+      - "      *****************************************************************"
+    style_lines:
+      - "CALL OCESQL avec guillemets doubles et END-CALL."
+      - "OCESQLConnect avec BY REFERENCE/ BY VALUE (ordre exact)."
+      - "EXIT PARAGRAPH sur erreur OPEN du curseur."
+      - "EVALUATE SQLCODE apres FETCH."
+      - "Apres DAL-CONNECT, si NOT WS-CONNECTED: MOVE 'Y' TO LK-END-OF-FILE puis GOBACK."
+      - "MAIN-ENTRY se termine strictement par END-EVALUATE, puis GOBACK, puis '.'"
+    required_lines:
+      - "      *****************************************************************"
+      - "      * Programme: PRODUCT-DAL-DB                                     *"
+      - "      * Couche: DAL (Data Access Layer)                               *"
+      - "      * Role: Acces a la base PostgreSQL pour PRODUCT                 *"
+      - "      *       Operations: READ, SAVE, END                             *"
+      - "      *****************************************************************"
+    environment_lines:
+      - "ENVIRONMENT DIVISION."
+      - "CONFIGURATION SECTION."
+      - "REPOSITORY."
+      - "    FUNCTION ALL INTRINSIC."
+    main_cursor: "C_PRD"
+    internal_paragraphs: ["DAL-CONNECT", "DAL-SET-ENV"]
+    working_storage_lines:
+      - "EXEC SQL INCLUDE SQLCA END-EXEC."
+      - "01  WS-CONNECTED-FLAG      PIC X VALUE 'N'."
+      - "88  WS-CONNECTED           VALUE 'Y'."
+      - "01  WS-CURSOR-OPEN-FLAG    PIC X VALUE 'N'."
+      - "88  WS-CURSOR-OPEN         VALUE 'Y'."
+      - "01  WS-PROD-ID             PIC 9(6)."
+      - "01  WS-PROD-NAME           PIC X(50)."
+      - "01  WS-CATEGORY            PIC X(20)."
+      - "01  WS-STOCK-CURRENT       PIC S9(6)."
+      - "01  WS-STOCK-MIN           PIC 9(6)."
+      - "01  WS-STOCK-MAX           PIC 9(6)."
+      - "01  WS-UNIT-COST           PIC S9(8)V99."
+      - "01  WS-LEAD-TIME-DAYS      PIC 9(3)."
+      - "01  WS-REORDER-QTY         PIC S9(6)."
+      - "01  WS-REORDER-COST        PIC S9(10)V99."
+      - "01  WS-REORDER-STATUS      PIC X(10)."
+      - "01  WS-DB-NAME."
+      - "05  WS-DB-NAME-TEXT     PIC X(7) VALUE 'stockdb'."
+      - "05  WS-DB-NAME-TERM     PIC X VALUE X'00'."
+      - "01  WS-DB-USER."
+      - "05  WS-DB-USER-TEXT     PIC X(9) VALUE 'stockuser'."
+      - "05  WS-DB-USER-TERM     PIC X VALUE X'00'."
+      - "01  WS-DB-PASSWORD."
+      - "05  WS-DB-PASSWORD-TEXT PIC X(8) VALUE 'STOCKPWD'."
+      - "05  WS-DB-PASSWORD-TERM PIC X VALUE X'00'."
+      - "01  WS-DB-NAME-LEN         PIC S9(4) COMP-5 VALUE 7."
+      - "01  WS-DB-USER-LEN         PIC S9(4) COMP-5 VALUE 9."
+      - "01  WS-DB-PASSWORD-LEN     PIC S9(4) COMP-5 VALUE 8."
+      - "01  WS-PGHOST-NAME         PIC X(6) VALUE 'PGHOST'."
+      - "01  WS-PGHOST-VALUE        PIC X(64) VALUE 'localhost'."
+      - "01  WS-PGPORT-NAME         PIC X(6) VALUE 'PGPORT'."
+      - "01  WS-PGPORT-VALUE        PIC X(5) VALUE '5432'."
+      - "01  WS-PGUSER-NAME         PIC X(6) VALUE 'PGUSER'."
+      - "01  WS-PGUSER-VALUE        PIC X(64) VALUE 'stockuser'."
+      - "01  WS-PGPASSWORD-NAME     PIC X(10) VALUE 'PGPASSWORD'."
+      - "01  WS-PGPASSWORD-VALUE    PIC X(64) VALUE 'STOCKPWD'."
+      - "01  WS-PGDATABASE-NAME     PIC X(10) VALUE 'PGDATABASE'."
+      - "01  WS-PGDATABASE-VALUE    PIC X(64) VALUE 'stockdb'."
+    flow:
+      - "MAIN-ENTRY: IF LK-OPERATION NOT = 'END ' THEN PERFORM DAL-CONNECT; IF NOT WS-CONNECTED THEN MOVE 'Y' TO LK-END-OF-FILE, GOBACK; END-IF; END-IF"
+      - "EVALUATE LK-OPERATION: READ->DAL-READ, SAVE->DAL-SAVE, END->DAL-END, OTHER->DISPLAY erreur"
+      - "GOBACK apres EVALUATE"
+      - "DAL-READ: ouverture curseur paresseuse, FETCH, mise a jour EOF"
+      - "DAL-SAVE: UPDATE REORDER_QTY, REORDER_COST, REORDER_STATUS"
+      - "DAL-END: CLOSE cursor, COMMIT, DISCONNECT, reset flags"
+    entry_block_rules:
+      - condition_regex: "^\\s*IF\\s+LK-OPERATION\\s+NOT\\s+(=|EQUAL)\\s+'END '\\s*$"
+        must_contain:
+          - "PERFORM DAL-CONNECT"
+          - "IF NOT WS-CONNECTED"
+          - "MOVE 'Y' TO LK-END-OF-FILE"
+          - "GOBACK"
+    entry_exit_sequence:
+      paragraph: "MAIN-ENTRY"
+      must_follow_order:
+        - "END-EVALUATE"
+        - "GOBACK"
+        - "."
+    paragraph_constraints:
+      - paragraph: "DAL-READ"
+        forbid_contains:
+          - "PERFORM DAL-CONNECT"
+          - "IF NOT WS-CONNECTED"
+    required_statements:
+      - "GOBACK"
+      - "END-CALL"
+      - "BY REFERENCE"
+      - "BY VALUE"
+      - "EXIT PARAGRAPH"
+      - "EVALUATE SQLCODE"
+    allow_procedure_sections: false
+    require_working_storage_section: true
+    logging_lines:
+      - "Connexion DB reussie: stockdb"
+      - "ERREUR CONNECT: SQLCODE="
+      - "SQLSTATE="
+      - "SQLERRMC="
+      - "Curseur C_PRD ouvert"
+      - "ERREUR OPEN: SQLCODE="
+      - "ERREUR FETCH: SQLCODE="
+      - "ERREUR UPDATE: SQLCODE="
+      - "ERREUR CLOSE: SQLCODE="
+      - "ERREUR COMMIT: SQLCODE="
+      - "ERREUR DISCONNECT: SQLCODE="
+      - "ERREUR: Operation inconnue:"
+      - "Fermeture connexion"
+    call_interface:
+      type: "CALL USING"
+      description: "CALL 'PRODUCT-DAL-DB' USING OPERATION, END-OF-FILE, PRODUCT."
+      linkage_parameters:
+        - name: "LK-OPERATION"
+          pic: "X(4)"
+          direction: in
+        - name: "LK-END-OF-FILE"
+          pic: "X"
+          direction: inout
+        - name: "LK-PRODUCT"
+          pic: "groupe PRODUCT"
+          direction: inout
+      operations:
+        read: "READ"
+        save: "SAVE"
+        end: "END "
+    cobol_sections:
+      identification_division: required
+      environment_division: required
+      data_division:
+        working_storage: required
+        linkage: required
+      procedure_division:
+        using_clause: ["LK-OPERATION", "LK-END-OF-FILE", "LK-PRODUCT"]
+        entry_paragraph: "MAIN-ENTRY"
+
+  - name: PRODUCT-LOGIC
+    layer: logic
+    role: "Traitement batch principal : boucle sur les produits, calcul des quantites de reapprovisionnement, sauvegarde, affichage."
+    entities: [PRODUCT]
+    allowed_sql: false
+    allowed_business_logic: true
+    allow_display: true
+    header_comment_lines:
+      - "      *****************************************************************"
+      - "      * Programme: PRODUCT-LOGIC                                      *"
+      - "      * Couche: LOGIC (Orchestration)                                 *"
+      - "      * Role: Traitement batch gestion de stock                       *"
+      - "      *       - Boucle sur les produits                               *"
+      - "      *       - Calcul quantites reapprovisionnement                  *"
+      - "      *       - Calcul couts reapprovisionnement                      *"
+      - "      *       - Sauvegarde en base                                    *"
+      - "      *       - Affichage des resultats                               *"
+      - "      *****************************************************************"
+    style_lines:
+      - "Utiliser commentaires de bloc pour les sections majeures."
+      - "Afficher les bandeaux debut et fin avec compteurs par statut."
+      - "Bloc commentaire CALCULATE-REORDER (verbatim):"
+      - "      *****************************************************************"
+      - "      * Regles metier R1 et R2:                                      *"
+      - "      * - REORDER_QTY selon niveau stock et delai livraison          *"
+      - "      * - REORDER_COST = REORDER_QTY * UNIT_COST                     *"
+      - "      * - REORDER_STATUS: OK / NORMAL / URGENT / ERROR               *"
+      - "      *****************************************************************"
+    required_lines:
+      - "      *****************************************************************"
+      - "      * Programme: PRODUCT-LOGIC                                      *"
+      - "      * Couche: LOGIC (Orchestration)                                 *"
+      - "      * Role: Traitement batch gestion de stock                       *"
+      - "      *       - Boucle sur les produits                               *"
+      - "      *       - Calcul quantites reapprovisionnement                  *"
+      - "      *       - Calcul couts reapprovisionnement                      *"
+      - "      *       - Sauvegarde en base                                    *"
+      - "      *       - Affichage des resultats                               *"
+      - "      *****************************************************************"
+      - "      *****************************************************************"
+      - "      * Regles metier R1 et R2:                                      *"
+      - "      * - REORDER_QTY selon niveau stock et delai livraison          *"
+      - "      * - REORDER_COST = REORDER_QTY * UNIT_COST                     *"
+      - "      * - REORDER_STATUS: OK / NORMAL / URGENT / ERROR               *"
+      - "      *****************************************************************"
+    environment_lines:
+      - "ENVIRONMENT DIVISION."
+      - "CONFIGURATION SECTION."
+      - "REPOSITORY."
+      - "    FUNCTION ALL INTRINSIC."
+    working_storage_lines:
+      - "01  END-OF-FILE            PIC X VALUE 'N'."
+      - "88  EOF-REACHED        VALUE 'Y'."
+      - "88  NOT-EOF            VALUE 'N'."
+      - "77  OPERATION              PIC X(4)."
+      - "77  WS-COUNT-TOTAL         PIC 9(4) VALUE 0."
+      - "77  WS-COUNT-OK            PIC 9(4) VALUE 0."
+      - "77  WS-COUNT-NORMAL        PIC 9(4) VALUE 0."
+      - "77  WS-COUNT-URGENT        PIC 9(4) VALUE 0."
+      - "77  WS-COUNT-ERROR         PIC 9(4) VALUE 0."
+      - "77  WS-LEAD-FACTOR         PIC 9V9 VALUE 1.0."
+      - "77  WS-STOCK-THRESHOLD     PIC S9(6) VALUE 0."
+      - "77  WS-TEMP-QTY            PIC S9(6) VALUE 0."
+      - "01  PRODUCT."
+      - "    05 PROD-ID             PIC 9(6)."
+      - "    05 PROD-NAME           PIC X(50)."
+      - "    05 CATEGORY            PIC X(20)."
+      - "    05 STOCK-CURRENT       PIC S9(6)."
+      - "    05 STOCK-MIN           PIC 9(6)."
+      - "    05 STOCK-MAX           PIC 9(6)."
+      - "    05 UNIT-COST           PIC S9(8)V99."
+      - "    05 LEAD-TIME-DAYS      PIC 9(3)."
+      - "    05 REORDER-QTY         PIC S9(6)."
+      - "    05 REORDER-COST        PIC S9(10)V99."
+      - "    05 REORDER-STATUS      PIC X(10)."
+    flow:
+      - "Afficher le bandeau de debut"
+      - "READ initial via DAL (OPERATION='READ')"
+      - "Boucle jusqu'a EOF: incrementer WS-COUNT-TOTAL, CALCULATE-REORDER, incrementer compteurs par statut, SAVE, BUSINESS display, READ suivant"
+      - "Appeler DAL avec OPERATION='END '"
+      - "Afficher le bandeau de fin avec tous les compteurs"
+      - "STOP RUN"
+    logging_lines:
+      - "=========================================="
+      - "DEBUT TRAITEMENT BATCH GESTION STOCK"
+      - "=========================================="
+      - "=========================================="
+      - "FIN TRAITEMENT BATCH GESTION STOCK"
+      - "Nombre produits traites: "
+      - "Produits OK (stock suffisant): "
+      - "Produits a reapprovisionner (normal): "
+      - "Produits urgents (stock critique): "
+      - "Produits en erreur: "
+      - "=========================================="
+      - "ANOMALIE: Stock negatif"
+      - "ANOMALIE: Configuration stock invalide (MIN>=MAX)"
+      - "ANOMALIE: Cout unitaire invalide"
+      - "AVERTISSEMENT: Delai livraison invalide, utilisation valeur defaut 7 jours"
+    required_statements:
+      - "STOP RUN"
+      - "CALL 'PRODUCT-DAL-DB' USING OPERATION, END-OF-FILE, PRODUCT"
+      - "CALL 'PRODUCT-BUSINESS' USING PRODUCT"
+    allow_procedure_sections: false
+    require_working_storage_section: true
+    cobol_sections:
+      identification_division: required
+      environment_division: required
+      data_division:
+        working_storage: required
+        linkage: none
+      procedure_division:
+        entry_paragraph: "MAIN-PROCESS"
+
+  - name: PRODUCT-BUSINESS
+    layer: business
+    role: "Affichage simple des informations d'un produit (nom, categorie, stocks, quantites et cout de reapprovisionnement, statut)."
+    entities: [PRODUCT]
+    allowed_sql: false
+    allowed_business_logic: "lecture_seule"
+    allow_display: true
+    header_comment_lines:
+      - "      *****************************************************************"
+      - "      * Programme: PRODUCT-BUSINESS                                   *"
+      - "      * Couche: BUSINESS (Presentation)                               *"
+      - "      * Role: Affichage simple des informations produit               *"
+      - "      *       - Nom, categorie, stocks actuels                        *"
+      - "      *       - Quantites et couts reapprovisionnement                *"
+      - "      *       - Statut reapprovisionnement                            *"
+      - "      *****************************************************************"
+    style_lines:
+      - "GOBACK en fin de paragraphe DISPLAY-OPERATION."
+    required_lines:
+      - "      *****************************************************************"
+      - "      * Programme: PRODUCT-BUSINESS                                   *"
+      - "      * Couche: BUSINESS (Presentation)                               *"
+      - "      * Role: Affichage simple des informations produit               *"
+      - "      *       - Nom, categorie, stocks actuels                        *"
+      - "      *       - Quantites et couts reapprovisionnement                *"
+      - "      *       - Statut reapprovisionnement                            *"
+      - "      *****************************************************************"
+    environment_lines:
+      - "ENVIRONMENT DIVISION."
+    working_storage_lines:
+      - "WORKING-STORAGE SECTION."
+    logging_lines:
+      - "----------------------------------------"
+      - "PRODUIT   : "
+      - "ID        : "
+      - "CATEGORIE : "
+      - "STOCK ACT.: "
+      - "STOCK MIN : "
+      - "STOCK MAX : "
+      - "COUT UNIT.: "
+      - "DELAI LIV.: "
+      - "QTE REAPP.: "
+      - "COUT REA. : "
+      - "STATUT    : "
+    required_statements:
+      - "GOBACK"
+    allow_procedure_sections: false
+    require_working_storage_section: true
+    call_interface:
+      type: "CALL USING"
+      description: "CALL 'PRODUCT-BUSINESS' USING LK-PRODUCT."
+      linkage_parameters:
+        - name: "LK-PRODUCT"
+          pic: "groupe PRODUCT"
+          direction: in
+    cobol_sections:
+      identification_division: required
+      environment_division: required
+      data_division:
+        working_storage: required
+        linkage: required
+      procedure_division:
+        using_clause: ["LK-PRODUCT"]
+        entry_paragraph: "DISPLAY-OPERATION"
+
+fonctions:
+  # --- Couche DAL / Physique ---
+
+  - id: FN-DAL-CONNECT
+    name: DAL-CONNECT
+    programme: PRODUCT-DAL-DB
+    layer: dal
+    visibility: internal
+    required: true
+    entity: PRODUCT
+    description: >
+      Connexion paresseuse a la base via OCESQL. Initialise les variables
+      d'environnement PostgreSQL, puis execute OCESQLStartSQL/OCESQLConnect/OCESQLEndSQL.
+    inputs: []
+    outputs:
+      - "SQLCODE"
+      - "SQLSTATE"
+    modifies:
+      - "WS-CONNECTED"
+      - "SQLCODE"
+    steps:
+      - "PERFORM DAL-SET-ENV"
+      - "CALL \"OCESQLStartSQL\" END-CALL"
+      - "IF SQLCODE NOT = ZERO"
+      - "  DISPLAY 'ERREUR CONNECT: SQLCODE=' SQLCODE"
+      - "  DISPLAY 'SQLSTATE=' SQLSTATE"
+      - "  DISPLAY 'SQLERRMC=' SQLERRMC"
+      - "  MOVE 'N' TO WS-CONNECTED-FLAG"
+      - "ELSE"
+      - "  CALL \"OCESQLConnect\" USING"
+      - "       BY REFERENCE SQLCA"
+      - "       BY REFERENCE WS-DB-USER"
+      - "       BY VALUE WS-DB-USER-LEN"
+      - "       BY REFERENCE WS-DB-PASSWORD"
+      - "       BY VALUE WS-DB-PASSWORD-LEN"
+      - "       BY REFERENCE WS-DB-NAME"
+      - "       BY VALUE WS-DB-NAME-LEN"
+      - "  END-CALL"
+      - "  IF SQLCODE NOT = ZERO"
+      - "    DISPLAY 'ERREUR CONNECT: SQLCODE=' SQLCODE"
+      - "    DISPLAY 'SQLSTATE=' SQLSTATE"
+      - "    DISPLAY 'SQLERRMC=' SQLERRMC"
+      - "    MOVE 'N' TO WS-CONNECTED-FLAG"
+      - "  ELSE"
+      - "    MOVE 'Y' TO WS-CONNECTED-FLAG"
+      - "    DISPLAY 'Connexion DB reussie: stockdb'"
+      - "    CALL \"OCESQLEndSQL\" END-CALL"
+      - "  END-IF"
+      - "END-IF"
+    related_exigences: [R3]
+    sql:
+      connection_method: "OCESQL (voir sql.connection)"
+      connection_calls:
+        - "CALL \"OCESQLStartSQL\" END-CALL"
+        - "CALL \"OCESQLConnect\" USING BY REFERENCE SQLCA BY REFERENCE WS-DB-USER BY VALUE WS-DB-USER-LEN BY REFERENCE WS-DB-PASSWORD BY VALUE WS-DB-PASSWORD-LEN BY REFERENCE WS-DB-NAME BY VALUE WS-DB-NAME-LEN END-CALL"
+        - "CALL \"OCESQLEndSQL\" END-CALL"
+    cobol_location:
+      fichier: "product_dal_db.cob"
+      programme: "PRODUCT-DAL-DB"
+      division: "PROCEDURE DIVISION"
+      paragraph: "DAL-CONNECT"
+      section: "couche_dal"
+
+  - id: FN-DAL-SET-ENV
+    name: DAL-SET-ENV
+    programme: PRODUCT-DAL-DB
+    layer: dal
+    visibility: internal
+    required: true
+    entity: PRODUCT
+    description: >
+      Force les variables d'environnement PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDATABASE.
+    inputs: []
+    outputs: []
+    modifies: []
+    steps:
+      - "DISPLAY WS-PGHOST-NAME UPON ENVIRONMENT-NAME"
+      - "DISPLAY WS-PGHOST-VALUE UPON ENVIRONMENT-VALUE"
+      - "DISPLAY WS-PGPORT-NAME UPON ENVIRONMENT-NAME"
+      - "DISPLAY WS-PGPORT-VALUE UPON ENVIRONMENT-VALUE"
+      - "DISPLAY WS-PGUSER-NAME UPON ENVIRONMENT-NAME"
+      - "DISPLAY WS-PGUSER-VALUE UPON ENVIRONMENT-VALUE"
+      - "DISPLAY WS-PGPASSWORD-NAME UPON ENVIRONMENT-NAME"
+      - "DISPLAY WS-PGPASSWORD-VALUE UPON ENVIRONMENT-VALUE"
+      - "DISPLAY WS-PGDATABASE-NAME UPON ENVIRONMENT-NAME"
+      - "DISPLAY WS-PGDATABASE-VALUE UPON ENVIRONMENT-VALUE"
+    related_exigences: [R3]
+    cobol_location:
+      fichier: "product_dal_db.cob"
+      programme: "PRODUCT-DAL-DB"
+      division: "PROCEDURE DIVISION"
+      paragraph: "DAL-SET-ENV"
+      section: "couche_dal"
+
+  - id: FN-DAL-READ
+    name: DAL-READ
+    programme: PRODUCT-DAL-DB
+    layer: dal
+    visibility: public
+    required: true
+    entity: PRODUCT
+    description: >
+      Ouvre le curseur C_PRD si necessaire, fait un FETCH et remplit la structure
+      OPERATION. Met END-OF-FILE a 'Y' en cas de fin de donnees ou d'erreur.
+    operation_code: "READ"
+    inputs:
+      - "OPERATION = 'READ'"
+      - "Connexion deja etablie par MAIN-ENTRY (sauf OPERATION='END ')."
+      - "Curseur non garanti ouvert (ouverture paresseuse)."
+    outputs:
+      - "PRODUCT.PROD_ID"
+      - "PRODUCT.PROD_NAME"
+      - "PRODUCT.CATEGORY"
+      - "PRODUCT.STOCK_CURRENT"
+      - "PRODUCT.STOCK_MIN"
+      - "PRODUCT.STOCK_MAX"
+      - "PRODUCT.UNIT_COST"
+      - "PRODUCT.LEAD_TIME_DAYS"
+      - "PRODUCT.REORDER_QTY"
+      - "PRODUCT.REORDER_COST"
+      - "PRODUCT.REORDER_STATUS"
+      - "END-OF-FILE"
+      - "SQLCODE"
+    modifies:
+      - "PRODUCT.*"
+      - "END-OF-FILE"
+      - "WS-CONNECTED"
+      - "WS-CURSOR-OPEN"
+      - "SQLCODE"
+    preconditions: []
+    postconditions:
+      - "Si SQLCODE = 0 : PRODUCT contient un enregistrement valide et END-OF-FILE = 'N'."
+      - "Si SQLCODE = 100 : fin de donnees, END-OF-FILE = 'Y'."
+      - "Si SQLCODE != 0 et != 100 : message d'erreur affiche et END-OF-FILE = 'Y'."
+    errors_flags:
+      - "SQLCODE = 0 : succes, une ligne lue."
+      - "SQLCODE = 100 : fin de curseur."
+      - "SQLCODE != 0 et != 100 : erreur SQL, le batch s'arrete logiquement."
+    steps:
+      - "EXEC SQL DECLARE C_PRD CURSOR FOR SELECT PROD_ID, PROD_NAME, CATEGORY, STOCK_CURRENT, STOCK_MIN, STOCK_MAX, UNIT_COST, LEAD_TIME_DAYS, REORDER_QTY, REORDER_COST, REORDER_STATUS FROM PRODUCT ORDER BY PROD_ID END-EXEC"
+      - "IF NOT WS-CURSOR-OPEN"
+      - "  EXEC SQL OPEN C_PRD END-EXEC"
+      - "  IF SQLCODE NOT = ZERO"
+      - "    DISPLAY 'ERREUR OPEN: SQLCODE=' SQLCODE"
+      - "    MOVE 'Y' TO LK-END-OF-FILE"
+      - "    EXIT PARAGRAPH"
+      - "  END-IF"
+      - "  SET WS-CURSOR-OPEN TO TRUE"
+      - "  DISPLAY 'Curseur C_PRD ouvert'"
+      - "END-IF"
+      - "EXEC SQL FETCH C_PRD INTO :WS-PROD-ID, :WS-PROD-NAME, :WS-CATEGORY, :WS-STOCK-CURRENT, :WS-STOCK-MIN, :WS-STOCK-MAX, :WS-UNIT-COST, :WS-LEAD-TIME-DAYS, :WS-REORDER-QTY, :WS-REORDER-COST, :WS-REORDER-STATUS END-EXEC"
+      - "EVALUATE SQLCODE"
+      - "  WHEN 0"
+      - "    MOVE WS-PROD-ID TO LK-PROD-ID"
+      - "    MOVE WS-PROD-NAME TO LK-PROD-NAME"
+      - "    MOVE WS-CATEGORY TO LK-CATEGORY"
+      - "    MOVE WS-STOCK-CURRENT TO LK-STOCK-CURRENT"
+      - "    MOVE WS-STOCK-MIN TO LK-STOCK-MIN"
+      - "    MOVE WS-STOCK-MAX TO LK-STOCK-MAX"
+      - "    MOVE WS-UNIT-COST TO LK-UNIT-COST"
+      - "    MOVE WS-LEAD-TIME-DAYS TO LK-LEAD-TIME-DAYS"
+      - "    MOVE WS-REORDER-QTY TO LK-REORDER-QTY"
+      - "    MOVE WS-REORDER-COST TO LK-REORDER-COST"
+      - "    MOVE WS-REORDER-STATUS TO LK-REORDER-STATUS"
+      - "  WHEN 100"
+      - "    MOVE 'Y' TO LK-END-OF-FILE"
+      - "  WHEN OTHER"
+      - "    DISPLAY 'ERREUR FETCH: SQLCODE=' SQLCODE"
+      - "    MOVE 'Y' TO LK-END-OF-FILE"
+      - "END-EVALUATE"
+    related_exigences: [R3]
+    sql:
+      declare_cursor: |
+        DECLARE C_PRD CURSOR FOR
+        SELECT PROD_ID, PROD_NAME, CATEGORY, STOCK_CURRENT, STOCK_MIN,
+               STOCK_MAX, UNIT_COST, LEAD_TIME_DAYS, REORDER_QTY,
+               REORDER_COST, REORDER_STATUS
+        FROM PRODUCT
+        ORDER BY PROD_ID
+      open_cursor: "OPEN C_PRD"
+      fetch_into: "FETCH C_PRD INTO :WS-PROD-ID, :WS-PROD-NAME, :WS-CATEGORY, :WS-STOCK-CURRENT, :WS-STOCK-MIN, :WS-STOCK-MAX, :WS-UNIT-COST, :WS-LEAD-TIME-DAYS, :WS-REORDER-QTY, :WS-REORDER-COST, :WS-REORDER-STATUS"
+    sql_actions:
+      - declare_cursor
+      - open_cursor
+      - fetch_cursor
+      - check_sqlcode
+      - map_to_linkage
+      - set_eof
+    eof_logic:
+      on_sqlcode_100_set_eof: true
+      eof_flag_name: "LK-END-OF-FILE"
+      eof_true_value: "Y"
+      eof_false_value: "N"
+    cobol_location:
+      fichier: "product_dal_db.cob"
+      programme: "PRODUCT-DAL-DB"
+      division: "PROCEDURE DIVISION"
+      paragraph: "DAL-READ"
+      section: "couche_dal"
+
+  - id: FN-DAL-SAVE
+    name: DAL-SAVE
+    programme: PRODUCT-DAL-DB
+    layer: dal
+    visibility: public
+    required: true
+    entity: PRODUCT
+    description: >
+      Met a jour en base les colonnes REORDER_QTY, REORDER_COST et REORDER_STATUS
+      pour le produit courant (PROD_ID) a partir des valeurs de la structure PRODUCT.
+    operation_code: "SAVE"
+    inputs:
+      - "PRODUCT.PROD_ID"
+      - "PRODUCT.REORDER_QTY"
+      - "PRODUCT.REORDER_COST"
+      - "PRODUCT.REORDER_STATUS"
+    outputs:
+      - "SQLCODE"
+    modifies:
+      - "SQLCODE"
+    preconditions:
+      - "PRODUCT.PROD_ID contient un identifiant existant en base."
+    postconditions:
+      - "Si SQLCODE = 0 : la ligne PRODUCT correspondante en base a ete mise a jour."
+    errors_flags:
+      - "SQLCODE = 0 : succes."
+      - "SQLCODE != 0 : erreur SQL, message affiche."
+    steps:
+      - "MOVE LK-PROD-ID TO WS-PROD-ID"
+      - "MOVE LK-REORDER-QTY TO WS-REORDER-QTY"
+      - "MOVE LK-REORDER-COST TO WS-REORDER-COST"
+      - "MOVE LK-REORDER-STATUS TO WS-REORDER-STATUS"
+      - "EXEC SQL FROM PRODUCT SET REORDER_QTY = :WS-REORDER-QTY, REORDER_COST = :WS-REORDER-COST, REORDER_STATUS = :WS-REORDER-STATUS WHERE PROD_ID = :WS-PROD-ID END-EXEC"
+      - "IF SQLCODE NOT = ZERO"
+      - "  DISPLAY 'ERREUR UPDATE: SQLCODE=' SQLCODE"
+      - "  DISPLAY 'SQLSTATE=' SQLSTATE"
+      - "  DISPLAY 'SQLERRMC=' SQLERRMC"
+      - "END-IF"
+    related_exigences: [R1, R2, R3]
+    sql:
+      update_statement: |
+        FROM PRODUCT
+        SET REORDER_QTY = :WS-REORDER-QTY,
+            REORDER_COST = :WS-REORDER-COST,
+            REORDER_STATUS = :WS-REORDER-STATUS
+        WHERE PROD_ID = :WS-PROD-ID
+    cobol_location:
+      fichier: "product_dal_db.cob"
+      programme: "PRODUCT-DAL-DB"
+      division: "PROCEDURE DIVISION"
+      paragraph: "DAL-SAVE"
+      section: "couche_dal"
+
+  - id: FN-DAL-END
+    name: DAL-END
+    programme: PRODUCT-DAL-DB
+    layer: dal
+    visibility: public
+    required: true
+    entity: PRODUCT
+    description: >
+      Ferme le curseur s'il est ouvert, commit la transaction et ferme la connexion a la base.
+      Appelee une fois en fin de traitement.
+    operation_code: "END "
+    inputs: []
+    outputs:
+      - "SQLCODE"
+    modifies:
+      - "WS-CURSOR-OPEN"
+      - "WS-CONNECTED"
+      - "SQLCODE"
+    preconditions: []
+    postconditions:
+      - "Curseur ferme si besoin."
+      - "COMMIT effectue."
+      - "Connexion base fermee."
+    errors_flags:
+      - "Les erreurs de CLOSE/COMMIT/DISCONNECT sont simplement affichees."
+    steps:
+      - "IF WS-CURSOR-OPEN"
+      - "  EXEC SQL CLOSE C_PRD END-EXEC"
+      - "  IF SQLCODE NOT = ZERO"
+      - "    DISPLAY 'ERREUR CLOSE: SQLCODE=' SQLCODE"
+      - "  ELSE"
+      - "    MOVE 'N' TO WS-CURSOR-OPEN-FLAG"
+      - "  END-IF"
+      - "END-IF"
+      - "EXEC SQL COMMIT END-EXEC"
+      - "IF SQLCODE NOT = ZERO"
+      - "  DISPLAY 'ERREUR COMMIT: SQLCODE=' SQLCODE"
+      - "END-IF"
+      - "IF WS-CONNECTED"
+      - "  EXEC SQL DISCONNECT ALL END-EXEC"
+      - "  IF SQLCODE NOT = ZERO"
+      - "    DISPLAY 'ERREUR DISCONNECT: SQLCODE=' SQLCODE"
+      - "  ELSE"
+      - "    MOVE 'N' TO WS-CONNECTED-FLAG"
+      - "    DISPLAY 'Fermeture connexion'"
+      - "  END-IF"
+      - "END-IF"
+    related_exigences: [R3]
+    sql:
+      close_cursor: "CLOSE C_PRD"
+      commit: "COMMIT"
+      disconnect: "DISCONNECT ALL"
+    cobol_location:
+      fichier: "product_dal_db.cob"
+      programme: "PRODUCT-DAL-DB"
+      division: "PROCEDURE DIVISION"
+      paragraph: "DAL-END"
+      section: "couche_dal"
+
+  # --- Couche LOGIQUE / Orchestration batch ---
+
+  - id: FN-LOGIC-MAIN
+    name: MAIN-PROCESS
+    programme: PRODUCT-LOGIC
+    layer: logic
+    visibility: public
+    required: true
+    entity: PRODUCT
+    description: >
+      Boucle principale du batch: lit les produits via la DAL, calcule les quantites
+      et couts de reapprovisionnement, sauvegarde le resultat en base et affiche
+      chaque produit avec statistiques par statut.
+    inputs: []
+    outputs: []
+    modifies:
+      - "PRODUCT.*"
+      - "END-OF-FILE"
+      - "WS-COUNT-TOTAL"
+      - "WS-COUNT-OK"
+      - "WS-COUNT-NORMAL"
+      - "WS-COUNT-URGENT"
+      - "WS-COUNT-ERROR"
+    preconditions: []
+    postconditions:
+      - "Tous les produits de la table PRODUCT ont REORDER_QTY, REORDER_COST et REORDER_STATUS calcules selon R1 et R2."
+    steps:
+      - "DISPLAY '=========================================='"
+      - "DISPLAY 'DEBUT TRAITEMENT BATCH GESTION STOCK'"
+      - "DISPLAY '=========================================='"
+      - "MOVE 'READ' TO OPERATION"
+      - "CALL 'PRODUCT-DAL-DB' USING OPERATION, END-OF-FILE, OPERATION"
+      - "PERFORM UNTIL EOF-REACHED"
+      - "  ADD 1 TO WS-COUNT-TOTAL"
+      - "  PERFORM CALCULATE-REORDER"
+      - "  EVALUATE REORDER-STATUS"
+      - "    WHEN 'OK'"
+      - "      ADD 1 TO WS-COUNT-OK"
+      - "    WHEN 'NORMAL'"
+      - "      ADD 1 TO WS-COUNT-NORMAL"
+      - "    WHEN 'URGENT'"
+      - "      ADD 1 TO WS-COUNT-URGENT"
+      - "    WHEN 'ERROR'"
+      - "      ADD 1 TO WS-COUNT-ERROR"
+      - "  END-EVALUATE"
+      - "  MOVE 'SAVE' TO OPERATION"
+      - "  CALL 'PRODUCT-DAL-DB' USING OPERATION, END-OF-FILE, OPERATION"
+      - "  CALL 'PRODUCT-BUSINESS' USING OPERATION"
+      - "  MOVE 'READ' TO OPERATION"
+      - "  CALL 'PRODUCT-DAL-DB' USING OPERATION, END-OF-FILE, OPERATION"
+      - "END-PERFORM"
+      - "MOVE 'END ' TO OPERATION"
+      - "CALL 'PRODUCT-DAL-DB' USING OPERATION, END-OF-FILE, OPERATION"
+      - "DISPLAY '=========================================='"
+      - "DISPLAY 'FIN TRAITEMENT BATCH GESTION STOCK'"
+      - "DISPLAY 'Nombre produits traites: ' WS-COUNT-TOTAL"
+      - "DISPLAY 'Produits OK (stock suffisant): ' WS-COUNT-OK"
+      - "DISPLAY 'Produits a reapprovisionner (normal): ' WS-COUNT-NORMAL"
+      - "DISPLAY 'Produits urgents (stock critique): ' WS-COUNT-URGENT"
+      - "DISPLAY 'Produits en erreur: ' WS-COUNT-ERROR"
+      - "DISPLAY '=========================================='"
+      - "STOP RUN"
+    calls:
+      - "OPERATION-DAL-DB avec OPERATION='READ'"
+      - "CALCULATE-REORDER"
+      - "OPERATION-DAL-DB avec OPERATION='SAVE'"
+      - "PRODUCT-BUSINESS.DISPLAY-OPERATION"
+      - "OPERATION-DAL-DB avec OPERATION='END '"
+    loop_control:
+      eof_flag_name: "END-OF-FILE"
+      eof_true_value: "Y"
+      eof_false_value: "N"
+    related_exigences: [F1, R1, R2, R3, R4, R5, R6, R7]
+    cobol_location:
+      fichier: "product_logic.cob"
+      programme: "PRODUCT-LOGIC"
+      division: "PROCEDURE DIVISION"
+      paragraph: "MAIN-PROCESS"
+      section: "couche_logique"
+
+  - id: FN-LOGIC-CALC
+    name: CALCULATE-REORDER
+    programme: PRODUCT-LOGIC
+    layer: logic
+    visibility: public
+    required: true
+    entity: PRODUCT
+    description: >
+      Applique les regles metier R1 et R2 pour calculer REORDER_QTY, REORDER_COST
+      et REORDER_STATUS selon le niveau de stock actuel, les seuils min/max,
+      le delai de livraison et le cout unitaire. Inclut validations R4, R5, R6, R7.
+    inputs:
+      - "PRODUCT.STOCK_CURRENT"
+      - "PRODUCT.STOCK_MIN"
+      - "PRODUCT.STOCK_MAX"
+      - "PRODUCT.UNIT_COST"
+      - "PRODUCT.LEAD_TIME_DAYS"
+    outputs:
+      - "PRODUCT.REORDER_QTY"
+      - "PRODUCT.REORDER_COST"
+      - "PRODUCT.REORDER_STATUS"
+    modifies:
+      - "PRODUCT.REORDER_QTY"
+      - "PRODUCT.REORDER_COST"
+      - "PRODUCT.REORDER_STATUS"
+      - "WS-LEAD-FACTOR"
+      - "WS-STOCK-THRESHOLD"
+      - "WS-TEMP-QTY"
+    preconditions:
+      - "PRODUCT.STOCK_CURRENT, STOCK_MIN, STOCK_MAX, UNIT_COST et LEAD_TIME_DAYS sont renseignes."
+    postconditions:
+      - "PRODUCT.REORDER_QTY >= 0."
+      - "PRODUCT.REORDER_COST >= 0."
+      - "PRODUCT.REORDER_STATUS dans ('OK', 'NORMAL', 'URGENT', 'ERROR')."
+    errors_flags:
+      - "Si STOCK_CURRENT < 0 alors ERROR (R4)."
+      - "Si STOCK_MIN >= STOCK_MAX alors ERROR (R5)."
+      - "Si UNIT_COST <= 0 alors ERROR (R6)."
+      - "Si LEAD_TIME_DAYS hors [1, 365] alors avertissement et valeur defaut 7 (R7)."
+    steps:
+      - "      *****************************************************************"
+      - "      * Regles metier R1 et R2:                                      *"
+      - "      * - REORDER_QTY selon niveau stock et delai livraison          *"
+      - "      * - REORDER_COST = REORDER_QTY * UNIT_COST                     *"
+      - "      * - REORDER_STATUS: OK / NORMAL / URGENT / ERROR               *"
+      - "      *****************************************************************"
+      - "* Validation R4: Stock negatif impossible"
+      - "IF STOCK-CURRENT < 0"
+      - "  MOVE 0 TO REORDER-QTY"
+      - "  MOVE 0 TO REORDER-COST"
+      - "  MOVE 'ERROR' TO REORDER-STATUS"
+      - "  DISPLAY 'ANOMALIE: Stock negatif'"
+      - "  EXIT PARAGRAPH"
+      - "END-IF"
+      - "* Validation R5: Configuration stock invalide"
+      - "IF STOCK-MIN >= STOCK-MAX"
+      - "  MOVE 0 TO REORDER-QTY"
+      - "  MOVE 0 TO REORDER-COST"
+      - "  MOVE 'ERROR' TO REORDER-STATUS"
+      - "  DISPLAY 'ANOMALIE: Configuration stock invalide (MIN>=MAX)'"
+      - "  EXIT PARAGRAPH"
+      - "END-IF"
+      - "* Validation R6: Cout unitaire invalide"
+      - "IF UNIT-COST <= 0"
+      - "  MOVE 0 TO REORDER-QTY"
+      - "  MOVE 0 TO REORDER-COST"
+      - "  MOVE 'ERROR' TO REORDER-STATUS"
+      - "  DISPLAY 'ANOMALIE: Cout unitaire invalide'"
+      - "  EXIT PARAGRAPH"
+      - "END-IF"
+      - "* Validation R7: Delai de livraison"
+      - "IF LEAD-TIME-DAYS < 1 OR LEAD-TIME-DAYS > 365"
+      - "  MOVE 7 TO LEAD-TIME-DAYS"
+      - "  DISPLAY 'AVERTISSEMENT: Delai livraison invalide, utilisation valeur defaut 7 jours'"
+      - "END-IF"
+      - "* Calcul facteur delai livraison"
+      - "IF LEAD-TIME-DAYS <= 3"
+      - "  MOVE 1.0 TO WS-LEAD-FACTOR"
+      - "ELSE IF LEAD-TIME-DAYS <= 10"
+      - "  MOVE 1.5 TO WS-LEAD-FACTOR"
+      - "ELSE"
+      - "  MOVE 2.0 TO WS-LEAD-FACTOR"
+      - "END-IF"
+      - "* Calcul seuil alerte (STOCK_MIN * 1.2)"
+      - "COMPUTE WS-STOCK-THRESHOLD ROUNDED = STOCK-MIN * 1.2"
+      - "* Regle R1: Calcul quantite reapprovisionnement"
+      - "IF STOCK-CURRENT < STOCK-MIN"
+      - "  * Stock critique - URGENT"
+      - "  COMPUTE WS-TEMP-QTY ROUNDED = (STOCK-MAX - STOCK-CURRENT) * WS-LEAD-FACTOR"
+      - "  IF WS-TEMP-QTY < 0"
+      - "    MOVE 0 TO REORDER-QTY"
+      - "  ELSE"
+      - "    MOVE WS-TEMP-QTY TO REORDER-QTY"
+      - "  END-IF"
+      - "  MOVE 'URGENT' TO REORDER-STATUS"
+      - "ELSE IF STOCK-CURRENT <= WS-STOCK-THRESHOLD"
+      - "  * Stock faible - NORMAL"
+      - "  COMPUTE WS-TEMP-QTY = STOCK-MAX - STOCK-CURRENT"
+      - "  IF WS-TEMP-QTY < 0"
+      - "    MOVE 0 TO REORDER-QTY"
+      - "  ELSE"
+      - "    MOVE WS-TEMP-QTY TO REORDER-QTY"
+      - "  END-IF"
+      - "  MOVE 'NORMAL' TO REORDER-STATUS"
+      - "ELSE"
+      - "  * Stock OK"
+      - "  MOVE 0 TO REORDER-QTY"
+      - "  MOVE 'OK' TO REORDER-STATUS"
+      - "END-IF"
+      - "* Regle R2: Calcul cout reapprovisionnement"
+      - "IF REORDER-QTY IS NUMERIC AND UNIT-COST IS NUMERIC"
+      - "  COMPUTE REORDER-COST ROUNDED = REORDER-QTY * UNIT-COST"
+      - "  IF REORDER-COST < 0"
+      - "    MOVE 0 TO REORDER-COST"
+      - "  END-IF"
+      - "ELSE"
+      - "  MOVE 0 TO REORDER-COST"
+      - "END-IF"
+    related_exigences: [R1, R2, R4, R5, R6, R7]
+    cobol_location:
+      fichier: "product_logic.cob"
+      programme: "PRODUCT-LOGIC"
+      division: "PROCEDURE DIVISION"
+      paragraph: "CALCULATE-REORDER"
+      section: "couche_logique"
+
+  # --- Couche MÉTIER / Présentation ---
+
+  - id: FN-BIZ-DISPLAY
+    name: DISPLAY-OPERATION
+    programme: PRODUCT-BUSINESS
+    layer: business
+    visibility: public
+    required: true
+    entity: PRODUCT
+    description: >
+      Affiche les informations principales du produit courant sur la console:
+      nom, categorie, stocks actuels, quantites et couts de reapprovisionnement, statut.
+    inputs:
+      - "PRODUCT.PROD_NAME"
+      - "PRODUCT.PROD_ID"
+      - "PRODUCT.CATEGORY"
+      - "PRODUCT.STOCK_CURRENT"
+      - "PRODUCT.STOCK_MIN"
+      - "PRODUCT.STOCK_MAX"
+      - "PRODUCT.UNIT_COST"
+      - "PRODUCT.LEAD_TIME_DAYS"
+      - "PRODUCT.REORDER_QTY"
+      - "PRODUCT.REORDER_COST"
+      - "PRODUCT.REORDER_STATUS"
+    outputs: []
+    modifies: []
+    preconditions:
+      - "PRODUCT contient des valeurs lues/calculees coherentes."
+    postconditions: []
+    errors_flags: []
+    related_exigences: [F1]
+    steps:
+      - "DISPLAY '----------------------------------------'"
+      - "DISPLAY 'PRODUIT   : ' LK-PROD-NAME"
+      - "DISPLAY 'ID        : ' LK-PROD-ID"
+      - "DISPLAY 'CATEGORIE : ' LK-CATEGORY"
+      - "DISPLAY 'STOCK ACT.: ' LK-STOCK-CURRENT"
+      - "DISPLAY 'STOCK MIN : ' LK-STOCK-MIN"
+      - "DISPLAY 'STOCK MAX : ' LK-STOCK-MAX"
+      - "DISPLAY 'COUT UNIT.: ' LK-UNIT-COST"
+      - "DISPLAY 'DELAI LIV.: ' LK-LEAD-TIME-DAYS"
+      - "DISPLAY 'QTE REAPP.: ' LK-REORDER-QTY"
+      - "DISPLAY 'COUT REA. : ' LK-REORDER-COST"
+      - "DISPLAY 'STATUT    : ' LK-REORDER-STATUS"
+      - "GOBACK"
+    display:
+      separator: "----------------------------------------"
+      lines:
+        - label: "PRODUIT   : "
+          field: "PRODUCT.PROD_NAME"
+          cobol_name: "LK-PROD-NAME"
+        - label: "ID        : "
+          field: "PRODUCT.PROD_ID"
+          cobol_name: "LK-PROD-ID"
+        - label: "CATEGORIE : "
+          field: "PRODUCT.CATEGORY"
+          cobol_name: "LK-CATEGORY"
+        - label: "STOCK ACT.: "
+          field: "PRODUCT.STOCK_CURRENT"
+          cobol_name: "LK-STOCK-CURRENT"
+        - label: "STOCK MIN : "
+          field: "PRODUCT.STOCK_MIN"
+          cobol_name: "LK-STOCK-MIN"
+        - label: "STOCK MAX : "
+          field: "PRODUCT.STOCK_MAX"
+          cobol_name: "LK-STOCK-MAX"
+        - label: "COUT UNIT.: "
+          field: "PRODUCT.UNIT_COST"
+          cobol_name: "LK-UNIT-COST"
+        - label: "DELAI LIV.: "
+          field: "PRODUCT.LEAD_TIME_DAYS"
+          cobol_name: "LK-LEAD-TIME-DAYS"
+        - label: "QTE REAPP.: "
+          field: "PRODUCT.REORDER_QTY"
+          cobol_name: "LK-REORDER-QTY"
+        - label: "COUT REA. : "
+          field: "PRODUCT.REORDER_COST"
+          cobol_name: "LK-REORDER-COST"
+        - label: "STATUT    : "
+          field: "PRODUCT.REORDER_STATUS"
+          cobol_name: "LK-REORDER-STATUS"
+    cobol_location:
+      fichier: "product_business.cob"
+      programme: "PRODUCT-BUSINESS"
+      division: "PROCEDURE DIVISION"
+      paragraph: "DISPLAY-OPERATION"
+      section: "couche_metier"

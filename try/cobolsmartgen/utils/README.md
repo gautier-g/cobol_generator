@@ -20,7 +20,7 @@ Exchanges: used by analyze/plan_programs.py and generate steps.
 Purpose: map SQL types to COBOL PIC clauses.
 Inputs: SQL type strings and mapping_types.yaml.
 Outputs: COBOL PIC strings.
-Exchanges: used by ingest and analyze/extract_io.py.
+Exchanges: used by ingest and analyze/extract_io.py. Default fallback maps SQL VARCHAR to PIC X(n).
 
 ### trace.py
 Purpose: write sidecar hashes, metadata, and prompt logs.

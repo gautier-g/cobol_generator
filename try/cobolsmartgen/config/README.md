@@ -14,6 +14,7 @@ Exchanges: values flow into ingest/analyze/generate/compile modules.
 Purpose: SQL type to COBOL PIC mappings per dialect.
 Inputs: read by analyze/extract_io.py and utils.typing_map.
 Outputs: COBOL PIC clauses for io_map.json and prompts.
+Notes: map SQL VARCHAR to PIC X(n) (not PIC A) to keep SQL strings safe by default.
 
 ### __init__.py
 Purpose: package marker (no runtime logic).

@@ -400,4 +400,4 @@ def detect_diagram_type(diagram: str) -> str:
     elif any(ext in diagram.lower() for ext in ['.png', '.jpg', '.jpeg', '.gif', '.svg']):
         return 'image'
     else:
-        return 'mermaid'  # Default assumption
+        return 'mermaid'

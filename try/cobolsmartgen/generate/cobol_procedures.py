@@ -682,14 +682,29 @@ def _build_strict_prompt(program_id: str, layer: str, entity: str, norm: Dict, i
         if prog_yaml.get("layer") == "business":
             biz_program = prog_yaml.get("name", "")
 
-    # Règles métier
+    # Exigences (toutes) + règles métier
     business_rules = []
+    exigences_lines: List[str] = []
     for req in norm.get("exigences", []):
-        if req.get("type") in ["business", "regle_metier"]:
-            rule_text = req.get("regle", "")
-            if rule_text:
-                business_rules.append(rule_text)
+        req_id = req.get("id", "").strip()
+        req_type = req.get("type", "").strip()
+        req_rule = req.get("regle", "").strip()
+        req_notes = req.get("notes", "").strip()
+        if req_rule:
+            label_parts = []
+            if req_id:
+                label_parts.append(req_id)
+            if req_type:
+                label_parts.append(req_type)
+            label = "[" + "][".join(label_parts) + "] " if label_parts else ""
+            line = f"{label}{req_rule}"
+            if req_notes:
+                line = f"{line} (notes: {req_notes})"
+            exigences_lines.append(line)
+        if req.get("type") in ["business", "regle_metier"] and req_rule:
+            business_rules.append(req_rule)
     business_rules_text = "; ".join(business_rules) if business_rules else "Aucune"
+    exigences_text = "\n".join(exigences_lines) if exigences_lines else "Aucune"
 
     # Interdictions dynamiques
     forbidden_items: List[str] = []
@@ -738,6 +753,7 @@ def _build_strict_prompt(program_id: str, layer: str, entity: str, norm: Dict, i
         "function_details": "\n".join(fn_lines) if fn_lines else "(voir fonctions)",
         "display_lines": "",
         "business_rules": business_rules_text,
+        "exigences_text": exigences_text,
         "dal_program": dal_program,
         "business_program": biz_program,
         "cursor_name": cursor_name,
@@ -768,6 +784,7 @@ def _build_strict_prompt(program_id: str, layer: str, entity: str, norm: Dict, i
     if not isinstance(global_constraints, list) or not global_constraints:
         global_constraints = [
             "Reponds uniquement avec du code COBOL compilable, sans Markdown ni texte autour.",
+            "CRITIQUE: NE PAS OUBLIER LE POINT FINAL POUR TERMINER LES PARAGRAPHES.",
             "La premiere ligne doit etre IDENTIFICATION DIVISION.",
             "Un seul PROGRAM-ID, pas de sous-programmes."
         ]
@@ -778,6 +795,12 @@ def _build_strict_prompt(program_id: str, layer: str, entity: str, norm: Dict, i
         "context", "interface", "structure", "working_storage", "sql",
         "flow", "logging", "constraints", "fonctions"
     ]
+    if "requirements" not in sections_order:
+        if "context" in sections_order:
+            idx = sections_order.index("context") + 1
+            sections_order.insert(idx, "requirements")
+        else:
+            sections_order.append("requirements")
 
     default_sections = {
         "strategy": [
@@ -787,6 +810,10 @@ def _build_strict_prompt(program_id: str, layer: str, entity: str, norm: Dict, i
             "Programme: {program_id} (couche {layer})",
             "SGBD: {sql_cible}. Dialecte COBOL: {dialecte_cobol}.",
             "Table {entity}: {table_signature}"
+        ],
+        "requirements": [
+            "Exigences (spec):",
+            "{exigences_text}"
         ],
         "style": [
             "Guidelines globales: {formatting_guidelines}",

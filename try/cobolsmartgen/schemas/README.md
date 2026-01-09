@@ -41,3 +41,6 @@ Outputs: enforces patch plan structure.
 
 ### __init__.py
 Purpose: package marker (no runtime logic).
+
+## Related docs
+SPEC_YAML.md: high level spec guide aligned with input_spec.schema.json.

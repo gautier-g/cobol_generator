@@ -30,6 +30,7 @@ CSG_RUN_ID: custom run id for out/trace/pipeline_debug.
 cli/README.md: full pipeline and CLI behavior.
 SPEC_YAML.md: how the YAML spec is structured and used.
 generate/README.md: COBOL/SQL generation details.
+TEST_SCRIPTS.md: how to build setup_db_quick.sh, compile_all.sh, and test_all.sh.
 
 ## Folder map
 adapters/: LLM clients and COBOL compiler adapter.

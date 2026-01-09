@@ -9,6 +9,7 @@ Purpose: load a YAML/JSON spec, validate it, and normalize naming and types.
 Inputs: input spec file, schemas/input_spec.schema.json, config defaults.
 Outputs: out/normalized_spec.json plus .meta/.sha256 sidecars.
 Exchanges: uses utils.fs/trace/typing_map; calls diagram_parser when spec has a diagramme field.
+Notes: normalization preserves prompting and cobol_format sections used by strict generation.
 
 ### diagram_parser.py
 Purpose: parse diagram strings (Mermaid ERD, PlantUML, or UML JSON) into entities/relations.

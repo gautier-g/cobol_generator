@@ -1,6 +1,7 @@
 # prompts
 
 Text templates used to build LLM requests and helper scripts.
+Strict mode reads prompt content from the spec `prompting` section, not these templates.
 
 ## Files
 

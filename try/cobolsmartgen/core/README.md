@@ -13,3 +13,6 @@ Exchanges: consumed by generate/cobol_procedures.py strict validation and by oth
 
 ### __init__.py
 Purpose: package marker (no runtime logic).
+
+## Related docs
+SPEC_YAML.md: spec fields that drive contract generation.

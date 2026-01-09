@@ -16,7 +16,9 @@ Purpose: generate PROCEDURE DIVISION code for each program.
 Inputs: out/program_plan.json, out/normalized_spec.json, out/io_map.json, out/architecture_contract.json.
 Outputs: out/<layer>/<PROGRAM-ID>.cbl with full program code and trace files under out/trace/generations/.
 Config/env: CSG_STRICT_825=1 enables strict prompt+validation; CSG_USE_LLM_PROCS=1 enables legacy LLM mode when strict is off.
-Exchanges: calls adapters.llm_auto and validates output against spec rules.
+Exchanges: calls adapters.llm_auto and validates output against spec rules. Strict mode enforces
+SQLCA presence for SQL programs, DATA DIVISION dot rules for PIC/VALUE lines, and wraps long
+PROCEDURE DIVISION lines when using fixed format.
 
 ### _llm_codegen.py
 Purpose: legacy LLM generator for headers and procedures using prompt templates.
@@ -52,7 +54,8 @@ Exchanges: may call llm_auto when strict mode needs SQL and spec has no DDL.
 ### assemble_layout.py
 Purpose: assemble the final output tree and generate copybooks.
 Inputs: out/program_plan.json, generated file list, config.io_map_path or out/io_map.json.
-Outputs: out/copy/SQLCA.cpy, STATUS-CODES.cpy, <ENTITY>-RECORD.cpy, and optional out/tests scripts.
+Outputs: out/copy/SQLCA.cpy, out/copy/sqlca.cbl (alias for OCESQL), STATUS-CODES.cpy,
+<ENTITY>-RECORD.cpy, and optional out/tests scripts.
 Exchanges: logs assembly with utils.trace.log_prompt.
 
 ### __init__.py

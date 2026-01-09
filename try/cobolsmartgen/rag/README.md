@@ -18,3 +18,6 @@ Exchanges: calls indexer.search and post-processes results.
 
 ### __init__.py
 Purpose: package marker (no runtime logic).
+
+## Related docs
+SPEC_YAML.md: fields indexed from the spec.

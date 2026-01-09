@@ -55,3 +55,7 @@ LLM guard: before headers/procs/autofix, main.py asks for confirmation unless --
 
 ### __init__.py
 Purpose: package marker (no runtime logic).
+
+## Related docs
+SPEC_YAML.md: spec structure and strict formatting rules.
+TEST_SCRIPTS.md: how to build setup_db_quick.sh, compile_all.sh, and test_all.sh.

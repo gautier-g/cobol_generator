@@ -43,3 +43,6 @@ Purpose: human setup notes for Mistral.
 
 ### __init__.py
 Purpose: package marker (no runtime logic).
+
+## Related docs
+README.md: pipeline overview and CLI usage.
