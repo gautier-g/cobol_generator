@@ -52,6 +52,7 @@ from typing import Dict, List, Optional
 
 from cobolsmartgen.adapters import llm_auto
 from cobolsmartgen.utils import fs, trace, pipeline_tracer, naming
+from . import cobol_constraints
 
 LOG = logging.getLogger(__name__)
 
@@ -766,6 +767,127 @@ def _validate_steps(
     return errors
 
 
+def _build_function_specific_commit_rules(spec: Dict, fn: Dict, program_id: str) -> str:
+    """
+    LEVEL 2 - DEFENSE IN DEPTH: Generate function-specific COMMIT interdictions.
+
+    Analyzes cursor_commit_policy from spec and identifies which functions
+    allow/forbid COMMIT, then generates explicit warnings for the current function.
+
+    This complements Level 1 (general prompt enrichment in cobol_procedures.py)
+    by adding function-specific interdictions in steps generation.
+    """
+    behavior = (spec.get("sql", {}) or {}).get("behavior", {})
+    cursor_policy = behavior.get("cursor_commit_policy", "")
+
+    if not cursor_policy or cursor_policy != "no_commit_while_open":
+        return ""
+
+    fn_name = fn.get("name", "").upper()
+    sql_actions = fn.get("sql_actions") or []
+
+    # Identify END/CLOSE functions (allow COMMIT)
+    is_end_function = any(action in ["close_cursor", "disconnect"] for action in sql_actions)
+    is_end_function = is_end_function or "END" in fn_name or "CLOSE" in fn_name or "DISCONNECT" in fn_name
+
+    # Identify processing functions (forbid COMMIT)
+    is_processing_function = any(action in ["fetch_cursor", "insert", "update", "delete"] for action in sql_actions)
+    is_processing_function = is_processing_function or any(name in fn_name for name in ["READ", "SAVE", "UPDATE", "DELETE", "INSERT", "FETCH", "PROCESS"])
+
+    if is_end_function:
+        # COMMIT allowed
+        return f"""=== POLITIQUE COMMIT POUR {fn_name} ===
+✅ COMMIT AUTORISE dans cette fonction ({fn_name}).
+Raison: Cette fonction ferme le curseur (close_cursor/disconnect).
+Tu peux utiliser: EXEC SQL COMMIT END-EXEC
+"""
+    elif is_processing_function:
+        # COMMIT FORBIDDEN
+        return f"""=== POLITIQUE COMMIT POUR {fn_name} (CRITIQUE) ===
+❌ INTERDIT: EXEC SQL COMMIT END-EXEC
+
+Raison: cursor_commit_policy = {cursor_policy}
+Cette fonction fait partie du traitement (READ/SAVE/UPDATE/etc.).
+COMMIT fermerait le curseur et causerait SQLCODE=-400 sur le prochain FETCH.
+
+✅ UTILISE A LA PLACE:
+  - Pour erreurs: EXEC SQL ROLLBACK END-EXEC
+  - Pour success: NE RIEN FAIRE (le COMMIT sera fait dans la fonction END)
+
+IMPORTANT: Si tu generes 'EXEC SQL COMMIT END-EXEC' dans {fn_name},
+le programme plantera apres le premier enregistrement avec SQLCODE=-400.
+"""
+    else:
+        # Unknown function type - be conservative
+        return f"""=== POLITIQUE COMMIT POUR {fn_name} ===
+⚠️  ATTENTION: cursor_commit_policy = {cursor_policy}
+Si cette fonction fait partie d'un traitement avec curseur ouvert,
+N'UTILISE PAS: EXEC SQL COMMIT END-EXEC (sauf si fonction de cloture/fin)
+"""
+
+
+def _validate_and_fix_commit_in_steps(spec: Dict, fn: Dict, steps: List[str]) -> tuple[List[str], List[str]]:
+    """
+    LEVEL 3 - DEFENSE IN DEPTH: Post-validation cleanup for COMMIT violations.
+
+    Validates generated steps against cursor_commit_policy and automatically
+    removes COMMIT from processing functions where it would break the cursor.
+
+    Returns:
+        tuple: (cleaned_steps, warnings)
+            - cleaned_steps: Steps with COMMIT removed if necessary
+            - warnings: List of warning messages for violations found and fixed
+    """
+    behavior = (spec.get("sql", {}) or {}).get("behavior", {})
+    cursor_policy = behavior.get("cursor_commit_policy", "")
+
+    if not cursor_policy or cursor_policy != "no_commit_while_open":
+        return steps, []
+
+    fn_name = fn.get("name", "").upper()
+    sql_actions = fn.get("sql_actions") or []
+
+    # Identify END/CLOSE functions (allow COMMIT)
+    is_end_function = any(action in ["close_cursor", "disconnect"] for action in sql_actions)
+    is_end_function = is_end_function or "END" in fn_name or "CLOSE" in fn_name or "DISCONNECT" in fn_name
+
+    # Identify processing functions (forbid COMMIT)
+    is_processing_function = any(action in ["fetch_cursor", "insert", "update", "delete"] for action in sql_actions)
+    is_processing_function = is_processing_function or any(name in fn_name for name in ["READ", "SAVE", "UPDATE", "DELETE", "INSERT", "FETCH", "PROCESS"])
+
+    if is_end_function or not is_processing_function:
+        # COMMIT is allowed in this function
+        return steps, []
+
+    # COMMIT is forbidden - check and remove
+    cleaned_steps = []
+    warnings = []
+    removed_count = 0
+
+    for i, step in enumerate(steps):
+        step_upper = step.upper().strip()
+
+        # Detect COMMIT statements (various formats)
+        has_commit = False
+        if "EXEC SQL" in step_upper and "COMMIT" in step_upper:
+            has_commit = True
+        elif step_upper == "COMMIT" or step_upper.startswith("COMMIT "):
+            has_commit = True
+
+        if has_commit:
+            # Remove this step
+            removed_count += 1
+            warnings.append(f"REMOVED step {i+1} in {fn_name}: '{step}' (violates cursor_commit_policy={cursor_policy})")
+            LOG.warning(f"Level 3 cleanup: Removed COMMIT from {fn_name} step {i+1}")
+        else:
+            cleaned_steps.append(step)
+
+    if removed_count > 0:
+        warnings.append(f"Total: {removed_count} COMMIT statement(s) removed from {fn_name} to prevent SQLCODE=-400")
+
+    return cleaned_steps, warnings
+
+
 def _build_prompt(
     spec: Dict,
     fn: Dict,
@@ -805,21 +927,29 @@ def _build_prompt(
 
     # ADDED 2026-01-07: Extract and clarify business rules
     # Separate validation rules from business logic rules
+    # UPDATED 2026-01-10: Filter by layer to prevent logic leakage into BUSINESS
+    all_requirements = [r for r in spec.get("exigences", []) or [] if r.get("id") in related]
+    filtered_requirements = cobol_constraints.filter_requirements_by_layer(all_requirements, layer)
+
     validation_rules = []
     business_logic_rules = []
-    for r in spec.get("exigences", []) or []:
-        if r.get("id") in related:
-            rtype = r.get("type", "").lower()
-            rule = r.get("regle", "").strip()
-            if rtype == "validation":
-                validation_rules.append(f"[{r.get('id')}] {rule}")
-            elif rtype in ("regle_metier", "business_rule", "calcul"):
-                business_logic_rules.append(f"[{r.get('id')}] {rule}")
-            else:
-                business_logic_rules.append(f"[{r.get('id')}] {rule}")
+    for r in filtered_requirements:
+        rtype = r.get("type", "").lower()
+        rule = r.get("regle", "").strip()
+        if rtype == "validation":
+            validation_rules.append(f"[{r.get('id')}] {rule}")
+        elif rtype in ("regle_metier", "business_rule", "calcul"):
+            business_logic_rules.append(f"[{r.get('id')}] {rule}")
+        else:
+            business_logic_rules.append(f"[{r.get('id')}] {rule}")
 
-    validation_rules_text = "\n".join(validation_rules) if validation_rules else "Aucune"
-    business_rules_text = "\n".join(business_logic_rules) if business_logic_rules else "Aucune"
+    # Add note if requirements were filtered for BUSINESS layer
+    if layer == "business" and len(filtered_requirements) < len(all_requirements):
+        validation_rules_text = "Aucune (regles de validation dans LOGIC)"
+        business_rules_text = "Aucune (regles metier dans LOGIC)"
+    else:
+        validation_rules_text = "\n".join(validation_rules) if validation_rules else "Aucune"
+        business_rules_text = "\n".join(business_logic_rules) if business_logic_rules else "Aucune"
 
     fields_text = _format_entity_fields(ent, io_ent)
     fn_names = [f.get("name") for f in spec.get("fonctions", []) or [] if f.get("programme") == program_id and f.get("name")]
@@ -1106,6 +1236,9 @@ def _build_prompt(
         "Privilegie les COMPUTE directs plutot que MOVE + ADD + MOVE.",
     ]
 
+    # ADDED 2026-01-10: Add GnuCOBOL intrinsic functions guide (hardcoded in Python, not in spec)
+    instructions.extend(["", cobol_constraints.get_gnucobol_intrinsic_functions_guide(), ""])
+
     # Add specific 88-level interdictions if applicable
     if conditions_88_text and "SANS clause FALSE" in conditions_88_text:
         no_false_conditions = [name for name, info in conditions_88.items() if not info['has_false_clause']]
@@ -1132,6 +1265,13 @@ def _build_prompt(
             "=== SEPARATION DES COUCHES (CRITIQUE) ===",
             layer_rules_text,
         ])
+        # ADDED 2026-01-10: Reinforce BUSINESS = display only (hardcoded in Python)
+        if layer == "business":
+            prompt_parts.extend([
+                "",
+                cobol_constraints.get_business_layer_strict_rules(),
+                ""
+            ])
         if layer == "business" and (fn_display_text or display_spec_text):
             prompt_parts.extend([
                 "NOTE BUSINESS: Si display_lines sont fournies, les steps DOIVENT etre exactement ces lignes,",
@@ -1151,11 +1291,33 @@ def _build_prompt(
                 "Si 'open_cursor' est present, OPEN doit apparaitre avant FETCH.",
             ])
 
+    # ADDED 2026-01-10: Add env_set_method for DAL functions that set PostgreSQL env vars
+    if layer == "dal" and fn.get("name", "").upper() in ["DAL-SET-ENV", "SET-ENV", "SETUP-ENV"]:
+        env_set_method = (spec.get("sql", {}) or {}).get("connection", {}).get("env_set_method", [])
+        if env_set_method:
+            env_guide = cobol_constraints.get_env_set_method_guide(env_set_method)
+            prompt_parts.extend(["", env_guide, ""])
+            # Add ENVIRONMENT-NAME and ENVIRONMENT-VALUE to allowed identifiers
+            if "ENVIRONMENT-NAME" not in allowed_ids:
+                allowed_ids.append("ENVIRONMENT-NAME")
+            if "ENVIRONMENT-VALUE" not in allowed_ids:
+                allowed_ids.append("ENVIRONMENT-VALUE")
+            # Rebuild allowed_text with new identifiers
+            allowed_text = _format_allowed_identifiers(allowed_ids)
+
     # Add orchestration mapping if present
     if orchestration_text:
         prompt_parts.extend([
             "",
             orchestration_text,
+        ])
+
+    # ADDED 2026-01-10: Level 2 - Function-specific COMMIT interdictions
+    commit_policy_rules = _build_function_specific_commit_rules(spec, fn, program_id)
+    if commit_policy_rules:
+        prompt_parts.extend([
+            "",
+            commit_policy_rules,
         ])
 
     # Add remaining sections
@@ -1328,6 +1490,13 @@ def run(
             LOG.warning("Trace LLM steps failed: %s", e)
 
         steps = _parse_steps(response or "")
+
+        # ADDED 2026-01-10: Level 3 - Post-validation COMMIT cleanup
+        steps, commit_warnings = _validate_and_fix_commit_in_steps(spec, fn, steps)
+        if commit_warnings:
+            for warning in commit_warnings:
+                LOG.warning(warning)
+
         sql_actions = fn.get("sql_actions") or []
         cursor_name = _extract_cursor_name(fn.get("sql") or {})
         errors = _validate_steps(steps, allowed_ids, max_cols, sql_actions, cursor_name)
@@ -1371,6 +1540,13 @@ def run(
             except Exception:
                 pass
             steps = _parse_steps(response2 or "")
+
+            # ADDED 2026-01-10: Level 3 - Post-validation COMMIT cleanup (retry path)
+            steps, commit_warnings = _validate_and_fix_commit_in_steps(spec, fn, steps)
+            if commit_warnings:
+                for warning in commit_warnings:
+                    LOG.warning(warning)
+
             errors = _validate_steps(steps, allowed_ids, max_cols, sql_actions, cursor_name)
 
             # Log retry outcome

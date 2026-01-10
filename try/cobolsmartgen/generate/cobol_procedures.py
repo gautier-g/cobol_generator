@@ -12,6 +12,7 @@ from typing import Dict, List
 
 from ..utils import fs, trace
 from cobolsmartgen.adapters import llm_auto
+from . import cobol_constraints
 import json
 
 LOG = logging.getLogger(__name__)
@@ -239,10 +240,82 @@ def _build_sql_behavior_details(norm: Dict) -> str:
         lines.append(f"disconnect: statement={disc_stmt}")
     if "null_indicators" in behavior:
         lines.append(f"null_indicators: {behavior.get('null_indicators')}")
-    cursor_policy = behavior.get("cursor_commit_policy")
-    if cursor_policy:
-        lines.append(f"cursor_commit_policy: {cursor_policy}")
+
+    # Note: cursor_commit_policy est maintenant géré par _build_cursor_commit_policy_rules
+    # pour fournir des explications détaillées au LLM
+
     return "\n".join(lines)
+
+def _build_cursor_commit_policy_rules(norm: Dict, program_id: str) -> str:
+    """
+    Génère automatiquement les règles COMMIT basées sur cursor_commit_policy.
+    S'adapte à toute spec - pas spécifique à DAL.
+
+    Returns:
+        Section de prompt expliquant la politique COMMIT/curseur
+    """
+    behavior = (norm.get("sql", {}) or {}).get("behavior", {})
+    cursor_policy = behavior.get("cursor_commit_policy", "")
+
+    if not cursor_policy:
+        return ""
+
+    # Analyser les fonctions pour trouver où le COMMIT final est fait
+    functions = [fn for fn in norm.get("fonctions", []) if fn.get("programme") == program_id]
+
+    commit_allowed_in = []
+    no_commit_in = []
+
+    for fn in functions:
+        fn_name = fn.get("name", "")
+        flow_desc = (fn.get("description", "") or "").upper()
+
+        # Détecter la fonction de fin (CLOSE + COMMIT + DISCONNECT)
+        if any(keyword in flow_desc for keyword in ["CLOSE", "DISCONNECT", "FIN", "END", "CLEANUP"]):
+            commit_allowed_in.append(fn_name)
+        elif any(keyword in fn_name.upper() for keyword in ["END", "CLOSE", "CLEANUP"]):
+            commit_allowed_in.append(fn_name)
+        else:
+            no_commit_in.append(fn_name)
+
+    if cursor_policy == "no_commit_while_open":
+        lines = [
+            "",
+            "=== POLITIQUE COMMIT/CURSOR (CRITIQUE) ===",
+            f"cursor_commit_policy: {cursor_policy}",
+            "",
+            "SIGNIFICATION:",
+            "- Le curseur DOIT rester ouvert pendant tout le traitement",
+            "- PostgreSQL ferme automatiquement les curseurs non-WITH-HOLD sur COMMIT",
+            "- DONC: NE PAS mettre EXEC SQL COMMIT dans les fonctions du traitement",
+            "",
+            "RÈGLES STRICTES:",
+        ]
+
+        if commit_allowed_in:
+            lines.append(f"✅ COMMIT AUTORISÉ dans: {', '.join(commit_allowed_in)}")
+
+        if no_commit_in:
+            lines.append(f"❌ COMMIT INTERDIT dans: {', '.join(no_commit_in)}")
+
+        lines.extend([
+            "",
+            "POURQUOI:",
+            "- Un COMMIT dans une fonction du traitement fermerait le curseur",
+            "- Les prochains FETCH échoueraient avec SQLCODE=-400 (curseur fermé)",
+            "- Le batch s'arrêterait prématurément après 1 seul enregistrement",
+            "",
+            "SI ERREUR UPDATE/INSERT/DELETE:",
+            "- ✅ AUTORISÉ: EXEC SQL ROLLBACK END-EXEC (annule sans fermer curseur)",
+            "- ❌ INTERDIT: EXEC SQL COMMIT END-EXEC (fermerait le curseur)",
+            f"- Le COMMIT final sera fait dans {commit_allowed_in[0] if commit_allowed_in else 'la fonction de fin'}",
+            ""
+        ])
+
+        return "\n".join(lines)
+
+    # Autres politiques (pour future extension)
+    return f"cursor_commit_policy: {cursor_policy}"
 
 def _build_sql_formatting_details(norm: Dict) -> str:
     fmt = (norm.get("sql", {}) or {}).get("formatting", {}) if norm else {}
@@ -511,6 +584,182 @@ def _wrap_long_lines_fixed(code: str, max_len: int) -> str:
     return "\n".join(out)
 
 
+def _inject_missing_cursor_declarations(code: str, program_id: str, norm: Dict) -> str:
+    """
+    Post-validation: Garantit que DECLARE CURSOR et OPEN CURSOR sont dans des blocs séparés.
+
+    Contexte: Le LLM peut:
+    1. Omettre complètement le DECLARE CURSOR
+    2. Mettre DECLARE et OPEN dans le même bloc EXEC SQL (cause des bugs OCESQL)
+
+    Cette fonction garantit que:
+    - DECLARE CURSOR est présent
+    - DECLARE et OPEN sont dans des blocs EXEC SQL SÉPARÉS (comme EMPLOYEE qui fonctionne)
+
+    Args:
+        code: Code COBOL généré par le LLM
+        program_id: ID du programme (ex: ACCOUNT-DAL-DB)
+        norm: Spec normalisée contenant les declare_cursor
+
+    Returns:
+        Code COBOL avec DECLARE et OPEN dans des blocs séparés
+    """
+    # Extraire les fonctions de ce programme
+    program_funcs = [fn for fn in norm.get("fonctions", []) if fn.get("programme") == program_id]
+
+    lines = code.splitlines()
+    modified = False
+
+    for fn in program_funcs:
+        sql = fn.get("sql", {}) or {}
+        declare_cursor = sql.get("declare_cursor", "").strip()
+        open_cursor = sql.get("open_cursor", "").strip()
+
+        # Si pas de declare_cursor dans la spec, rien à faire
+        if not declare_cursor or not open_cursor:
+            continue
+
+        # Extraire le nom du curseur (ex: C_ACC depuis "OPEN C_ACC")
+        cursor_match = re.search(r'OPEN\s+(\w+)', open_cursor, re.IGNORECASE)
+        if not cursor_match:
+            continue
+
+        cursor_name = cursor_match.group(1)
+
+        # Vérifier si DECLARE est présent dans le code
+        code_upper = code.upper()
+        declare_pattern = f"DECLARE\\s+{cursor_name}\\s+CURSOR"
+
+        # CAS 1: DECLARE et OPEN dans le même bloc (problème OCESQL)
+        # Chercher un bloc qui contient les deux
+        declare_idx = None
+        open_idx = None
+
+        for i, line in enumerate(lines):
+            if re.search(rf'\bDECLARE\s+{cursor_name}\s+CURSOR', line, re.IGNORECASE):
+                declare_idx = i
+            if re.search(rf'\bOPEN\s+{cursor_name}\b', line, re.IGNORECASE):
+                open_idx = i
+
+        if declare_idx is not None and open_idx is not None:
+            # DECLARE et OPEN trouvés - vérifier s'ils sont dans le même bloc
+            # Trouver le END-EXEC entre DECLARE et OPEN
+            end_exec_between = False
+            for i in range(declare_idx, open_idx):
+                if re.search(r'END-EXEC', lines[i], re.IGNORECASE):
+                    end_exec_between = True
+                    break
+
+            if not end_exec_between:
+                # DECLARE et OPEN dans le MÊME bloc → Séparer!
+                LOG.warning(f"⚠️  DECLARE et OPEN {cursor_name} dans le même bloc EXEC SQL, séparation requise")
+
+                # Trouver EXEC SQL de départ
+                exec_sql_start = None
+                for j in range(declare_idx - 1, -1, -1):
+                    if re.search(r'EXEC\s+SQL\s*$', lines[j], re.IGNORECASE):
+                        exec_sql_start = j
+                        break
+
+                # Trouver END-EXEC de fin
+                exec_sql_end = None
+                for j in range(open_idx, len(lines)):
+                    if re.search(r'END-EXEC', lines[j], re.IGNORECASE):
+                        exec_sql_end = j
+                        break
+
+                if exec_sql_start and exec_sql_end:
+                    # Récupérer l'indentation
+                    exec_indent = re.match(r'^(\s*)', lines[exec_sql_start]).group(0)
+                    open_indent = re.match(r'^(\s*)', lines[open_idx]).group(0)
+
+                    # Créer le bloc OPEN séparé
+                    open_block = [
+                        f"{exec_indent}EXEC SQL",
+                        f"{open_indent}OPEN {cursor_name}",
+                        f"{exec_indent}END-EXEC"
+                    ]
+
+                    # Supprimer la ligne OPEN du bloc actuel
+                    del lines[open_idx]
+
+                    # Insérer le END-EXEC après DECLARE (si pas déjà là)
+                    # et ajouter le nouveau bloc OPEN après
+                    lines[exec_sql_end:exec_sql_end] = open_block
+
+                    modified = True
+                    LOG.warning(f"✅ DECLARE et OPEN {cursor_name} séparés en deux blocs EXEC SQL")
+                    # Pas de break car on continue pour d'autres curseurs potentiels
+                    continue
+
+            # Si on arrive ici, DECLARE existe déjà et est bien séparé
+            continue
+
+        # CAS 2: DECLARE manquant complètement
+
+        # DECLARE manquant! Chercher le OPEN et injecter le DECLARE avant
+        LOG.warning(f"⚠️  DECLARE {cursor_name} CURSOR manquant dans {program_id}, injection automatique")
+
+        # Chercher la ligne contenant OPEN cursor_name
+        for i, line in enumerate(lines):
+            if re.search(rf'\bOPEN\s+{cursor_name}\b', line, re.IGNORECASE):
+                # Trouver le début du bloc EXEC SQL (en remontant)
+                exec_sql_start = None
+                for j in range(i - 1, -1, -1):
+                    if re.search(r'EXEC\s+SQL\s*$', lines[j], re.IGNORECASE):
+                        exec_sql_start = j
+                        break
+
+                if exec_sql_start is None:
+                    LOG.error(f"Cannot find EXEC SQL before OPEN {cursor_name}")
+                    continue
+
+                # Récupérer l'indentation du bloc EXEC SQL
+                exec_indent = re.match(r'^(\s*)', lines[exec_sql_start]).group(1)
+                # Récupérer l'indentation du contenu SQL (généralement exec_indent + quelques espaces)
+                sql_content_indent = re.match(r'^(\s*)', lines[i]).group(1)
+
+                # Préparer le bloc DECLARE complet (EXEC SQL ... END-EXEC)
+                declare_block = []
+
+                # EXEC SQL
+                declare_block.append(f"{exec_indent}EXEC SQL")
+
+                # DECLARE avec indentation du contenu
+                declare_block.append(f"{sql_content_indent}DECLARE {cursor_name} CURSOR FOR")
+
+                # Extraire la partie SELECT du declare_cursor
+                select_part = declare_cursor
+                if "DECLARE" in select_part.upper():
+                    # Extraire seulement après DECLARE ... FOR
+                    select_match = re.search(r'CURSOR\s+FOR\s+(SELECT\s+.+)', select_part, re.DOTALL | re.IGNORECASE)
+                    if select_match:
+                        select_part = select_match.group(1)
+                    else:
+                        # Sinon extraire SELECT directement
+                        select_match = re.search(r'(SELECT\s+.+)', select_part, re.DOTALL | re.IGNORECASE)
+                        if select_match:
+                            select_part = select_match.group(1)
+
+                # Ajouter les lignes SELECT avec même indentation que le DECLARE
+                for select_line in select_part.strip().splitlines():
+                    if select_line.strip():
+                        declare_block.append(f"{sql_content_indent}     {select_line.strip()}")
+
+                # END-EXEC
+                declare_block.append(f"{exec_indent}END-EXEC")
+
+                # Insérer le bloc DECLARE complet AVANT le bloc EXEC SQL qui contient OPEN
+                lines[exec_sql_start:exec_sql_start] = declare_block
+                modified = True
+                LOG.warning(f"✅ DECLARE {cursor_name} CURSOR injecté dans un bloc EXEC SQL séparé")
+                break
+
+    if modified:
+        return "\n".join(lines)
+    return code
+
+
 def _generate_with_validation(prompt_base: str, system: str, program_id: str, layer: str,
                               entity: str, norm: Dict, config: Dict) -> (str, str):
     """Gen LLM puis valide; si échec, renvoie avec message correctif (1 retry)."""
@@ -523,6 +772,10 @@ def _generate_with_validation(prompt_base: str, system: str, program_id: str, la
             max_len = fmt.get("max_line_length")
             if isinstance(max_len, int) and max_len > 0:
                 clean = _wrap_long_lines_fixed(clean, max_len)
+
+        # Post-injection: Garantir que DECLARE CURSOR est présent si nécessaire
+        clean = _inject_missing_cursor_declarations(clean, program_id, norm)
+
         errors = _validate_program(clean, program_id, layer, entity, norm)
         if not errors:
             return clean, last_prompt
@@ -683,9 +936,13 @@ def _build_strict_prompt(program_id: str, layer: str, entity: str, norm: Dict, i
             biz_program = prog_yaml.get("name", "")
 
     # Exigences (toutes) + règles métier
+    # UPDATED 2026-01-10: Filter requirements by layer to prevent logic leakage into BUSINESS
+    all_requirements = norm.get("exigences", [])
+    filtered_requirements = cobol_constraints.filter_requirements_by_layer(all_requirements, layer)
+
     business_rules = []
     exigences_lines: List[str] = []
-    for req in norm.get("exigences", []):
+    for req in filtered_requirements:
         req_id = req.get("id", "").strip()
         req_type = req.get("type", "").strip()
         req_rule = req.get("regle", "").strip()
@@ -703,8 +960,14 @@ def _build_strict_prompt(program_id: str, layer: str, entity: str, norm: Dict, i
             exigences_lines.append(line)
         if req.get("type") in ["business", "regle_metier"] and req_rule:
             business_rules.append(req_rule)
-    business_rules_text = "; ".join(business_rules) if business_rules else "Aucune"
-    exigences_text = "\n".join(exigences_lines) if exigences_lines else "Aucune"
+
+    # Add note if requirements were filtered for BUSINESS layer
+    if layer == "business" and len(filtered_requirements) < len(all_requirements):
+        business_rules_text = "Aucune (regles metier dans LOGIC)"
+        exigences_text = "Aucune (presentation seulement)"
+    else:
+        business_rules_text = "; ".join(business_rules) if business_rules else "Aucune"
+        exigences_text = "\n".join(exigences_lines) if exigences_lines else "Aucune"
 
     # Interdictions dynamiques
     forbidden_items: List[str] = []
@@ -722,6 +985,7 @@ def _build_strict_prompt(program_id: str, layer: str, entity: str, norm: Dict, i
     format_details = _build_format_details(norm)
     naming_conventions = _build_naming_conventions(norm)
     sql_behavior_details = _build_sql_behavior_details(norm)
+    cursor_commit_policy_rules = _build_cursor_commit_policy_rules(norm, program_id)
     sql_formatting_details = _build_sql_formatting_details(norm)
     generation_strategy = "\n".join(prompting.get("generation_strategy", []) or []) or "Aucune"
     formatting_guidelines = "\n".join(prompting.get("formatting_guidelines", []) or [])
@@ -767,6 +1031,7 @@ def _build_strict_prompt(program_id: str, layer: str, entity: str, norm: Dict, i
         "format_details": format_details,
         "naming_conventions": naming_conventions,
         "sql_behavior_details": sql_behavior_details,
+        "cursor_commit_policy_rules": cursor_commit_policy_rules,
         "sql_formatting_details": sql_formatting_details,
         "generation_strategy": generation_strategy,
         "entry_block_rules": entry_block_rules_text,
@@ -847,7 +1112,8 @@ def _build_strict_prompt(program_id: str, layer: str, entity: str, norm: Dict, i
             "{sql_formatting_details}"
         ],
         "sql_behavior": [
-            "{sql_behavior_details}"
+            "{sql_behavior_details}",
+            "{cursor_commit_policy_rules}"
         ],
         "flow": [
             "{flow_notes}"
@@ -869,6 +1135,15 @@ def _build_strict_prompt(program_id: str, layer: str, entity: str, norm: Dict, i
     prompt_parts.append("\n".join(global_constraints))
     if global_directives:
         prompt_parts.append("\n".join(global_directives))
+
+    # ADDED 2026-01-10: Add hardcoded COBOL constraints (not in specs)
+    prompt_parts.append("")
+    prompt_parts.append(cobol_constraints.get_gnucobol_intrinsic_functions_guide())
+
+    # ADDED 2026-01-10: Add strict BUSINESS layer rules if applicable
+    if layer == "business":
+        prompt_parts.append("")
+        prompt_parts.append(cobol_constraints.get_business_layer_strict_rules())
 
     for section in sections_order:
         section_lines = program_prompt.get(section)

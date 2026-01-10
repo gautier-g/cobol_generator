@@ -1,11 +1,11 @@
-# Exemple 1 — Salaire net (NET = BRUT * 0.7 arrondi à 2 décimales)
-title: CALCUL-SALAIRE
+# Exemple 2 - Interet compte (INTEREST_AMOUNT = BALANCE_BRUT * RATE / 100)
+title: CALCUL-INTERET
 dialecte_cobol: gnucobol
 sql_cible: postgres
 
 nommage:
-  variables_case: UPPER_SNAKE      # ex : SALARY_NET, END-OF-FILE
-  programmes_case: UPPER-KEBAB     # ex : EMPLOYEE-DAL-DB, EMPLOYEE-LOGIC
+  variables_case: UPPER_SNAKE      # ex : BALANCE_NET, END-OF-FILE
+  programmes_case: UPPER-KEBAB     # ex : ACCOUNT-DAL-DB, ACCOUNT-LOGIC
 
 cobol_format:
   line_format: fixed
@@ -27,93 +27,114 @@ naming_rules:
 
 fonctionnalites:
   - id: F1
-    resume: "Calculer le salaire net à partir du salaire brut pour chaque employé."
+    resume: "Calculer les interets et le solde net pour chaque compte."
 
 exigences:
   - id: R1
     type: regle_metier
-    regle: "SALARY_NET = ROUND(SALARY_BRUT * 0.7, 2)"
-    notes: "Salaire net = salaire brut − cotisations sociales (20%) − impôt (10%). Arrondi bancaire à 2 décimales. SALARY_NET ne doit pas être négatif."
+    regle: "INTEREST_AMOUNT = ROUND(BALANCE_BRUT * INTEREST_RATE / 100, 2); BALANCE_NET = BALANCE_BRUT + INTEREST_AMOUNT"
+    notes: "Interet uniquement si BALANCE_BRUT >= 0. Arrondi bancaire a 2 decimales."
   - id: R2
     type: technique
-    regle: "Traitement batch quotidien; journalisation des exécutions (messages simples sur la console)."
+    regle: "Traitement batch journalier; journalisation console."
   - id: R3
     type: validation
-    regle: "Si SALARY_BRUT est NULL ou invalide, ignorer la ligne ou la signaler en anomalie."
+    regle: "Si BALANCE_BRUT ou INTEREST_RATE sont NULL ou invalides, signaler une anomalie et ignorer la ligne."
+  - id: R4
+    type: validation
+    regle: "Si BALANCE_BRUT < 0 alors INTEREST_AMOUNT = 0 et BALANCE_NET = BALANCE_BRUT."
 
 mcd:
   entites:
-    - name: EMPLOYEE
+    - name: ACCOUNT
       attrs:
-        - name: EMP_ID
+        - name: ACC_ID
           type: INT
           sql_type: INT
-          cobol_pic: "9(4)"
+          cobol_pic: "9(6)"
           pk: true
           nullable: false
-        - name: EMP_NAME
-          type: VARCHAR(30)
-          sql_type: VARCHAR(30)
-          cobol_pic: "X(30)"
+        - name: ACC_HOLDER
+          type: VARCHAR(40)
+          sql_type: VARCHAR(40)
+          cobol_pic: "X(40)"
           nullable: false
-        - name: SALARY_BRUT
-          type: DECIMAL(8,2)
-          sql_type: DECIMAL(8,2)
-          cobol_pic: "S9(6)V99"
+        - name: BALANCE_BRUT
+          type: DECIMAL(11,2)
+          sql_type: DECIMAL(11,2)
+          cobol_pic: "S9(9)V99"
           nullable: false
-        - name: SALARY_NET
-          type: DECIMAL(8,2)
-          sql_type: DECIMAL(8,2)
-          cobol_pic: "S9(6)V99"
+        - name: INTEREST_RATE
+          type: DECIMAL(5,2)
+          sql_type: DECIMAL(5,2)
+          cobol_pic: "S9(3)V99"
+          nullable: false
+        - name: INTEREST_AMOUNT
+          type: DECIMAL(11,2)
+          sql_type: DECIMAL(11,2)
+          cobol_pic: "S9(9)V99"
+          nullable: true
+        - name: BALANCE_NET
+          type: DECIMAL(11,2)
+          sql_type: DECIMAL(11,2)
+          cobol_pic: "S9(9)V99"
           nullable: true
   relations: []
 
 diagramme: |
   erDiagram
-    EMPLOYEE {
-      INT EMP_ID PK
-      VARCHAR EMP_NAME
-      DECIMAL SALARY_BRUT
-      DECIMAL SALARY_NET
+    ACCOUNT {
+      INT ACC_ID PK
+      VARCHAR ACC_HOLDER
+      DECIMAL BALANCE_BRUT
+      DECIMAL INTEREST_RATE
+      DECIMAL INTEREST_AMOUNT
+      DECIMAL BALANCE_NET
     }
 
 sql:
   ddl:
-    EMPLOYEE: |
-      CREATE TABLE EMPLOYEE (
-          EMP_ID INT PRIMARY KEY,
-          EMP_NAME VARCHAR(30) NOT NULL,
-          SALARY_BRUT DECIMAL(8,2) NOT NULL,
-          SALARY_NET DECIMAL(8,2)
+    ACCOUNT: |
+      CREATE TABLE ACCOUNT (
+          ACC_ID INT PRIMARY KEY,
+          ACC_HOLDER VARCHAR(40) NOT NULL,
+          BALANCE_BRUT DECIMAL(11,2) NOT NULL,
+          INTEREST_RATE DECIMAL(5,2) NOT NULL,
+          INTEREST_AMOUNT DECIMAL(11,2),
+          BALANCE_NET DECIMAL(11,2)
       );
   initial_data:
-    EMPLOYEE:
-      - EMP_ID: 1
-        EMP_NAME: "Dupont"
-        SALARY_BRUT: 3000.00
-        SALARY_NET: 0.00
-      - EMP_ID: 2
-        EMP_NAME: "Durand"
-        SALARY_BRUT: 1500.00
-        SALARY_NET: 0.00
+    ACCOUNT:
+      - ACC_ID: 10
+        ACC_HOLDER: "Martin"
+        BALANCE_BRUT: 1500.00
+        INTEREST_RATE: 1.50
+        INTEREST_AMOUNT: 0.00
+        BALANCE_NET: 0.00
+      - ACC_ID: 20
+        ACC_HOLDER: "Leroy"
+        BALANCE_BRUT: 2500.00
+        INTEREST_RATE: 2.00
+        INTEREST_AMOUNT: 0.00
+        BALANCE_NET: 0.00
   indexes:
-    - entity: EMPLOYEE
-      name: EMPLOYEE_EMP_NAME_IDX
-      columns: [EMP_NAME]
+    - entity: ACCOUNT
+      name: ACCOUNT_ACC_HOLDER_IDX
+      columns: [ACC_HOLDER]
   connection:
     engine: postgres
     method: ocesql
-    dbname: empdb
-    user: empuser
-    password: SECRETPWD
+    dbname: bankdb
+    user: bankuser
+    password: BANKPWD
     host: localhost
     port: 5432
     env_vars:
       PGHOST: "localhost"
       PGPORT: "5432"
-      PGUSER: "empuser"
-      PGPASSWORD: "SECRETPWD"
-      PGDATABASE: "empdb"
+      PGUSER: "bankuser"
+      PGPASSWORD: "BANKPWD"
+      PGDATABASE: "bankdb"
     env_set_method:
       - "DISPLAY <ENV_NAME> UPON ENVIRONMENT-NAME"
       - "DISPLAY <ENV_VALUE> UPON ENVIRONMENT-VALUE"
@@ -152,20 +173,20 @@ technique:
   cursor_naming:
     pattern: "C_<ENTITY_UPPER3>"
     example:
-      EMPLOYEE: "C_EMP"
+      ACCOUNT: "C_ACC"
   eof_flag:
     name: "END-OF-FILE"
     pic: "X"
     initial_value: "N"
     true_value: "Y"
     false_value: "N"
-  sqlca_required: true   # la DAL doit inclure SQLCA dès qu'elle utilise SQLCODE
+  sqlca_required: true
   dal_call_pattern:
-    description: "Programme DAL appelé avec un code opération court (READ, SAVE, END)."
+    description: "Programme DAL appele avec un code operation court (READ, SAVE, END)."
     operation_param_name: "OPERATION"
     operation_pic: "X(4)"
     eof_param_name: "END-OF-FILE"
-    employee_param_name: "EMPLOYEE"
+    employee_param_name: "ACCOUNT"
 
 prompting:
   global_constraints:
@@ -205,7 +226,7 @@ prompting:
     - "Respecter l'ordre: IDENTIFICATION -> ENVIRONMENT -> DATA -> PROCEDURE."
     - "Dans DATA: WORKING-STORAGE puis LINKAGE (si present)."
   programs:
-    EMPLOYEE-DAL-DB:
+    ACCOUNT-DAL-DB:
       sections_order: [strategy, context, style, format, naming, environment, interface, structure, working_storage, sql, sql_format, sql_behavior, flow, logging, constraints, skeleton, fonctions]
       context:
         - "SGBD: {sql_cible}. Dialecte COBOL: {dialecte_cobol}."
@@ -266,11 +287,11 @@ prompting:
         - "{entry_paragraph}."
       fonctions:
         - "{function_details}"
-    EMPLOYEE-LOGIC:
+    ACCOUNT-LOGIC:
       sections_order: [strategy, context, style, format, naming, environment, interface, working_storage, flow, logging, constraints, skeleton, fonctions]
       context:
         - "Regles metier: {business_rules}"
-        - "Batch: traiter tous les employes."
+        - "Batch: traiter tous les comptes."
       style:
         - "Guidelines globales: {formatting_guidelines}"
         - "Header commentaire (verbatim):"
@@ -313,11 +334,11 @@ prompting:
         - "{entry_paragraph}."
       fonctions:
         - "{function_details}"
-    EMPLOYEE-BUSINESS:
+    ACCOUNT-BUSINESS:
       sections_order: [strategy, context, style, format, naming, environment, interface, working_storage, logging, constraints, skeleton, fonctions]
       context:
         - "Role: couche presentation simple, affiche les valeurs."
-        - "Structure EMPLOYEE: {entity_fields_list}"
+        - "Structure ACCOUNT: {entity_fields_list}"
       style:
         - "Guidelines globales: {formatting_guidelines}"
         - "Header commentaire (verbatim):"
@@ -355,18 +376,18 @@ prompting:
         - "{function_details}"
 
 programmes:
-  - name: EMPLOYEE-DAL-DB
+  - name: ACCOUNT-DAL-DB
     layer: dal
-    role: "Couche d'accès à la base pour EMPLOYEE (lecture via curseur et mise à jour de SALARY_NET)."
-    entities: [EMPLOYEE]
+    role: "Couche d'acces a la base pour ACCOUNT (lecture via curseur et mise a jour des interets)."
+    entities: [ACCOUNT]
     allowed_sql: true
     allowed_business_logic: false
     allow_display: true
     header_comment_lines:
       - "      *****************************************************************"
-      - "      * Programme: EMPLOYEE-DAL-DB                                     *"
+      - "      * Programme: ACCOUNT-DAL-DB                                      *"
       - "      * Couche: DAL (Data Access Layer)                                *"
-      - "      * Role: Acces a la base PostgreSQL pour EMPLOYEE                 *"
+      - "      * Role: Acces a la base PostgreSQL pour ACCOUNT                  *"
       - "      *       Operations: READ, SAVE, END                              *"
       - "      *****************************************************************"
     style_lines:
@@ -374,13 +395,14 @@ programmes:
       - "OCESQLConnect avec BY REFERENCE/ BY VALUE (ordre exact)."
       - "EXIT PARAGRAPH sur erreur OPEN du curseur."
       - "EVALUATE SQLCODE apres FETCH."
-      - "Apres DAL-CONNECT, si NOT WS-CONNECTED: MOVE 'Y' TO LK-END-OF-FILE puis GOBACK."
-      - "MAIN-ENTRY se termine strictement par END-EVALUATE, puis GOBACK, puis '.'"
+      - "Apres DAL-CONNECT, si NOT WS-CONNECTED:"
+      - "MOVE 'Y' TO LK-END-OF-FILE puis GOBACK."
+      - "MAIN-ENTRY finit par END-EVALUATE, puis GOBACK, puis '.'"
     required_lines:
       - "      *****************************************************************"
-      - "      * Programme: EMPLOYEE-DAL-DB                                     *"
+      - "      * Programme: ACCOUNT-DAL-DB                                      *"
       - "      * Couche: DAL (Data Access Layer)                                *"
-      - "      * Role: Acces a la base PostgreSQL pour EMPLOYEE                 *"
+      - "      * Role: Acces a la base PostgreSQL pour ACCOUNT                  *"
       - "      *       Operations: READ, SAVE, END                              *"
       - "      *****************************************************************"
     environment_lines:
@@ -388,7 +410,7 @@ programmes:
       - "CONFIGURATION SECTION."
       - "REPOSITORY."
       - "    FUNCTION ALL INTRINSIC."
-    main_cursor: "C_EMP"
+    main_cursor: "C_ACC"
     internal_paragraphs: ["DAL-CONNECT", "DAL-SET-ENV"]
     working_storage_lines:
       - "EXEC SQL INCLUDE SQLCA END-EXEC."
@@ -396,38 +418,40 @@ programmes:
       - "88  WS-CONNECTED           VALUE 'Y'."
       - "01  WS-CURSOR-OPEN-FLAG    PIC X VALUE 'N'."
       - "88  WS-CURSOR-OPEN         VALUE 'Y'."
-      - "01  WS-EMP-ID              PIC 9(4)."
-      - "01  WS-EMP-NAME            PIC X(30)."
-      - "01  WS-SALARY-BRUT         PIC S9(6)V99."
-      - "01  WS-SALARY-NET          PIC S9(6)V99."
+      - "01  WS-ACC-ID              PIC 9(6)."
+      - "01  WS-ACC-HOLDER          PIC X(40)."
+      - "01  WS-BALANCE-BRUT        PIC S9(9)V99."
+      - "01  WS-INTEREST-RATE       PIC S9(3)V99."
+      - "01  WS-INTEREST-AMOUNT     PIC S9(9)V99."
+      - "01  WS-BALANCE-NET         PIC S9(9)V99."
       - "01  WS-DB-NAME."
-      - "05  WS-DB-NAME-TEXT     PIC X(5) VALUE 'empdb'."
+      - "05  WS-DB-NAME-TEXT     PIC X(6) VALUE 'bankdb'."
       - "05  WS-DB-NAME-TERM     PIC X VALUE X'00'."
       - "01  WS-DB-USER."
-      - "05  WS-DB-USER-TEXT     PIC X(7) VALUE 'empuser'."
+      - "05  WS-DB-USER-TEXT     PIC X(8) VALUE 'bankuser'."
       - "05  WS-DB-USER-TERM     PIC X VALUE X'00'."
       - "01  WS-DB-PASSWORD."
-      - "05  WS-DB-PASSWORD-TEXT PIC X(9) VALUE 'SECRETPWD'."
+      - "05  WS-DB-PASSWORD-TEXT PIC X(7) VALUE 'BANKPWD'."
       - "05  WS-DB-PASSWORD-TERM PIC X VALUE X'00'."
-      - "01  WS-DB-NAME-LEN         PIC S9(4) COMP-5 VALUE 5."
-      - "01  WS-DB-USER-LEN         PIC S9(4) COMP-5 VALUE 7."
-      - "01  WS-DB-PASSWORD-LEN     PIC S9(4) COMP-5 VALUE 9."
+      - "01  WS-DB-NAME-LEN         PIC S9(4) COMP-5 VALUE 6."
+      - "01  WS-DB-USER-LEN         PIC S9(4) COMP-5 VALUE 8."
+      - "01  WS-DB-PASSWORD-LEN     PIC S9(4) COMP-5 VALUE 7."
       - "01  WS-PGHOST-NAME         PIC X(6) VALUE 'PGHOST'."
       - "01  WS-PGHOST-VALUE        PIC X(64) VALUE 'localhost'."
       - "01  WS-PGPORT-NAME         PIC X(6) VALUE 'PGPORT'."
       - "01  WS-PGPORT-VALUE        PIC X(5) VALUE '5432'."
       - "01  WS-PGUSER-NAME         PIC X(6) VALUE 'PGUSER'."
-      - "01  WS-PGUSER-VALUE        PIC X(64) VALUE 'empuser'."
+      - "01  WS-PGUSER-VALUE        PIC X(64) VALUE 'bankuser'."
       - "01  WS-PGPASSWORD-NAME     PIC X(10) VALUE 'PGPASSWORD'."
-      - "01  WS-PGPASSWORD-VALUE    PIC X(64) VALUE 'SECRETPWD'."
+      - "01  WS-PGPASSWORD-VALUE    PIC X(64) VALUE 'BANKPWD'."
       - "01  WS-PGDATABASE-NAME     PIC X(10) VALUE 'PGDATABASE'."
-      - "01  WS-PGDATABASE-VALUE    PIC X(64) VALUE 'empdb'."
+      - "01  WS-PGDATABASE-VALUE    PIC X(64) VALUE 'bankdb'."
     flow:
       - "MAIN-ENTRY: IF LK-OPERATION NOT = 'END ' THEN PERFORM DAL-CONNECT; IF NOT WS-CONNECTED THEN MOVE 'Y' TO LK-END-OF-FILE, GOBACK; END-IF; END-IF"
-      - "EVALUATE LK-OPERATION: READ->DAL-READ, SAVE->DAL-SAVE, END->DAL-END, OTHER->DISPLAY erreur"
+      - "EVALUATE LK-OPERATION: READ->DAL-READ-ACCOUNT, SAVE->DAL-SAVE-ACCOUNT, END->DAL-END, OTHER->DISPLAY erreur"
       - "GOBACK apres EVALUATE"
-      - "DAL-READ: ouverture curseur paresseuse, FETCH, mise a jour EOF"
-      - "DAL-SAVE: UPDATE SALARY_NET"
+      - "DAL-READ-ACCOUNT: ouverture curseur paresseuse, FETCH, mise a jour EOF"
+      - "DAL-SAVE-ACCOUNT: UPDATE INTEREST_AMOUNT et BALANCE_NET"
       - "DAL-END: CLOSE cursor, COMMIT, DISCONNECT, reset flags"
     entry_block_rules:
       - condition_regex: "^\\s*IF\\s+LK-OPERATION\\s+NOT\\s+(=|EQUAL)\\s+'END '\\s*$"
@@ -443,7 +467,7 @@ programmes:
         - "GOBACK"
         - "."
     paragraph_constraints:
-      - paragraph: "DAL-READ"
+      - paragraph: "DAL-READ-ACCOUNT"
         forbid_contains:
           - "PERFORM DAL-CONNECT"
           - "IF NOT WS-CONNECTED"
@@ -457,11 +481,11 @@ programmes:
     allow_procedure_sections: false
     require_working_storage_section: true
     logging_lines:
-      - "Connexion DB reussie: empdb"
+      - "Connexion DB reussie: bankdb"
       - "ERREUR CONNECT: SQLCODE="
       - "SQLSTATE="
       - "SQLERRMC="
-      - "Curseur C_EMP ouvert"
+      - "Curseur C_ACC ouvert"
       - "ERREUR OPEN: SQLCODE="
       - "ERREUR FETCH: SQLCODE="
       - "ERREUR UPDATE: SQLCODE="
@@ -472,7 +496,7 @@ programmes:
       - "Fermeture connexion"
     call_interface:
       type: "CALL USING"
-      description: "CALL 'EMPLOYEE-DAL-DB' USING OPERATION, END-OF-FILE, EMPLOYEE."
+      description: "CALL 'ACCOUNT-DAL-DB' USING OPERATION, END-OF-FILE, ACCOUNT."
       linkage_parameters:
         - name: "LK-OPERATION"
           pic: "X(4)"
@@ -480,8 +504,8 @@ programmes:
         - name: "LK-END-OF-FILE"
           pic: "X"
           direction: inout
-        - name: "LK-EMPLOYEE"
-          pic: "groupe EMPLOYEE"
+        - name: "LK-ACCOUNT"
+          pic: "groupe ACCOUNT"
           direction: inout
       operations:
         read: "READ"
@@ -494,49 +518,47 @@ programmes:
         working_storage: required
         linkage: required
       procedure_division:
-        using_clause: ["LK-OPERATION", "LK-END-OF-FILE", "LK-EMPLOYEE"]
+        using_clause: ["LK-OPERATION", "LK-END-OF-FILE", "LK-ACCOUNT"]
         entry_paragraph: "MAIN-ENTRY"
 
-  - name: EMPLOYEE-LOGIC
+  - name: ACCOUNT-LOGIC
     layer: logic
-    role: "Traitement batch principal : boucle sur les employés, calcul du net, sauvegarde, affichage."
-    entities: [EMPLOYEE]
+    role: "Traitement batch principal : boucle sur les comptes, calcul des interets, sauvegarde, affichage."
+    entities: [ACCOUNT]
     allowed_sql: false
     allowed_business_logic: true
     allow_display: true
     header_comment_lines:
       - "      *****************************************************************"
-      - "      * Programme: EMPLOYEE-LOGIC                                      *"
+      - "      * Programme: ACCOUNT-LOGIC                                       *"
       - "      * Couche: LOGIC (Orchestration)                                  *"
       - "      * Role: Traitement batch principal                               *"
-      - "      *       - Boucle sur les employes                                *"
-      - "      *       - Calcul du salaire net (BRUT * 0.7)                     *"
+      - "      *       - Boucle sur les comptes                                 *"
+      - "      *       - Calcul des interets et solde net                       *"
       - "      *       - Sauvegarde en base                                     *"
       - "      *       - Affichage des resultats                                *"
       - "      *****************************************************************"
     style_lines:
       - "Utiliser commentaires de bloc pour les sections majeures."
       - "Afficher les bandeaux debut et fin."
-      - "Bloc commentaire CALCULATE-NET (verbatim):"
+      - "Bloc commentaire CALCULATE-INTEREST (verbatim):"
       - "      *****************************************************************"
-      - "      * Regle metier R1: SALARY_NET = ROUND(SALARY_BRUT * 0.7, 2)    *"
-      - "      * Calcul: Salaire net = Salaire brut - 30%                      *"
-      - "      *         (20% cotisations sociales + 10% impot)                *"
+      - "      * Regle metier R1: INTEREST_AMOUNT = ROUND(BALANCE_BRUT * RATE  *"
+      - "      * / 100, 2) et BALANCE_NET = BALANCE_BRUT + INTEREST_AMOUNT     *"
       - "      *****************************************************************"
     required_lines:
       - "      *****************************************************************"
-      - "      * Programme: EMPLOYEE-LOGIC                                      *"
+      - "      * Programme: ACCOUNT-LOGIC                                       *"
       - "      * Couche: LOGIC (Orchestration)                                  *"
       - "      * Role: Traitement batch principal                               *"
-      - "      *       - Boucle sur les employes                                *"
-      - "      *       - Calcul du salaire net (BRUT * 0.7)                     *"
+      - "      *       - Boucle sur les comptes                                 *"
+      - "      *       - Calcul des interets et solde net                       *"
       - "      *       - Sauvegarde en base                                     *"
       - "      *       - Affichage des resultats                                *"
       - "      *****************************************************************"
       - "      *****************************************************************"
-      - "      * Regle metier R1: SALARY_NET = ROUND(SALARY_BRUT * 0.7, 2)    *"
-      - "      * Calcul: Salaire net = Salaire brut - 30%                      *"
-      - "      *         (20% cotisations sociales + 10% impot)                *"
+      - "      * Regle metier R1: INTEREST_AMOUNT = ROUND(BALANCE_BRUT * RATE  *"
+      - "      * / 100, 2) et BALANCE_NET = BALANCE_BRUT + INTEREST_AMOUNT     *"
       - "      *****************************************************************"
     environment_lines:
       - "ENVIRONMENT DIVISION."
@@ -549,32 +571,35 @@ programmes:
       - "88  NOT-EOF            VALUE 'N'."
       - "77  OPERATION              PIC X(4)."
       - "77  WS-COUNT               PIC 9(4) VALUE 0."
-      - "01  EMPLOYEE."
-      - "    05 EMP-ID              PIC 9(4)."
-      - "    05 EMP-NAME            PIC X(30)."
-      - "    05 SALARY-BRUT         PIC S9(6)V99."
-      - "    05 SALARY-NET          PIC S9(6)V99."
+      - "01  ACCOUNT."
+      - "    05 ACC-ID              PIC 9(6)."
+      - "    05 ACC-HOLDER          PIC X(40)."
+      - "    05 BALANCE-BRUT        PIC S9(9)V99."
+      - "    05 INTEREST-RATE       PIC S9(3)V99."
+      - "    05 INTEREST-AMOUNT     PIC S9(9)V99."
+      - "    05 BALANCE-NET         PIC S9(9)V99."
     flow:
       - "Afficher le bandeau de debut"
       - "READ initial via DAL (OPERATION='READ')"
-      - "Boucle jusqu'a EOF: incrementer WS-COUNT, CALCULATE-NET, SAVE, BUSINESS display, READ suivant"
+      - "Boucle jusqu'a EOF: incrementer WS-COUNT, CALCULATE-INTEREST, SAVE, BUSINESS display, READ suivant"
       - "Appeler DAL avec OPERATION='END '"
       - "Afficher le bandeau de fin avec le compteur"
       - "STOP RUN"
     logging_lines:
       - "=========================================="
-      - "DEBUT TRAITEMENT BATCH CALCUL SALAIRE NET"
+      - "DEBUT TRAITEMENT BATCH CALCUL INTERET"
       - "=========================================="
       - "=========================================="
       - "FIN TRAITEMENT BATCH"
-      - "Nombre employes traites: "
+      - "Nombre comptes traites: "
       - "=========================================="
-      - "ANOMALIE: Salaire net negatif corrige"
-      - "ANOMALIE: SALARY_BRUT invalide"
+      - "ANOMALIE: Solde negatif, interet a 0"
+      - "ANOMALIE: BALANCE_BRUT invalide"
+      - "ANOMALIE: INTEREST_RATE invalide"
     required_statements:
       - "STOP RUN"
-      - "CALL 'EMPLOYEE-DAL-DB' USING OPERATION, END-OF-FILE, EMPLOYEE"
-      - "CALL 'EMPLOYEE-BUSINESS' USING EMPLOYEE"
+      - "CALL 'ACCOUNT-DAL-DB' USING OPERATION, END-OF-FILE, ACCOUNT"
+      - "CALL 'ACCOUNT-BUSINESS' USING ACCOUNT"
     allow_procedure_sections: false
     require_working_storage_section: true
     cobol_sections:
@@ -586,28 +611,28 @@ programmes:
       procedure_division:
         entry_paragraph: "MAIN-PROCESS"
 
-  - name: EMPLOYEE-BUSINESS
+  - name: ACCOUNT-BUSINESS
     layer: business
-    role: "Affichage simple des informations d'un employé (nom, ID, salaire brut/net)."
-    entities: [EMPLOYEE]
+    role: "Affichage simple des informations d'un compte (titulaire, solde, interet)."
+    entities: [ACCOUNT]
     allowed_sql: false
     allowed_business_logic: "lecture_seule"
     allow_display: true
     header_comment_lines:
       - "      *****************************************************************"
-      - "      * Programme: EMPLOYEE-BUSINESS                                   *"
+      - "      * Programme: ACCOUNT-BUSINESS                                    *"
       - "      * Couche: BUSINESS (Presentation)                                *"
-      - "      * Role: Affichage simple des informations employe                *"
-      - "      *       - Nom, ID, salaire brut, salaire net                     *"
+      - "      * Role: Affichage simple des informations compte                 *"
+      - "      *       - Titulaire, solde, interet, net                   *"
       - "      *****************************************************************"
     style_lines:
-      - "GOBACK en fin de paragraphe DISPLAY-EMPLOYEE."
+      - "GOBACK en fin de paragraphe DISPLAY-ACCOUNT."
     required_lines:
       - "      *****************************************************************"
-      - "      * Programme: EMPLOYEE-BUSINESS                                   *"
+      - "      * Programme: ACCOUNT-BUSINESS                                    *"
       - "      * Couche: BUSINESS (Presentation)                                *"
-      - "      * Role: Affichage simple des informations employe                *"
-      - "      *       - Nom, ID, salaire brut, salaire net                     *"
+      - "      * Role: Affichage simple des informations compte                 *"
+      - "      *       - Titulaire, solde, interet, net                   *"
       - "      *****************************************************************"
     environment_lines:
       - "ENVIRONMENT DIVISION."
@@ -615,9 +640,12 @@ programmes:
       - "WORKING-STORAGE SECTION."
     logging_lines:
       - "----------------------------------------"
-      - "EMPLOYE : "
+      - "COMPTE : "
       - "ID      : "
+      - "TITULAIRE: "
       - "BRUT    : "
+      - "TAUX    : "
+      - "INTERET : "
       - "NET     : "
     required_statements:
       - "GOBACK"
@@ -625,10 +653,10 @@ programmes:
     require_working_storage_section: true
     call_interface:
       type: "CALL USING"
-      description: "CALL 'EMPLOYEE-BUSINESS' USING LK-EMPLOYEE."
+      description: "CALL 'ACCOUNT-BUSINESS' USING LK-ACCOUNT."
       linkage_parameters:
-        - name: "LK-EMPLOYEE"
-          pic: "groupe EMPLOYEE"
+        - name: "LK-ACCOUNT"
+          pic: "groupe ACCOUNT"
           direction: in
     cobol_sections:
       identification_division: required
@@ -637,19 +665,17 @@ programmes:
         working_storage: required
         linkage: required
       procedure_division:
-        using_clause: ["LK-EMPLOYEE"]
-        entry_paragraph: "DISPLAY-EMPLOYEE"
+        using_clause: ["LK-ACCOUNT"]
+        entry_paragraph: "DISPLAY-ACCOUNT"
 
 fonctions:
-  # --- Couche DAL / Physique ---
-
   - id: FN-DAL-CONNECT
     name: DAL-CONNECT
-    programme: EMPLOYEE-DAL-DB
+    programme: ACCOUNT-DAL-DB
     layer: dal
     visibility: internal
     required: true
-    entity: EMPLOYEE
+    entity: ACCOUNT
     description: >
       Connexion paresseuse a la base via OCESQL. Initialise les variables
       d'environnement PostgreSQL, puis execute OCESQLStartSQL/OCESQLConnect/OCESQLEndSQL.
@@ -667,240 +693,133 @@ fonctions:
         - "CALL \"OCESQLStartSQL\" END-CALL"
         - "CALL \"OCESQLConnect\" USING BY REFERENCE SQLCA BY REFERENCE WS-DB-USER BY VALUE WS-DB-USER-LEN BY REFERENCE WS-DB-PASSWORD BY VALUE WS-DB-PASSWORD-LEN BY REFERENCE WS-DB-NAME BY VALUE WS-DB-NAME-LEN END-CALL"
         - "CALL \"OCESQLEndSQL\" END-CALL"
-
   - id: FN-DAL-SET-ENV
     name: DAL-SET-ENV
-    programme: EMPLOYEE-DAL-DB
+    programme: ACCOUNT-DAL-DB
     layer: dal
     visibility: internal
     required: true
-    entity: EMPLOYEE
+    entity: ACCOUNT
     description: >
       Force les variables d'environnement PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDATABASE.
     inputs: []
     outputs: []
     modifies: []
     related_exigences: [R2]
-
   - id: FN-DAL-READ
-    name: DAL-READ
-    programme: EMPLOYEE-DAL-DB
+    name: DAL-READ-ACCOUNT
+    programme: ACCOUNT-DAL-DB
     layer: dal
     visibility: public
     required: true
-    entity: EMPLOYEE
+    entity: ACCOUNT
     description: >
-      Ouvre le curseur C_EMP si nécessaire, fait un FETCH et remplit la structure
-      EMPLOYEE. Met END-OF-FILE à 'Y'
-      en cas de fin de données ou d'erreur.
+      Ouvre le curseur C_ACC si necessaire, fait un FETCH et remplit la structure
+      ACCOUNT. Met END-OF-FILE a 'Y' en cas de fin de donnees ou d'erreur.
     operation_code: "READ"
     inputs:
       - "OPERATION = 'READ'"
-      - "Connexion déjà établie par MAIN-ENTRY (sauf OPERATION='END ')."
+      - "Connexion deja etablie par MAIN-ENTRY (sauf OPERATION='END ')."
       - "Curseur non garanti ouvert (ouverture paresseuse)."
     outputs:
-      - "EMPLOYEE.EMP_ID"
-      - "EMPLOYEE.EMP_NAME"
-      - "EMPLOYEE.SALARY_BRUT"
-      - "EMPLOYEE.SALARY_NET"
+      - "ACCOUNT.ACC_ID"
+      - "ACCOUNT.ACC_HOLDER"
+      - "ACCOUNT.BALANCE_BRUT"
+      - "ACCOUNT.INTEREST_RATE"
+      - "ACCOUNT.INTEREST_AMOUNT"
+      - "ACCOUNT.BALANCE_NET"
       - "END-OF-FILE"
       - "SQLCODE"
     modifies:
-      - "EMPLOYEE.*"
+      - "ACCOUNT.*"
       - "END-OF-FILE"
       - "WS-CONNECTED"
       - "WS-CURSOR-OPEN"
       - "SQLCODE"
     preconditions: []
     postconditions:
-      - "Si SQLCODE = 0 : EMPLOYEE contient un enregistrement valide et END-OF-FILE = 'N'."
-      - "Si SQLCODE = 100 : fin de données, END-OF-FILE = 'Y'."
-      - "Si SQLCODE != 0 et != 100 : message d'erreur affiché et END-OF-FILE = 'Y'."
+      - "Si SQLCODE = 0 : ACCOUNT contient un enregistrement valide et END-OF-FILE = 'N'."
+      - "Si SQLCODE = 100 : fin de donnees, END-OF-FILE = 'Y'."
+      - "Si SQLCODE != 0 et != 100 : message d'erreur affiche et END-OF-FILE = 'Y'."
     errors_flags:
-      - "SQLCODE = 0 : succès, une ligne lue."
+      - "SQLCODE = 0 : succes, une ligne lue."
       - "SQLCODE = 100 : fin de curseur."
-      - "SQLCODE != 0 et != 100 : erreur SQL, le batch s'arrête logiquement."
+      - "SQLCODE != 0 et != 100 : erreur SQL, le batch s'arrete logiquement."
     related_exigences: [R2, R3]
     sql:
       declare_cursor: |
-        DECLARE C_EMP CURSOR FOR
-        SELECT EMP_ID, EMP_NAME, SALARY_BRUT, SALARY_NET
-        FROM EMPLOYEE
-        ORDER BY EMP_ID
-      open_cursor: "OPEN C_EMP"
-      fetch_into: "FETCH C_EMP INTO :WS-EMP-ID, :WS-EMP-NAME, :WS-SALARY-BRUT, :WS-SALARY-NET"
-    sql_actions:
-      - declare_cursor
-      - open_cursor
-      - fetch_cursor
-      - check_sqlcode
-      - map_to_linkage
-      - set_eof
-    eof_logic:
-      on_sqlcode_100_set_eof: true
-      eof_flag_name: "LK-END-OF-FILE"
-      eof_true_value: "Y"
-      eof_false_value: "N"
+        DECLARE C_ACC CURSOR FOR
+        SELECT ACC_ID, ACC_HOLDER, BALANCE_BRUT, INTEREST_RATE, INTEREST_AMOUNT, BALANCE_NET
+        FROM ACCOUNT
+        ORDER BY ACC_ID
+      open_cursor: "OPEN C_ACC"
+      fetch_cursor: "FETCH C_ACC INTO :WS-ACC-ID, :WS-ACC-HOLDER, :WS-BALANCE-BRUT, :WS-INTEREST-RATE, :WS-INTEREST-AMOUNT, :WS-BALANCE-NET"
 
   - id: FN-DAL-SAVE
-    name: DAL-SAVE
-    programme: EMPLOYEE-DAL-DB
+    name: DAL-SAVE-ACCOUNT
+    programme: ACCOUNT-DAL-DB
     layer: dal
     visibility: public
     required: true
-    entity: EMPLOYEE
-    description: >
-      Met à jour en base la colonne SALARY_NET pour l'employé courant (EMP_ID)
-      à partir de la valeur SALARY_NET de la structure EMPLOYEE.
+    entity: ACCOUNT
+    description: "Met a jour INTEREST_AMOUNT et BALANCE_NET pour le compte courant."
     operation_code: "SAVE"
     inputs:
-      - "EMPLOYEE.EMP_ID"
-      - "EMPLOYEE.SALARY_NET"
+      - "OPERATION = 'SAVE'"
+      - "ACCOUNT.*"
     outputs:
       - "SQLCODE"
-    modifies:
-      - "SQLCODE"
-    preconditions:
-      - "EMPLOYEE.EMP_ID contient un identifiant existant en base."
-    postconditions:
-      - "Si SQLCODE = 0 : la ligne EMPLOYEE correspondante en base a été mise à jour."
-    errors_flags:
-      - "SQLCODE = 0 : succès."
-      - "SQLCODE != 0 : erreur SQL, message affiché."
     related_exigences: [R1, R2]
     sql:
-      update_statement: |
-        UPDATE EMPLOYEE
-        SET SALARY_NET = :WS-SALARY-NET
-        WHERE EMP_ID = :WS-EMP-ID
+      update: |
+        UPDATE ACCOUNT
+        SET INTEREST_AMOUNT = :WS-INTEREST-AMOUNT,
+            BALANCE_NET = :WS-BALANCE-NET
+        WHERE ACC_ID = :WS-ACC-ID
 
   - id: FN-DAL-END
     name: DAL-END
-    programme: EMPLOYEE-DAL-DB
+    programme: ACCOUNT-DAL-DB
     layer: dal
     visibility: public
     required: true
-    entity: EMPLOYEE
-    description: >
-      Ferme le curseur s'il est ouvert, commit la transaction et ferme la connexion à la base.
-      Appelée une fois en fin de traitement.
-    operation_code: "END "
-    inputs: []
-    outputs:
-      - "SQLCODE"
-    modifies:
-      - "WS-CURSOR-OPEN"
-      - "WS-CONNECTED"
-      - "SQLCODE"
-    preconditions: []
-    postconditions:
-      - "Curseur fermé si besoin."
-      - "COMMIT effectué."
-      - "Connexion base fermée."
-    errors_flags:
-      - "Les erreurs de CLOSE/COMMIT/DISCONNECT sont simplement affichées."
-    related_exigences: [R2]
-    sql:
-      close_cursor: "CLOSE C_EMP"
-      commit: "COMMIT"
-      disconnect: "DISCONNECT ALL"
-
-  # --- Couche LOGIQUE / Orchestration batch ---
-
+    entity: ACCOUNT
+    description: "Ferme le curseur, commit, disconnect."
+    operation_code: "END"
   - id: FN-LOGIC-MAIN
     name: MAIN-PROCESS
-    programme: EMPLOYEE-LOGIC
+    programme: ACCOUNT-LOGIC
     layer: logic
     visibility: public
     required: true
-    entity: EMPLOYEE
-    description: >
-      Boucle principale du batch: lit les employés via la DAL, calcule le salaire net,
-      sauvegarde le résultat en base et affiche chaque employé.
-    inputs: []
-    outputs: []
-    modifies:
-      - "EMPLOYEE.*"
-      - "END-OF-FILE"
-    preconditions: []
-    postconditions:
-      - "Tous les employés de la table EMPLOYEE ont un SALARY_NET calculé selon R1."
-    calls:
-      - "EMPLOYEE-DAL-DB avec OPERATION='READ'"
-      - "CALCULATE-NET"
-      - "EMPLOYEE-DAL-DB avec OPERATION='SAVE'"
-      - "EMPLOYEE-BUSINESS.DISPLAY-EMPLOYEE"
-      - "EMPLOYEE-DAL-DB avec OPERATION='END '"
-    loop_control:
-      eof_flag_name: "END-OF-FILE"
-      eof_true_value: "Y"
-      eof_false_value: "N"
-    related_exigences: [F1, R1, R2, R3]
+    entity: ACCOUNT
+    description: "Orchestre le batch: lecture, calcul, sauvegarde, affichage."
+    related_exigences: [R1, R2]
 
   - id: FN-LOGIC-CALC
-    name: CALCULATE-NET
-    programme: EMPLOYEE-LOGIC
+    name: CALCULATE-INTEREST
+    programme: ACCOUNT-LOGIC
     layer: logic
     visibility: public
     required: true
-    entity: EMPLOYEE
-    description: >
-      Applique la règle métier SALARY_NET = ROUND(SALARY_BRUT * 0.7, 2) à l'employé courant.
-      Aucun accès base, uniquement traitement en mémoire.
-    inputs:
-      - "EMPLOYEE.SALARY_BRUT"
-    outputs:
-      - "EMPLOYEE.SALARY_NET"
-    modifies:
-      - "EMPLOYEE.SALARY_NET"
-    preconditions:
-      - "EMPLOYEE.SALARY_BRUT contient une valeur numérique valide."
-    postconditions:
-      - "EMPLOYEE.SALARY_NET >= 0."
-      - "EMPLOYEE.SALARY_NET correspond à SALARY_BRUT * 0.7 arrondi à 2 décimales."
-    errors_flags:
-      - "Si SALARY_BRUT invalide, la logique appelante peut ignorer la ligne ou la journaliser (R3)."
-    related_exigences: [R1, R3]
-    expression:
-      target: "EMPLOYEE.SALARY_NET"
-      formula: "ROUND(EMPLOYEE.SALARY_BRUT * 0.7, 2)"
-
-  # --- Couche MÉTIER / Présentation ---
-
-  - id: FN-BIZ-DISPLAY
-    name: DISPLAY-EMPLOYEE
-    programme: EMPLOYEE-BUSINESS
+    entity: ACCOUNT
+    description: "Calcule INTEREST_AMOUNT et BALANCE_NET avec controle des anomalies."
+    related_exigences: [R1, R4]
+  - id: FN-BUSINESS-DISPLAY
+    name: DISPLAY-ACCOUNT
+    programme: ACCOUNT-BUSINESS
     layer: business
     visibility: public
     required: true
-    entity: EMPLOYEE
-    description: >
-      Affiche les informations principales de l'employé courant sur la console:
-      nom, identifiant, salaire brut, salaire net.
-    inputs:
-      - "EMPLOYEE.EMP_NAME"
-      - "EMPLOYEE.EMP_ID"
-      - "EMPLOYEE.SALARY_BRUT"
-      - "EMPLOYEE.SALARY_NET"
-    outputs: []
-    modifies: []
-    preconditions:
-      - "EMPLOYEE contient des valeurs lues/calculées cohérentes."
-    postconditions: []
-    errors_flags: []
-    related_exigences: [F1]
-    display:
-      separator: "----------------------------------------"
-      lines:
-        - label: "EMPLOYE : "
-          field: "EMPLOYEE.EMP_NAME"
-          cobol_name: "LK-EMP-NAME"
-        - label: "ID      : "
-          field: "EMPLOYEE.EMP_ID"
-          cobol_name: "LK-EMP-ID"
-        - label: "BRUT    : "
-          field: "EMPLOYEE.SALARY_BRUT"
-          cobol_name: "LK-SALARY-BRUT"
-        - label: "NET     : "
-          field: "EMPLOYEE.SALARY_NET"
-          cobol_name: "LK-SALARY-NET"
+    entity: ACCOUNT
+    description: "Affiche le compte (id, titulaire, solde, taux, interet, net)."
+    display_lines:
+      - "DISPLAY '----------------------------------------'"
+      - "DISPLAY 'COMPTE : '"
+      - "DISPLAY 'ID      : ' ACC-ID"
+      - "DISPLAY 'TITULAIRE: ' ACC-HOLDER"
+      - "DISPLAY 'BRUT    : ' BALANCE-BRUT"
+      - "DISPLAY 'TAUX    : ' INTEREST-RATE"
+      - "DISPLAY 'INTERET : ' INTEREST-AMOUNT"
+      - "DISPLAY 'NET     : ' BALANCE-NET"
+    related_exigences: [R2]

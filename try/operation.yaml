@@ -238,20 +238,6 @@ sql:
     host_vars_one_per_line: true
     split_long_exec_sql: true
 
-mapping_types:
-  - sql: "INT"
-    cobol_pic_default: "9(6)"
-  - sql: "VARCHAR(50)"
-    cobol_pic_default: "X(50)"
-  - sql: "VARCHAR(20)"
-    cobol_pic_default: "X(20)"
-  - sql: "VARCHAR(10)"
-    cobol_pic_default: "X(10)"
-  - sql: "DECIMAL(10,2)"
-    cobol_pic_default: "S9(8)V99"
-  - sql: "DECIMAL(12,2)"
-    cobol_pic_default: "S9(10)V99"
-
 technique:
   cursor_naming:
     pattern: "C_<ENTITY_UPPER3>"
@@ -457,19 +443,6 @@ prompting:
         - "{entry_paragraph}."
       fonctions:
         - "{function_details}"
-
-sources:
-  cobol:
-    - programme: PRODUCT-DAL-DB
-      fichier: "product_dal_db.cob"
-    - programme: PRODUCT-LOGIC
-      fichier: "product_logic.cob"
-    - programme: PRODUCT-BUSINESS
-      fichier: "product_business.cob"
-  sql:
-    - logical_name: "PRODUCT-INIT"
-      fichier: "product_init.sql"
-      entity: PRODUCT
 
 programmes:
   - name: PRODUCT-DAL-DB
@@ -819,35 +792,6 @@ fonctions:
     modifies:
       - "WS-CONNECTED"
       - "SQLCODE"
-    steps:
-      - "PERFORM DAL-SET-ENV"
-      - "CALL \"OCESQLStartSQL\" END-CALL"
-      - "IF SQLCODE NOT = ZERO"
-      - "  DISPLAY 'ERREUR CONNECT: SQLCODE=' SQLCODE"
-      - "  DISPLAY 'SQLSTATE=' SQLSTATE"
-      - "  DISPLAY 'SQLERRMC=' SQLERRMC"
-      - "  MOVE 'N' TO WS-CONNECTED-FLAG"
-      - "ELSE"
-      - "  CALL \"OCESQLConnect\" USING"
-      - "       BY REFERENCE SQLCA"
-      - "       BY REFERENCE WS-DB-USER"
-      - "       BY VALUE WS-DB-USER-LEN"
-      - "       BY REFERENCE WS-DB-PASSWORD"
-      - "       BY VALUE WS-DB-PASSWORD-LEN"
-      - "       BY REFERENCE WS-DB-NAME"
-      - "       BY VALUE WS-DB-NAME-LEN"
-      - "  END-CALL"
-      - "  IF SQLCODE NOT = ZERO"
-      - "    DISPLAY 'ERREUR CONNECT: SQLCODE=' SQLCODE"
-      - "    DISPLAY 'SQLSTATE=' SQLSTATE"
-      - "    DISPLAY 'SQLERRMC=' SQLERRMC"
-      - "    MOVE 'N' TO WS-CONNECTED-FLAG"
-      - "  ELSE"
-      - "    MOVE 'Y' TO WS-CONNECTED-FLAG"
-      - "    DISPLAY 'Connexion DB reussie: stockdb'"
-      - "    CALL \"OCESQLEndSQL\" END-CALL"
-      - "  END-IF"
-      - "END-IF"
     related_exigences: [R3]
     sql:
       connection_method: "OCESQL (voir sql.connection)"
@@ -855,12 +799,6 @@ fonctions:
         - "CALL \"OCESQLStartSQL\" END-CALL"
         - "CALL \"OCESQLConnect\" USING BY REFERENCE SQLCA BY REFERENCE WS-DB-USER BY VALUE WS-DB-USER-LEN BY REFERENCE WS-DB-PASSWORD BY VALUE WS-DB-PASSWORD-LEN BY REFERENCE WS-DB-NAME BY VALUE WS-DB-NAME-LEN END-CALL"
         - "CALL \"OCESQLEndSQL\" END-CALL"
-    cobol_location:
-      fichier: "product_dal_db.cob"
-      programme: "PRODUCT-DAL-DB"
-      division: "PROCEDURE DIVISION"
-      paragraph: "DAL-CONNECT"
-      section: "couche_dal"
 
   - id: FN-DAL-SET-ENV
     name: DAL-SET-ENV
@@ -874,24 +812,7 @@ fonctions:
     inputs: []
     outputs: []
     modifies: []
-    steps:
-      - "DISPLAY WS-PGHOST-NAME UPON ENVIRONMENT-NAME"
-      - "DISPLAY WS-PGHOST-VALUE UPON ENVIRONMENT-VALUE"
-      - "DISPLAY WS-PGPORT-NAME UPON ENVIRONMENT-NAME"
-      - "DISPLAY WS-PGPORT-VALUE UPON ENVIRONMENT-VALUE"
-      - "DISPLAY WS-PGUSER-NAME UPON ENVIRONMENT-NAME"
-      - "DISPLAY WS-PGUSER-VALUE UPON ENVIRONMENT-VALUE"
-      - "DISPLAY WS-PGPASSWORD-NAME UPON ENVIRONMENT-NAME"
-      - "DISPLAY WS-PGPASSWORD-VALUE UPON ENVIRONMENT-VALUE"
-      - "DISPLAY WS-PGDATABASE-NAME UPON ENVIRONMENT-NAME"
-      - "DISPLAY WS-PGDATABASE-VALUE UPON ENVIRONMENT-VALUE"
     related_exigences: [R3]
-    cobol_location:
-      fichier: "product_dal_db.cob"
-      programme: "PRODUCT-DAL-DB"
-      division: "PROCEDURE DIVISION"
-      paragraph: "DAL-SET-ENV"
-      section: "couche_dal"
 
   - id: FN-DAL-READ
     name: DAL-READ
@@ -937,38 +858,6 @@ fonctions:
       - "SQLCODE = 0 : succes, une ligne lue."
       - "SQLCODE = 100 : fin de curseur."
       - "SQLCODE != 0 et != 100 : erreur SQL, le batch s'arrete logiquement."
-    steps:
-      - "EXEC SQL DECLARE C_PRD CURSOR FOR SELECT PROD_ID, PROD_NAME, CATEGORY, STOCK_CURRENT, STOCK_MIN, STOCK_MAX, UNIT_COST, LEAD_TIME_DAYS, REORDER_QTY, REORDER_COST, REORDER_STATUS FROM PRODUCT ORDER BY PROD_ID END-EXEC"
-      - "IF NOT WS-CURSOR-OPEN"
-      - "  EXEC SQL OPEN C_PRD END-EXEC"
-      - "  IF SQLCODE NOT = ZERO"
-      - "    DISPLAY 'ERREUR OPEN: SQLCODE=' SQLCODE"
-      - "    MOVE 'Y' TO LK-END-OF-FILE"
-      - "    EXIT PARAGRAPH"
-      - "  END-IF"
-      - "  SET WS-CURSOR-OPEN TO TRUE"
-      - "  DISPLAY 'Curseur C_PRD ouvert'"
-      - "END-IF"
-      - "EXEC SQL FETCH C_PRD INTO :WS-PROD-ID, :WS-PROD-NAME, :WS-CATEGORY, :WS-STOCK-CURRENT, :WS-STOCK-MIN, :WS-STOCK-MAX, :WS-UNIT-COST, :WS-LEAD-TIME-DAYS, :WS-REORDER-QTY, :WS-REORDER-COST, :WS-REORDER-STATUS END-EXEC"
-      - "EVALUATE SQLCODE"
-      - "  WHEN 0"
-      - "    MOVE WS-PROD-ID TO LK-PROD-ID"
-      - "    MOVE WS-PROD-NAME TO LK-PROD-NAME"
-      - "    MOVE WS-CATEGORY TO LK-CATEGORY"
-      - "    MOVE WS-STOCK-CURRENT TO LK-STOCK-CURRENT"
-      - "    MOVE WS-STOCK-MIN TO LK-STOCK-MIN"
-      - "    MOVE WS-STOCK-MAX TO LK-STOCK-MAX"
-      - "    MOVE WS-UNIT-COST TO LK-UNIT-COST"
-      - "    MOVE WS-LEAD-TIME-DAYS TO LK-LEAD-TIME-DAYS"
-      - "    MOVE WS-REORDER-QTY TO LK-REORDER-QTY"
-      - "    MOVE WS-REORDER-COST TO LK-REORDER-COST"
-      - "    MOVE WS-REORDER-STATUS TO LK-REORDER-STATUS"
-      - "  WHEN 100"
-      - "    MOVE 'Y' TO LK-END-OF-FILE"
-      - "  WHEN OTHER"
-      - "    DISPLAY 'ERREUR FETCH: SQLCODE=' SQLCODE"
-      - "    MOVE 'Y' TO LK-END-OF-FILE"
-      - "END-EVALUATE"
     related_exigences: [R3]
     sql:
       declare_cursor: |
@@ -992,12 +881,6 @@ fonctions:
       eof_flag_name: "LK-END-OF-FILE"
       eof_true_value: "Y"
       eof_false_value: "N"
-    cobol_location:
-      fichier: "product_dal_db.cob"
-      programme: "PRODUCT-DAL-DB"
-      division: "PROCEDURE DIVISION"
-      paragraph: "DAL-READ"
-      section: "couche_dal"
 
   - id: FN-DAL-SAVE
     name: DAL-SAVE
@@ -1026,17 +909,6 @@ fonctions:
     errors_flags:
       - "SQLCODE = 0 : succes."
       - "SQLCODE != 0 : erreur SQL, message affiche."
-    steps:
-      - "MOVE LK-PROD-ID TO WS-PROD-ID"
-      - "MOVE LK-REORDER-QTY TO WS-REORDER-QTY"
-      - "MOVE LK-REORDER-COST TO WS-REORDER-COST"
-      - "MOVE LK-REORDER-STATUS TO WS-REORDER-STATUS"
-      - "EXEC SQL FROM PRODUCT SET REORDER_QTY = :WS-REORDER-QTY, REORDER_COST = :WS-REORDER-COST, REORDER_STATUS = :WS-REORDER-STATUS WHERE PROD_ID = :WS-PROD-ID END-EXEC"
-      - "IF SQLCODE NOT = ZERO"
-      - "  DISPLAY 'ERREUR UPDATE: SQLCODE=' SQLCODE"
-      - "  DISPLAY 'SQLSTATE=' SQLSTATE"
-      - "  DISPLAY 'SQLERRMC=' SQLERRMC"
-      - "END-IF"
     related_exigences: [R1, R2, R3]
     sql:
       update_statement: |
@@ -1045,12 +917,6 @@ fonctions:
             REORDER_COST = :WS-REORDER-COST,
             REORDER_STATUS = :WS-REORDER-STATUS
         WHERE PROD_ID = :WS-PROD-ID
-    cobol_location:
-      fichier: "product_dal_db.cob"
-      programme: "PRODUCT-DAL-DB"
-      division: "PROCEDURE DIVISION"
-      paragraph: "DAL-SAVE"
-      section: "couche_dal"
 
   - id: FN-DAL-END
     name: DAL-END
@@ -1077,39 +943,11 @@ fonctions:
       - "Connexion base fermee."
     errors_flags:
       - "Les erreurs de CLOSE/COMMIT/DISCONNECT sont simplement affichees."
-    steps:
-      - "IF WS-CURSOR-OPEN"
-      - "  EXEC SQL CLOSE C_PRD END-EXEC"
-      - "  IF SQLCODE NOT = ZERO"
-      - "    DISPLAY 'ERREUR CLOSE: SQLCODE=' SQLCODE"
-      - "  ELSE"
-      - "    MOVE 'N' TO WS-CURSOR-OPEN-FLAG"
-      - "  END-IF"
-      - "END-IF"
-      - "EXEC SQL COMMIT END-EXEC"
-      - "IF SQLCODE NOT = ZERO"
-      - "  DISPLAY 'ERREUR COMMIT: SQLCODE=' SQLCODE"
-      - "END-IF"
-      - "IF WS-CONNECTED"
-      - "  EXEC SQL DISCONNECT ALL END-EXEC"
-      - "  IF SQLCODE NOT = ZERO"
-      - "    DISPLAY 'ERREUR DISCONNECT: SQLCODE=' SQLCODE"
-      - "  ELSE"
-      - "    MOVE 'N' TO WS-CONNECTED-FLAG"
-      - "    DISPLAY 'Fermeture connexion'"
-      - "  END-IF"
-      - "END-IF"
     related_exigences: [R3]
     sql:
       close_cursor: "CLOSE C_PRD"
       commit: "COMMIT"
       disconnect: "DISCONNECT ALL"
-    cobol_location:
-      fichier: "product_dal_db.cob"
-      programme: "PRODUCT-DAL-DB"
-      division: "PROCEDURE DIVISION"
-      paragraph: "DAL-END"
-      section: "couche_dal"
 
   # --- Couche LOGIQUE / Orchestration batch ---
 
@@ -1137,42 +975,6 @@ fonctions:
     preconditions: []
     postconditions:
       - "Tous les produits de la table PRODUCT ont REORDER_QTY, REORDER_COST et REORDER_STATUS calcules selon R1 et R2."
-    steps:
-      - "DISPLAY '=========================================='"
-      - "DISPLAY 'DEBUT TRAITEMENT BATCH GESTION STOCK'"
-      - "DISPLAY '=========================================='"
-      - "MOVE 'READ' TO OPERATION"
-      - "CALL 'PRODUCT-DAL-DB' USING OPERATION, END-OF-FILE, OPERATION"
-      - "PERFORM UNTIL EOF-REACHED"
-      - "  ADD 1 TO WS-COUNT-TOTAL"
-      - "  PERFORM CALCULATE-REORDER"
-      - "  EVALUATE REORDER-STATUS"
-      - "    WHEN 'OK'"
-      - "      ADD 1 TO WS-COUNT-OK"
-      - "    WHEN 'NORMAL'"
-      - "      ADD 1 TO WS-COUNT-NORMAL"
-      - "    WHEN 'URGENT'"
-      - "      ADD 1 TO WS-COUNT-URGENT"
-      - "    WHEN 'ERROR'"
-      - "      ADD 1 TO WS-COUNT-ERROR"
-      - "  END-EVALUATE"
-      - "  MOVE 'SAVE' TO OPERATION"
-      - "  CALL 'PRODUCT-DAL-DB' USING OPERATION, END-OF-FILE, OPERATION"
-      - "  CALL 'PRODUCT-BUSINESS' USING OPERATION"
-      - "  MOVE 'READ' TO OPERATION"
-      - "  CALL 'PRODUCT-DAL-DB' USING OPERATION, END-OF-FILE, OPERATION"
-      - "END-PERFORM"
-      - "MOVE 'END ' TO OPERATION"
-      - "CALL 'PRODUCT-DAL-DB' USING OPERATION, END-OF-FILE, OPERATION"
-      - "DISPLAY '=========================================='"
-      - "DISPLAY 'FIN TRAITEMENT BATCH GESTION STOCK'"
-      - "DISPLAY 'Nombre produits traites: ' WS-COUNT-TOTAL"
-      - "DISPLAY 'Produits OK (stock suffisant): ' WS-COUNT-OK"
-      - "DISPLAY 'Produits a reapprovisionner (normal): ' WS-COUNT-NORMAL"
-      - "DISPLAY 'Produits urgents (stock critique): ' WS-COUNT-URGENT"
-      - "DISPLAY 'Produits en erreur: ' WS-COUNT-ERROR"
-      - "DISPLAY '=========================================='"
-      - "STOP RUN"
     calls:
       - "OPERATION-DAL-DB avec OPERATION='READ'"
       - "CALCULATE-REORDER"
@@ -1184,12 +986,6 @@ fonctions:
       eof_true_value: "Y"
       eof_false_value: "N"
     related_exigences: [F1, R1, R2, R3, R4, R5, R6, R7]
-    cobol_location:
-      fichier: "product_logic.cob"
-      programme: "PRODUCT-LOGIC"
-      division: "PROCEDURE DIVISION"
-      paragraph: "MAIN-PROCESS"
-      section: "couche_logique"
 
   - id: FN-LOGIC-CALC
     name: CALCULATE-REORDER
@@ -1230,92 +1026,7 @@ fonctions:
       - "Si STOCK_MIN >= STOCK_MAX alors ERROR (R5)."
       - "Si UNIT_COST <= 0 alors ERROR (R6)."
       - "Si LEAD_TIME_DAYS hors [1, 365] alors avertissement et valeur defaut 7 (R7)."
-    steps:
-      - "      *****************************************************************"
-      - "      * Regles metier R1 et R2:                                      *"
-      - "      * - REORDER_QTY selon niveau stock et delai livraison          *"
-      - "      * - REORDER_COST = REORDER_QTY * UNIT_COST                     *"
-      - "      * - REORDER_STATUS: OK / NORMAL / URGENT / ERROR               *"
-      - "      *****************************************************************"
-      - "* Validation R4: Stock negatif impossible"
-      - "IF STOCK-CURRENT < 0"
-      - "  MOVE 0 TO REORDER-QTY"
-      - "  MOVE 0 TO REORDER-COST"
-      - "  MOVE 'ERROR' TO REORDER-STATUS"
-      - "  DISPLAY 'ANOMALIE: Stock negatif'"
-      - "  EXIT PARAGRAPH"
-      - "END-IF"
-      - "* Validation R5: Configuration stock invalide"
-      - "IF STOCK-MIN >= STOCK-MAX"
-      - "  MOVE 0 TO REORDER-QTY"
-      - "  MOVE 0 TO REORDER-COST"
-      - "  MOVE 'ERROR' TO REORDER-STATUS"
-      - "  DISPLAY 'ANOMALIE: Configuration stock invalide (MIN>=MAX)'"
-      - "  EXIT PARAGRAPH"
-      - "END-IF"
-      - "* Validation R6: Cout unitaire invalide"
-      - "IF UNIT-COST <= 0"
-      - "  MOVE 0 TO REORDER-QTY"
-      - "  MOVE 0 TO REORDER-COST"
-      - "  MOVE 'ERROR' TO REORDER-STATUS"
-      - "  DISPLAY 'ANOMALIE: Cout unitaire invalide'"
-      - "  EXIT PARAGRAPH"
-      - "END-IF"
-      - "* Validation R7: Delai de livraison"
-      - "IF LEAD-TIME-DAYS < 1 OR LEAD-TIME-DAYS > 365"
-      - "  MOVE 7 TO LEAD-TIME-DAYS"
-      - "  DISPLAY 'AVERTISSEMENT: Delai livraison invalide, utilisation valeur defaut 7 jours'"
-      - "END-IF"
-      - "* Calcul facteur delai livraison"
-      - "IF LEAD-TIME-DAYS <= 3"
-      - "  MOVE 1.0 TO WS-LEAD-FACTOR"
-      - "ELSE IF LEAD-TIME-DAYS <= 10"
-      - "  MOVE 1.5 TO WS-LEAD-FACTOR"
-      - "ELSE"
-      - "  MOVE 2.0 TO WS-LEAD-FACTOR"
-      - "END-IF"
-      - "* Calcul seuil alerte (STOCK_MIN * 1.2)"
-      - "COMPUTE WS-STOCK-THRESHOLD ROUNDED = STOCK-MIN * 1.2"
-      - "* Regle R1: Calcul quantite reapprovisionnement"
-      - "IF STOCK-CURRENT < STOCK-MIN"
-      - "  * Stock critique - URGENT"
-      - "  COMPUTE WS-TEMP-QTY ROUNDED = (STOCK-MAX - STOCK-CURRENT) * WS-LEAD-FACTOR"
-      - "  IF WS-TEMP-QTY < 0"
-      - "    MOVE 0 TO REORDER-QTY"
-      - "  ELSE"
-      - "    MOVE WS-TEMP-QTY TO REORDER-QTY"
-      - "  END-IF"
-      - "  MOVE 'URGENT' TO REORDER-STATUS"
-      - "ELSE IF STOCK-CURRENT <= WS-STOCK-THRESHOLD"
-      - "  * Stock faible - NORMAL"
-      - "  COMPUTE WS-TEMP-QTY = STOCK-MAX - STOCK-CURRENT"
-      - "  IF WS-TEMP-QTY < 0"
-      - "    MOVE 0 TO REORDER-QTY"
-      - "  ELSE"
-      - "    MOVE WS-TEMP-QTY TO REORDER-QTY"
-      - "  END-IF"
-      - "  MOVE 'NORMAL' TO REORDER-STATUS"
-      - "ELSE"
-      - "  * Stock OK"
-      - "  MOVE 0 TO REORDER-QTY"
-      - "  MOVE 'OK' TO REORDER-STATUS"
-      - "END-IF"
-      - "* Regle R2: Calcul cout reapprovisionnement"
-      - "IF REORDER-QTY IS NUMERIC AND UNIT-COST IS NUMERIC"
-      - "  COMPUTE REORDER-COST ROUNDED = REORDER-QTY * UNIT-COST"
-      - "  IF REORDER-COST < 0"
-      - "    MOVE 0 TO REORDER-COST"
-      - "  END-IF"
-      - "ELSE"
-      - "  MOVE 0 TO REORDER-COST"
-      - "END-IF"
     related_exigences: [R1, R2, R4, R5, R6, R7]
-    cobol_location:
-      fichier: "product_logic.cob"
-      programme: "PRODUCT-LOGIC"
-      division: "PROCEDURE DIVISION"
-      paragraph: "CALCULATE-REORDER"
-      section: "couche_logique"
 
   # --- Couche MÉTIER / Présentation ---
 
@@ -1348,20 +1059,6 @@ fonctions:
     postconditions: []
     errors_flags: []
     related_exigences: [F1]
-    steps:
-      - "DISPLAY '----------------------------------------'"
-      - "DISPLAY 'PRODUIT   : ' LK-PROD-NAME"
-      - "DISPLAY 'ID        : ' LK-PROD-ID"
-      - "DISPLAY 'CATEGORIE : ' LK-CATEGORY"
-      - "DISPLAY 'STOCK ACT.: ' LK-STOCK-CURRENT"
-      - "DISPLAY 'STOCK MIN : ' LK-STOCK-MIN"
-      - "DISPLAY 'STOCK MAX : ' LK-STOCK-MAX"
-      - "DISPLAY 'COUT UNIT.: ' LK-UNIT-COST"
-      - "DISPLAY 'DELAI LIV.: ' LK-LEAD-TIME-DAYS"
-      - "DISPLAY 'QTE REAPP.: ' LK-REORDER-QTY"
-      - "DISPLAY 'COUT REA. : ' LK-REORDER-COST"
-      - "DISPLAY 'STATUT    : ' LK-REORDER-STATUS"
-      - "GOBACK"
     display:
       separator: "----------------------------------------"
       lines:
@@ -1398,9 +1095,3 @@ fonctions:
         - label: "STATUT    : "
           field: "PRODUCT.REORDER_STATUS"
           cobol_name: "LK-REORDER-STATUS"
-    cobol_location:
-      fichier: "product_business.cob"
-      programme: "PRODUCT-BUSINESS"
-      division: "PROCEDURE DIVISION"
-      paragraph: "DISPLAY-OPERATION"
-      section: "couche_metier"
