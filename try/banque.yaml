@@ -1,0 +1,948 @@
+# Gestion d'operations bancaires avec validation de risque et conformite
+title: BANQUE-OPS
+dialecte_cobol: gnucobol
+sql_cible: postgres
+
+nommage:
+  variables_case: UPPER_SNAKE
+  programmes_case: UPPER-KEBAB
+
+cobol_format:
+  line_format: fixed
+  indent_spaces: 7
+  max_line_length: 72
+  comment:
+    column: 7
+    prefix: "*"
+  literal_quotes: single
+  paragraph_terminator: "."
+  allow_source_format_directive: false
+
+naming_rules:
+  prefixes:
+    working_storage: "WS-"
+    linkage: "LK-"
+    flags: "WS-"
+  paragraph_style: "VERB-NOUN"
+
+fonctionnalites:
+  - id: F1
+    resume: "Calculer les frais bancaires, taxes et montant net pour chaque operation en fonction du type d'operation (DEBIT/CREDIT), du montant brut, des taux de frais et de taxe."
+  - id: F2
+    resume: "Evaluer le niveau de risque de chaque operation en fonction du montant, du pays d'origine, du pays de destination et du statut du client."
+  - id: F3
+    resume: "Valider la conformite reglementaire de l'operation: verifier les limites transactionnelles, les pays restrictifs et les seuils quotidiens du client."
+
+exigences:
+  - id: R1
+    type: regle_metier
+    regle: "FEE_AMOUNT = ROUND(AMOUNT_BRUT * FEE_RATE / 100, 2)"
+    notes: "Calcul des frais bancaires en pourcentage du montant brut. Arrondi a 2 decimales."
+  - id: R2
+    type: regle_metier
+    regle: "TAX_AMOUNT = ROUND(FEE_AMOUNT * TAX_RATE / 100, 2)"
+    notes: "Calcul de la taxe en pourcentage des frais (pas du montant brut). Arrondi a 2 decimales."
+  - id: R3
+    type: regle_metier
+    regle: "Si OP_TYPE = 'DEBIT' alors AMOUNT_NET = AMOUNT_BRUT + FEE_AMOUNT + TAX_AMOUNT; si OP_TYPE = 'CREDIT' alors AMOUNT_NET = AMOUNT_BRUT - FEE_AMOUNT - TAX_AMOUNT."
+    notes: "Pour un debit, le client paie montant + frais + taxes. Pour un credit, le client recoit montant - frais - taxes."
+    related_fonctionnalites: [F1]
+  - id: R4
+    type: regle_metier
+    regle: "RISK_SCORE = ROUND((AMOUNT_NET / CLIENT_LIMIT) * COUNTRY_RISK_FACTOR, 4)"
+    notes: "Score de risque base sur le ratio montant/limite client multiplie par le facteur de risque pays. 4 decimales de precision."
+    related_fonctionnalites: [F2]
+  - id: R5
+    type: regle_metier
+    regle: "Si COUNTRY_DEST dans ['CUBA', 'IRAN', 'SYRIE', 'COREEDUNORD'] alors COUNTRY_RISK_FACTOR = 3.0; si COUNTRY_DEST dans ['RUSSIE', 'BELARUS', 'VENEZUELA'] alors COUNTRY_RISK_FACTOR = 2.0; sinon COUNTRY_RISK_FACTOR = 1.0."
+    notes: "Facteur de risque pays base sur des listes de pays a risque eleve, moyen ou faible."
+    related_fonctionnalites: [F2]
+  - id: R6
+    type: regle_metier
+    regle: "Si RISK_SCORE >= 2.0 alors RISK_LEVEL = 'HIGH'; si RISK_SCORE >= 1.0 alors RISK_LEVEL = 'MEDIUM'; sinon RISK_LEVEL = 'LOW'."
+    notes: "Classification du niveau de risque en trois categories basees sur des seuils de score."
+    related_fonctionnalites: [F2]
+  - id: R7
+    type: validation
+    regle: "Si AMOUNT_NET > 100000.00 alors COMPLIANCE_STATUS = 'BLOCKED', COMPLIANCE_REASON = 'LIMITE_TRANSACTION' et signaler anomalie (depassement limite transactionnelle)."
+    notes: "Limite reglementaire absolue de 100000 EUR par transaction."
+    related_fonctionnalites: [F3]
+  - id: R8
+    type: validation
+    regle: "Si COUNTRY_DEST dans ['CUBA', 'IRAN', 'SYRIE', 'COREEDUNORD'] alors COMPLIANCE_STATUS = 'BLOCKED', COMPLIANCE_REASON = 'PAYS_RESTRICTIF' et signaler anomalie (pays sous embargo)."
+    notes: "Liste de pays sous embargo international - operations interdites."
+    related_fonctionnalites: [F3]
+  - id: R9
+    type: validation
+    regle: "Si AMOUNT_NET > CLIENT_DAILY_LIMIT alors COMPLIANCE_STATUS = 'REVIEW', COMPLIANCE_REASON = 'LIMITE_QUOTIDIENNE'; sinon si aucune autre anomalie alors COMPLIANCE_STATUS = 'OK', COMPLIANCE_REASON = ''."
+    notes: "Validation de la limite quotidienne du client. Si depassee, l'operation necessite une revue manuelle mais n'est pas bloquee automatiquement."
+    related_fonctionnalites: [F3]
+
+mcd:
+  entites:
+    - name: OPERATION
+      attrs:
+        - name: OP_ID
+          type: INT
+          sql_type: INT
+          cobol_pic: "9(8)"
+          pk: true
+          nullable: false
+        - name: CLIENT_ID
+          type: INT
+          sql_type: INT
+          cobol_pic: "9(6)"
+          fk: true
+          fk_target: CLIENT.CLIENT_ID
+          nullable: false
+        - name: OP_TYPE
+          type: VARCHAR(10)
+          sql_type: VARCHAR(10)
+          cobol_pic: "X(10)"
+          nullable: false
+        - name: AMOUNT_BRUT
+          type: DECIMAL(12,2)
+          sql_type: DECIMAL(12,2)
+          cobol_pic: "S9(10)V99"
+          nullable: false
+        - name: FEE_RATE
+          type: DECIMAL(5,2)
+          sql_type: DECIMAL(5,2)
+          cobol_pic: "9(3)V99"
+          nullable: false
+        - name: TAX_RATE
+          type: DECIMAL(5,2)
+          sql_type: DECIMAL(5,2)
+          cobol_pic: "9(3)V99"
+          nullable: false
+        - name: COUNTRY_ORIG
+          type: VARCHAR(20)
+          sql_type: VARCHAR(20)
+          cobol_pic: "X(20)"
+          nullable: false
+        - name: COUNTRY_DEST
+          type: VARCHAR(20)
+          sql_type: VARCHAR(20)
+          cobol_pic: "X(20)"
+          nullable: false
+        - name: FEE_AMOUNT
+          type: DECIMAL(12,2)
+          sql_type: DECIMAL(12,2)
+          cobol_pic: "S9(10)V99"
+          nullable: true
+        - name: TAX_AMOUNT
+          type: DECIMAL(12,2)
+          sql_type: DECIMAL(12,2)
+          cobol_pic: "S9(10)V99"
+          nullable: true
+        - name: AMOUNT_NET
+          type: DECIMAL(12,2)
+          sql_type: DECIMAL(12,2)
+          cobol_pic: "S9(10)V99"
+          nullable: true
+        - name: RISK_SCORE
+          type: DECIMAL(8,4)
+          sql_type: DECIMAL(8,4)
+          cobol_pic: "9(4)V9999"
+          nullable: true
+        - name: RISK_LEVEL
+          type: VARCHAR(10)
+          sql_type: VARCHAR(10)
+          cobol_pic: "X(10)"
+          nullable: true
+        - name: COMPLIANCE_STATUS
+          type: VARCHAR(10)
+          sql_type: VARCHAR(10)
+          cobol_pic: "X(10)"
+          nullable: true
+        - name: COMPLIANCE_REASON
+          type: VARCHAR(30)
+          sql_type: VARCHAR(30)
+          cobol_pic: "X(30)"
+          nullable: true
+
+    - name: CLIENT
+      attrs:
+        - name: CLIENT_ID
+          type: INT
+          sql_type: INT
+          cobol_pic: "9(6)"
+          pk: true
+          nullable: false
+        - name: CLIENT_NAME
+          type: VARCHAR(50)
+          sql_type: VARCHAR(50)
+          cobol_pic: "X(50)"
+          nullable: false
+        - name: CLIENT_STATUS
+          type: VARCHAR(10)
+          sql_type: VARCHAR(10)
+          cobol_pic: "X(10)"
+          nullable: false
+        - name: CLIENT_LIMIT
+          type: DECIMAL(12,2)
+          sql_type: DECIMAL(12,2)
+          cobol_pic: "S9(10)V99"
+          nullable: false
+        - name: DAILY_LIMIT
+          type: DECIMAL(12,2)
+          sql_type: DECIMAL(12,2)
+          cobol_pic: "S9(10)V99"
+          nullable: false
+
+  relations:
+    - from: OPERATION
+      to: CLIENT
+      type: "N:1"
+      fk_field: CLIENT_ID
+
+diagramme: |
+  erDiagram
+    OPERATION ||--o{ CLIENT : "belongs_to"
+    OPERATION {
+      INT OP_ID PK
+      INT CLIENT_ID FK
+      VARCHAR OP_TYPE
+      DECIMAL AMOUNT_BRUT
+      DECIMAL FEE_RATE
+      DECIMAL TAX_RATE
+      VARCHAR COUNTRY_ORIG
+      VARCHAR COUNTRY_DEST
+      DECIMAL FEE_AMOUNT
+      DECIMAL TAX_AMOUNT
+      DECIMAL AMOUNT_NET
+      DECIMAL RISK_SCORE
+      VARCHAR RISK_LEVEL
+      VARCHAR COMPLIANCE_STATUS
+      VARCHAR COMPLIANCE_REASON
+    }
+    CLIENT {
+      INT CLIENT_ID PK
+      VARCHAR CLIENT_NAME
+      VARCHAR CLIENT_STATUS
+      DECIMAL CLIENT_LIMIT
+      DECIMAL DAILY_LIMIT
+    }
+
+sql:
+  ddl:
+    CLIENT: |
+      CREATE TABLE CLIENT (
+          CLIENT_ID INT PRIMARY KEY,
+          CLIENT_NAME VARCHAR(50) NOT NULL,
+          CLIENT_STATUS VARCHAR(10) NOT NULL,
+          CLIENT_LIMIT DECIMAL(12,2) NOT NULL,
+          DAILY_LIMIT DECIMAL(12,2) NOT NULL
+      );
+
+    OPERATION: |
+      CREATE TABLE OPERATION (
+          OP_ID INT PRIMARY KEY,
+          CLIENT_ID INT NOT NULL REFERENCES CLIENT(CLIENT_ID),
+          OP_TYPE VARCHAR(10) NOT NULL,
+          AMOUNT_BRUT DECIMAL(12,2) NOT NULL,
+          FEE_RATE DECIMAL(5,2) NOT NULL,
+          TAX_RATE DECIMAL(5,2) NOT NULL,
+          COUNTRY_ORIG VARCHAR(20) NOT NULL,
+          COUNTRY_DEST VARCHAR(20) NOT NULL,
+          FEE_AMOUNT DECIMAL(12,2),
+          TAX_AMOUNT DECIMAL(12,2),
+          AMOUNT_NET DECIMAL(12,2),
+          RISK_SCORE DECIMAL(8,4),
+          RISK_LEVEL VARCHAR(10),
+          COMPLIANCE_STATUS VARCHAR(10),
+          COMPLIANCE_REASON VARCHAR(30)
+      );
+
+  initial_data:
+    CLIENT:
+      - CLIENT_ID: 100001
+        CLIENT_NAME: "ALICE MARTIN"
+        CLIENT_STATUS: "GOLD"
+        CLIENT_LIMIT: 50000.00
+        DAILY_LIMIT: 25000.00
+      - CLIENT_ID: 100002
+        CLIENT_NAME: "BOB DUPONT"
+        CLIENT_STATUS: "SILVER"
+        CLIENT_LIMIT: 30000.00
+        DAILY_LIMIT: 15000.00
+      - CLIENT_ID: 100003
+        CLIENT_NAME: "CLAIRE BERNARD"
+        CLIENT_STATUS: "STANDARD"
+        CLIENT_LIMIT: 10000.00
+        DAILY_LIMIT: 5000.00
+
+    OPERATION:
+      - OP_ID: 20240001
+        CLIENT_ID: 100001
+        OP_TYPE: "DEBIT"
+        AMOUNT_BRUT: 5000.00
+        FEE_RATE: 2.50
+        TAX_RATE: 20.00
+        COUNTRY_ORIG: "FRANCE"
+        COUNTRY_DEST: "ALLEMAGNE"
+        FEE_AMOUNT: 0.00
+        TAX_AMOUNT: 0.00
+        AMOUNT_NET: 0.00
+        RISK_SCORE: 0.0000
+        RISK_LEVEL: "PENDING"
+        COMPLIANCE_STATUS: "PENDING"
+        COMPLIANCE_REASON: ""
+      - OP_ID: 20240002
+        CLIENT_ID: 100002
+        OP_TYPE: "CREDIT"
+        AMOUNT_BRUT: 15000.00
+        FEE_RATE: 3.00
+        TAX_RATE: 20.00
+        COUNTRY_ORIG: "ALLEMAGNE"
+        COUNTRY_DEST: "FRANCE"
+        FEE_AMOUNT: 0.00
+        TAX_AMOUNT: 0.00
+        AMOUNT_NET: 0.00
+        RISK_SCORE: 0.0000
+        RISK_LEVEL: "PENDING"
+        COMPLIANCE_STATUS: "PENDING"
+        COMPLIANCE_REASON: ""
+      - OP_ID: 20240003
+        CLIENT_ID: 100003
+        OP_TYPE: "DEBIT"
+        AMOUNT_BRUT: 8000.00
+        FEE_RATE: 2.00
+        TAX_RATE: 20.00
+        COUNTRY_ORIG: "FRANCE"
+        COUNTRY_DEST: "RUSSIE"
+        FEE_AMOUNT: 0.00
+        TAX_AMOUNT: 0.00
+        AMOUNT_NET: 0.00
+        RISK_SCORE: 0.0000
+        RISK_LEVEL: "PENDING"
+        COMPLIANCE_STATUS: "PENDING"
+        COMPLIANCE_REASON: ""
+
+  indexes:
+    - entity: OPERATION
+      name: OP_CLIENT_IDX
+      columns: [CLIENT_ID]
+    - entity: OPERATION
+      name: OP_COMPLIANCE_IDX
+      columns: [COMPLIANCE_STATUS]
+    - entity: OPERATION
+      name: OP_RISK_IDX
+      columns: [RISK_LEVEL]
+    - entity: CLIENT
+      name: CLIENT_STATUS_IDX
+      columns: [CLIENT_STATUS]
+
+  connection:
+    engine: postgres
+    method: ocesql
+    dbname: bankdb
+    user: bankuser
+    password: BANKPWD
+    host: localhost
+    port: 5432
+    env_vars:
+      PGHOST: "localhost"
+      PGPORT: "5432"
+      PGUSER: "bankuser"
+      PGPASSWORD: "BANKPWD"
+      PGDATABASE: "bankdb"
+    env_set_method:
+      - "DISPLAY <ENV_NAME> UPON ENVIRONMENT-NAME"
+      - "DISPLAY <ENV_VALUE> UPON ENVIRONMENT-VALUE"
+    ocesql:
+      start_call: "OCESQLStartSQL"
+      connect_call: "OCESQLConnect"
+      end_call: "OCESQLEndSQL"
+      connect_args:
+        - "SQLCA"
+        - "WS-DB-USER"
+        - "WS-DB-USER-LEN"
+        - "WS-DB-PASSWORD"
+        - "WS-DB-PASSWORD-LEN"
+        - "WS-DB-NAME"
+        - "WS-DB-NAME-LEN"
+      connect_args_order_note: "CRITIQUE: RESPECTE EXACTEMENT L'ORDRE des parametres ci-dessus dans le CALL. Ne les inverse JAMAIS. order: SQLCA, user, user_len, password, password_len, dbname, dbname_len"
+
+  behavior:
+    check_sqlcode: true
+    check_sqlstate: true
+    sqlcode_success: 0
+    sqlcode_eof: 100
+    rollback_on_error: false
+    commit:
+      mode: "end"
+      statement: "EXEC SQL COMMIT END-EXEC."
+    disconnect:
+      statement: "EXEC SQL DISCONNECT ALL END-EXEC."
+    null_indicators: false
+    cursor_commit_policy: "no_commit_while_open"
+
+  formatting:
+    max_line_length: 72
+    host_vars_one_per_line: true
+    split_long_exec_sql: true
+
+technique:
+  cursor_naming:
+    pattern: "C_<ENTITY_UPPER3>"
+    example:
+      OPERATION: "C_OPS"
+      CLIENT: "C_CLI"
+  eof_flag:
+    name: "END-OF-FILE"
+    pic: "X"
+    initial_value: "N"
+    true_value: "Y"
+    false_value: "N"
+  sqlca_required: true
+  dal_call_pattern:
+    description: "Programme DAL appele avec un code operation court (READ, SAVE, END)."
+    operation_param_name: "OPERATION"
+    operation_pic: "X(4)"
+    eof_param_name: "END-OF-FILE"
+    operation_param_name: "OPERATION"
+
+prompting:
+  global_constraints:
+    - "Reponds uniquement avec du code COBOL compilable, sans Markdown ni texte autour."
+    - "La premiere ligne doit etre IDENTIFICATION DIVISION."
+    - "Un seul PROGRAM-ID, pas de sous-programmes."
+  forbidden_items:
+    - "GO TO"
+    - "*>"
+  global_directives:
+    - "Utilise strictement les identifiants, messages, SQL et sequences definis dans la spec."
+    - "N'invente aucune variable, paragraphe, message ou SQL."
+    - "Respecte exactement les listes de WORKING-STORAGE, LINKAGE et USING."
+    - "Toujours utiliser les terminateurs explicites END-IF / END-EVALUATE / END-PERFORM / END-EXEC."
+    - "Pas de GO TO, pas de logique DAL dans LOGIC, pas de SQL hors DAL."
+    - "Toute variable utilisee doit etre declaree (WORKING-STORAGE ou LINKAGE)."
+    - "REGLE ABSOLUE PARAGRAPHES: Le nom ET le point sur la MEME ligne. Format: CALCULATE-FEES. JAMAIS de ligne avec juste un point apres."
+    - "REGLE ABSOLUE EXEC SQL INCLUDE: EXEC SQL INCLUDE SQLCA END-EXEC. (avec point final). Autres instructions COBOL sans point final."
+    - "REGLE ABSOLUE QUALIFICATION: Sous-champs avec OF obligatoire. Format: AMOUNT-BRUT OF OPERATION-REC."
+    - "Dans DATA DIVISION (WORKING-STORAGE/LINKAGE), toute ligne 01/05/77/88 avec PIC ou VALUE doit se terminer par un point. Regle non applicable en PROCEDURE DIVISION."
+  generation_strategy:
+    - "1) Construis d'abord le squelette COBOL complet (DIVISION/SECTION) dans l'ordre."
+    - "2) Insere les blocs WORKING-STORAGE/LINKAGE exacts fournis par la spec."
+    - "3) Ecris la PROCEDURE DIVISION en suivant le flow et les fonctions."
+    - "4) REGLE CRITIQUE FERMETURE: Pour toute fonction ouverte (OPEN cursor, EVALUATE, IF, PERFORM), tu DOIS la fermer (CLOSE, END-EVALUATE, END-IF, END-PERFORM)."
+    - "5) Verifie la coherence: aucune variable/paragraphes inventes."
+  formatting_guidelines:
+    - "Format FIXED: instructions commencent en colonne 8 (prefixe de 7 espaces)."
+    - "Commentaires: '*' en colonne 7 (6 espaces + '*'), pas de commentaires '*>'."
+    - "Ne pas utiliser '>>SOURCE FORMAT FREE'."
+    - "PARAGRAPHES: Nom + point sur meme ligne. Format: MAIN-PROCESS. JAMAIS de point seul sur ligne."
+    - "En DATA DIVISION, chaque ligne 01/05/77/88 avec PIC ou VALUE se termine par un point."
+    - "Aucune ligne ne doit depasser 72 colonnes (format FIXED)."
+    - "Si une instruction depasse 72 colonnes, la scinder sur plusieurs lignes."
+    - "Pour EXEC SQL FETCH/SELECT/UPDATE: mettre chaque variable hote sur sa propre ligne."
+    - "Ne pas mettre de point en fin de DISPLAY/GOBACK/STOP RUN/CALL/MOVE/IF (sauf EXEC SQL INCLUDE SQLCA END-EXEC.)."
+    - "Utiliser des guillemets simples pour les messages DISPLAY."
+    - "Respecter l'ordre: IDENTIFICATION -> ENVIRONMENT -> DATA -> PROCEDURE."
+    - "Dans DATA: WORKING-STORAGE puis LINKAGE (si present)."
+
+  programs:
+    OPERATION-DAL-DB:
+      sections_order: [strategy, context, style, format, naming, environment, interface, structure, working_storage, sql, sql_format, sql_behavior, flow, logging, constraints, skeleton, fonctions]
+    OPERATION-LOGIC:
+      sections_order: [strategy, context, style, format, naming, environment, interface, working_storage, flow, logging, constraints, skeleton, fonctions]
+      skeleton:
+        - "Squelette attendu (rappel structure):"
+        - "IDENTIFICATION DIVISION."
+        - "PROGRAM-ID. {program_id}."
+        - "{header_comment_lines}"
+        - "ENVIRONMENT DIVISION."
+        - "CONFIGURATION SECTION."
+        - "REPOSITORY."
+        - "    FUNCTION ALL INTRINSIC."
+        - "DATA DIVISION."
+        - "WORKING-STORAGE SECTION."
+        - "{working_storage_lines}"
+        - "PROCEDURE DIVISION."
+        - "{entry_paragraph}."
+    OPERATION-BUSINESS:
+      sections_order: [strategy, context, style, format, naming, environment, interface, working_storage, logging, constraints, skeleton, fonctions]
+
+programmes:
+  - name: OPERATION-DAL-DB
+    layer: dal
+    role: "Couche d'acces a la base pour OPERATION (lecture via curseur avec jointure CLIENT, mise a jour des champs calcules)."
+    entities: [OPERATION, CLIENT]
+    allowed_sql: true
+    entry_paragraph: "MAIN-ENTRY"
+    entry_block_rules:
+      - "Si OPERATION != 'END ' alors se connecter (si pas deja connecte)."
+      - "EVALUATE OPERATION: 'READ' -> DAL-READ, 'SAVE' -> DAL-SAVE, 'END ' -> DAL-END."
+      - "Terminer par GOBACK."
+    entry_exit_sequence:
+      expected_last_statement: "GOBACK"
+      no_fall_through: true
+    header_comment:
+      - "*****************************************************************"
+      - "* Programme: OPERATION-DAL-DB                                  *"
+      - "* Couche: DAL (Data Access Layer)                              *"
+      - "* Role: Acces a la base PostgreSQL pour OPERATION              *"
+      - "*       Operations: READ (avec JOIN CLIENT), SAVE, END         *"
+      - "*       Jointure: OPERATION.CLIENT_ID = CLIENT.CLIENT_ID       *"
+      - "*****************************************************************"
+    environment_lines:
+      - "ENVIRONMENT DIVISION."
+      - "CONFIGURATION SECTION."
+      - "REPOSITORY."
+      - "    FUNCTION ALL INTRINSIC."
+    working_storage_lines:
+      - "EXEC SQL INCLUDE SQLCA END-EXEC."
+      - "01  WS-CONNECTED-FLAG      PIC X VALUE 'N'."
+      - "    88  WS-CONNECTED           VALUE 'Y'."
+      - "01  WS-CURSOR-OPEN-FLAG    PIC X VALUE 'N'."
+      - "    88  WS-CURSOR-OPEN         VALUE 'Y'."
+      - "01  WS-OP-ID               PIC 9(8)."
+      - "01  WS-CLIENT-ID           PIC 9(6)."
+      - "01  WS-OP-TYPE             PIC X(10)."
+      - "01  WS-AMOUNT-BRUT         PIC S9(10)V99."
+      - "01  WS-FEE-RATE            PIC 9(3)V99."
+      - "01  WS-TAX-RATE            PIC 9(3)V99."
+      - "01  WS-COUNTRY-ORIG        PIC X(20)."
+      - "01  WS-COUNTRY-DEST        PIC X(20)."
+      - "01  WS-FEE-AMOUNT          PIC S9(10)V99."
+      - "01  WS-TAX-AMOUNT          PIC S9(10)V99."
+      - "01  WS-AMOUNT-NET          PIC S9(10)V99."
+      - "01  WS-RISK-SCORE          PIC 9(4)V9999."
+      - "01  WS-RISK-LEVEL          PIC X(10)."
+      - "01  WS-COMPLIANCE-STATUS   PIC X(10)."
+      - "01  WS-COMPLIANCE-REASON   PIC X(30)."
+      - "01  WS-CLIENT-NAME         PIC X(50)."
+      - "01  WS-CLIENT-STATUS       PIC X(10)."
+      - "01  WS-CLIENT-LIMIT        PIC S9(10)V99."
+      - "01  WS-DAILY-LIMIT         PIC S9(10)V99."
+      - "01  WS-DB-NAME."
+      - "    05  WS-DB-NAME-TEXT     PIC X(6) VALUE 'bankdb'."
+      - "    05  WS-DB-NAME-TERM     PIC X VALUE X'00'."
+      - "01  WS-DB-USER."
+      - "    05  WS-DB-USER-TEXT     PIC X(8) VALUE 'bankuser'."
+      - "    05  WS-DB-USER-TERM     PIC X VALUE X'00'."
+      - "01  WS-DB-PASSWORD."
+      - "    05  WS-DB-PASSWORD-TEXT PIC X(7) VALUE 'BANKPWD'."
+      - "    05  WS-DB-PASSWORD-TERM PIC X VALUE X'00'."
+      - "01  WS-DB-NAME-LEN         PIC S9(4) COMP-5 VALUE 6."
+      - "01  WS-DB-USER-LEN         PIC S9(4) COMP-5 VALUE 8."
+      - "01  WS-DB-PASSWORD-LEN     PIC S9(4) COMP-5 VALUE 7."
+      - "01  WS-PGHOST-NAME         PIC X(6) VALUE 'PGHOST'."
+      - "01  WS-PGHOST-VALUE        PIC X(64) VALUE 'localhost'."
+      - "01  WS-PGPORT-NAME         PIC X(6) VALUE 'PGPORT'."
+      - "01  WS-PGPORT-VALUE        PIC X(5) VALUE '5432'."
+      - "01  WS-PGUSER-NAME         PIC X(6) VALUE 'PGUSER'."
+      - "01  WS-PGUSER-VALUE        PIC X(64) VALUE 'bankuser'."
+      - "01  WS-PGPASSWORD-NAME     PIC X(10) VALUE 'PGPASSWORD'."
+      - "01  WS-PGPASSWORD-VALUE    PIC X(64) VALUE 'BANKPWD'."
+      - "01  WS-PGDATABASE-NAME     PIC X(10) VALUE 'PGDATABASE'."
+      - "01  WS-PGDATABASE-VALUE    PIC X(64) VALUE 'bankdb'."
+    call_interface:
+      description: "CALL 'OPERATION-DAL-DB' USING LK-OPERATION LK-END-OF-FILE LK-OPERATION-REC"
+      linkage_parameters:
+        - name: "LK-OPERATION"
+          pic: "X(4)"
+          direction: "INPUT"
+        - name: "LK-END-OF-FILE"
+          pic: "X"
+          direction: "OUTPUT"
+        - name: "LK-OPERATION-REC"
+          pic: "01 level structure"
+          direction: "INPUT/OUTPUT"
+    linkage_structure: |
+      01 LK-OPERATION PIC X(4).
+      01 LK-END-OF-FILE PIC X.
+      01 LK-OPERATION-REC.
+          05 LK-OP-ID PIC 9(8).
+          05 LK-CLIENT-ID PIC 9(6).
+          05 LK-OP-TYPE PIC X(10).
+          05 LK-AMOUNT-BRUT PIC S9(10)V99.
+          05 LK-FEE-RATE PIC 9(3)V99.
+          05 LK-TAX-RATE PIC 9(3)V99.
+          05 LK-COUNTRY-ORIG PIC X(20).
+          05 LK-COUNTRY-DEST PIC X(20).
+          05 LK-FEE-AMOUNT PIC S9(10)V99.
+          05 LK-TAX-AMOUNT PIC S9(10)V99.
+          05 LK-AMOUNT-NET PIC S9(10)V99.
+          05 LK-RISK-SCORE PIC 9(4)V9999.
+          05 LK-RISK-LEVEL PIC X(10).
+          05 LK-COMPLIANCE-STATUS PIC X(10).
+          05 LK-COMPLIANCE-REASON PIC X(30).
+          05 LK-CLIENT-NAME PIC X(50).
+          05 LK-CLIENT-STATUS PIC X(10).
+          05 LK-CLIENT-LIMIT PIC S9(10)V99.
+          05 LK-DAILY-LIMIT PIC S9(10)V99.
+    flow:
+      - "MAIN-ENTRY: Router les operations (READ/SAVE/END)."
+      - "DAL-SET-ENV: Definir les variables d'environnement PostgreSQL."
+      - "DAL-CONNECT: Se connecter a la base (OCESQLStartSQL, OCESQLConnect)."
+      - "DAL-READ: Ouvrir curseur C_OPS (SELECT OPERATION JOIN CLIENT), FETCH, copier vers LINKAGE."
+      - "DAL-SAVE: UPDATE OPERATION SET champs calcules WHERE OP_ID."
+      - "DAL-END: Fermer curseur, COMMIT, DISCONNECT."
+    logging_lines:
+      - "Connexion DB reussie: bankdb"
+      - "Curseur C_OPS ouvert"
+      - "ERREUR CONNECT: SQLCODE="
+      - "ERREUR OPEN: SQLCODE="
+      - "ERREUR FETCH: SQLCODE="
+      - "ERREUR UPDATE: SQLCODE="
+      - "ERREUR CLOSE: SQLCODE="
+      - "ERREUR COMMIT: SQLCODE="
+      - "ERREUR DISCONNECT: SQLCODE="
+      - "Curseur C_OPS ferme"
+      - "Transaction validee"
+      - "Fermeture connexion"
+    required_statements: []
+    forbidden_items: []
+
+  - name: OPERATION-LOGIC
+    layer: logic
+    role: "Couche orchestration pour le traitement batch des operations: calcul frais/taxes/montant net, evaluation risque, validation conformite."
+    entities: [OPERATION, CLIENT]
+    allowed_sql: false
+    entry_paragraph: "MAIN-PROCESS"
+    entry_exit_sequence:
+      expected_last_statement: "STOP RUN"
+      no_fall_through: true
+    header_comment:
+      - "*****************************************************************"
+      - "* Programme: OPERATION-LOGIC                                   *"
+      - "* Couche: LOGIC (Orchestration)                                *"
+      - "* Role: Traitement batch operations bancaires                  *"
+      - "*       - Calcul frais, taxes, montant net                     *"
+      - "*       - Evaluation niveau de risque                          *"
+      - "*       - Validation conformite reglementaire                  *"
+      - "*****************************************************************"
+    environment_lines:
+      - "ENVIRONMENT DIVISION."
+      - "CONFIGURATION SECTION."
+      - "REPOSITORY."
+      - "    FUNCTION ALL INTRINSIC."
+    working_storage_lines:
+      - "01  END-OF-FILE            PIC X VALUE 'N'."
+      - "    88  EOF-REACHED        VALUE 'Y'."
+      - "    88  NOT-EOF            VALUE 'N'."
+      - "77  OPERATION              PIC X(4)."
+      - "77  WS-COUNT-TOTAL         PIC 9(6) VALUE 0."
+      - "77  WS-COUNT-OK            PIC 9(6) VALUE 0."
+      - "77  WS-COUNT-REVIEW        PIC 9(6) VALUE 0."
+      - "77  WS-COUNT-BLOCKED       PIC 9(6) VALUE 0."
+      - "77  WS-COUNT-ERROR         PIC 9(6) VALUE 0."
+      - "77  WS-COUNTRY-RISK-FACTOR PIC 9V9 VALUE 1.0."
+      - "77  WS-TEMP-CALC           PIC S9(10)V99 VALUE 0."
+      - "77  WS-RATIO-CALC          PIC 9(4)V9999 VALUE 0."
+      - "01  OPERATION-REC."
+      - "    05 OP-ID               PIC 9(8)."
+      - "    05 CLIENT-ID           PIC 9(6)."
+      - "    05 OP-TYPE             PIC X(10)."
+      - "    05 AMOUNT-BRUT         PIC S9(10)V99."
+      - "    05 FEE-RATE            PIC 9(3)V99."
+      - "    05 TAX-RATE            PIC 9(3)V99."
+      - "    05 COUNTRY-ORIG        PIC X(20)."
+      - "    05 COUNTRY-DEST        PIC X(20)."
+      - "    05 FEE-AMOUNT          PIC S9(10)V99."
+      - "    05 TAX-AMOUNT          PIC S9(10)V99."
+      - "    05 AMOUNT-NET          PIC S9(10)V99."
+      - "    05 RISK-SCORE          PIC 9(4)V9999."
+      - "    05 RISK-LEVEL          PIC X(10)."
+      - "    05 COMPLIANCE-STATUS   PIC X(10)."
+      - "    05 COMPLIANCE-REASON   PIC X(30)."
+      - "    05 CLIENT-NAME         PIC X(50)."
+      - "    05 CLIENT-STATUS       PIC X(10)."
+      - "    05 CLIENT-LIMIT        PIC S9(10)V99."
+      - "    05 DAILY-LIMIT         PIC S9(10)V99."
+    call_targets:
+      programs:
+        - "OPERATION-DAL-DB"
+        - "OPERATION-BUSINESS"
+    flow:
+      - "MAIN-PROCESS: Afficher bandeau debut, boucle READ -> CALCULATE-FEES -> EVALUATE-RISK -> VALIDATE-COMPLIANCE -> SAVE -> DISPLAY, puis END et afficher statistiques."
+      - "CALCULATE-FEES: Calculer FEE_AMOUNT, TAX_AMOUNT, AMOUNT_NET selon type operation (DEBIT/CREDIT)."
+      - "EVALUATE-RISK: Determiner COUNTRY_RISK_FACTOR selon COUNTRY_DEST, calculer RISK_SCORE, determiner RISK_LEVEL."
+      - "VALIDATE-COMPLIANCE: Verifier limites transaction, pays restrictifs, limites quotidiennes client."
+    logging_lines:
+      - "=========================================="
+      - "DEBUT TRAITEMENT BATCH OPERATIONS BANCAIRES"
+      - "=========================================="
+      - "FIN TRAITEMENT BATCH OPERATIONS BANCAIRES"
+      - "Nombre operations traitees: "
+      - "Operations conformes (OK): "
+      - "Operations en revue (REVIEW): "
+      - "Operations bloquees (BLOCKED): "
+      - "Operations en erreur: "
+      - "=========================================="
+      - "ANOMALIE: Limite transaction depassee"
+      - "ANOMALIE: Pays sous embargo"
+      - "AVERTISSEMENT: Limite quotidienne depassee"
+    required_statements: []
+    forbidden_items: []
+
+  - name: OPERATION-BUSINESS
+    layer: business
+    role: "Couche presentation pour afficher les details d'une operation bancaire: montants, frais, taxes, risque, conformite."
+    entities: [OPERATION]
+    allowed_sql: false
+    entry_paragraph: "DISPLAY-OPERATION"
+    entry_exit_sequence:
+      expected_last_statement: "GOBACK"
+      no_fall_through: true
+    header_comment:
+      - "*****************************************************************"
+      - "* Programme: OPERATION-BUSINESS                                *"
+      - "* Couche: BUSINESS (Presentation)                              *"
+      - "* Role: Affichage details operation bancaire                   *"
+      - "*       - Montants brut/net, frais, taxes                      *"
+      - "*       - Niveau de risque                                     *"
+      - "*       - Statut de conformite                                 *"
+      - "*****************************************************************"
+    environment_lines:
+      - "ENVIRONMENT DIVISION."
+    working_storage_lines: []
+    linkage_structure: |
+      01 LK-OPERATION-REC.
+          05 LK-OP-ID PIC 9(8).
+          05 LK-CLIENT-ID PIC 9(6).
+          05 LK-OP-TYPE PIC X(10).
+          05 LK-AMOUNT-BRUT PIC S9(10)V99.
+          05 LK-FEE-RATE PIC 9(3)V99.
+          05 LK-TAX-RATE PIC 9(3)V99.
+          05 LK-COUNTRY-ORIG PIC X(20).
+          05 LK-COUNTRY-DEST PIC X(20).
+          05 LK-FEE-AMOUNT PIC S9(10)V99.
+          05 LK-TAX-AMOUNT PIC S9(10)V99.
+          05 LK-AMOUNT-NET PIC S9(10)V99.
+          05 LK-RISK-SCORE PIC 9(4)V9999.
+          05 LK-RISK-LEVEL PIC X(10).
+          05 LK-COMPLIANCE-STATUS PIC X(10).
+          05 LK-COMPLIANCE-REASON PIC X(30).
+          05 LK-CLIENT-NAME PIC X(50).
+          05 LK-CLIENT-STATUS PIC X(10).
+          05 LK-CLIENT-LIMIT PIC S9(10)V99.
+          05 LK-DAILY-LIMIT PIC S9(10)V99.
+    display_lines:
+      - "DISPLAY '----------------------------------------'"
+      - "DISPLAY 'OPERATION : ' LK-OP-ID"
+      - "DISPLAY 'CLIENT    : ' LK-CLIENT-NAME ' (' LK-CLIENT-ID ')'"
+      - "DISPLAY 'STATUT CLI: ' LK-CLIENT-STATUS"
+      - "DISPLAY 'TYPE OP   : ' LK-OP-TYPE"
+      - "DISPLAY 'PAYS ORIG : ' LK-COUNTRY-ORIG"
+      - "DISPLAY 'PAYS DEST : ' LK-COUNTRY-DEST"
+      - "DISPLAY 'MONT. BRUT: ' LK-AMOUNT-BRUT"
+      - "DISPLAY 'FRAIS     : ' LK-FEE-AMOUNT ' (' LK-FEE-RATE '%)')"
+      - "DISPLAY 'TAXE      : ' LK-TAX-AMOUNT ' (' LK-TAX-RATE '%)')"
+      - "DISPLAY 'MONT. NET : ' LK-AMOUNT-NET"
+      - "DISPLAY 'RISQUE    : ' LK-RISK-LEVEL ' (score: ' LK-RISK-SCORE ')'"
+      - "DISPLAY 'CONFORMITE: ' LK-COMPLIANCE-STATUS"
+      - "DISPLAY 'RAISON    : ' LK-COMPLIANCE-REASON"
+      - "DISPLAY 'LIMITE CLI: ' LK-CLIENT-LIMIT"
+      - "DISPLAY 'LIM. QUOTI: ' LK-DAILY-LIMIT"
+      - "DISPLAY '----------------------------------------'"
+    required_statements: []
+    forbidden_items: []
+
+fonctions:
+  - name: DAL-SET-ENV
+    programme: OPERATION-DAL-DB
+    layer: dal
+    entity: OPERATION
+    visibility: internal
+    description: "Definir les variables d'environnement PostgreSQL (PGHOST, PGPORT, PGUSER, PGPASSWORD, PGDATABASE)."
+    inputs: []
+    outputs: []
+    modifies: []
+    sql_actions: []
+    sql: {}
+    display_lines: []
+    required_statements: []
+
+  - name: DAL-CONNECT
+    programme: OPERATION-DAL-DB
+    layer: dal
+    entity: OPERATION
+    visibility: internal
+    description: "Se connecter a PostgreSQL via OCESQL (OCESQLStartSQL, OCESQLConnect, OCESQLEndSQL)."
+    inputs: []
+    outputs: []
+    modifies: [WS-CONNECTED]
+    sql_actions: [connect]
+    sql: {}
+    display_lines:
+      - "Connexion DB reussie: bankdb"
+    required_statements: []
+    related_exigences: []
+
+  - name: DAL-READ
+    programme: OPERATION-DAL-DB
+    layer: dal
+    entity: OPERATION
+    visibility: public
+    description: "Lire la prochaine operation depuis le curseur C_OPS (SELECT OPERATION JOIN CLIENT). Si premiere fois, DECLARE et OPEN curseur."
+    inputs: []
+    outputs: [LK-OPERATION-REC, LK-END-OF-FILE]
+    modifies: [WS-CURSOR-OPEN]
+    sql_actions: [declare_cursor, open_cursor, fetch_cursor]
+    sql:
+      select:
+        - |
+          SELECT o.OP_ID, o.CLIENT_ID, o.OP_TYPE, o.AMOUNT_BRUT,
+                 o.FEE_RATE, o.TAX_RATE, o.COUNTRY_ORIG, o.COUNTRY_DEST,
+                 o.FEE_AMOUNT, o.TAX_AMOUNT, o.AMOUNT_NET,
+                 o.RISK_SCORE, o.RISK_LEVEL, o.COMPLIANCE_STATUS, o.COMPLIANCE_REASON,
+                 c.CLIENT_NAME, c.CLIENT_STATUS, c.CLIENT_LIMIT, c.DAILY_LIMIT
+          FROM OPERATION o
+          INNER JOIN CLIENT c ON o.CLIENT_ID = c.CLIENT_ID
+          ORDER BY o.OP_ID
+    display_lines:
+      - "Curseur C_OPS ouvert"
+    required_statements: []
+    related_exigences: []
+
+  - name: DAL-SAVE
+    programme: OPERATION-DAL-DB
+    layer: dal
+    entity: OPERATION
+    visibility: public
+    description: "Mettre a jour les champs calcules de l'operation (FEE_AMOUNT, TAX_AMOUNT, AMOUNT_NET, RISK_SCORE, RISK_LEVEL, COMPLIANCE_STATUS, COMPLIANCE_REASON)."
+    inputs: [LK-OPERATION-REC]
+    outputs: [LK-END-OF-FILE]
+    modifies: []
+    sql_actions: [update]
+    sql:
+      update:
+        - |
+          UPDATE OPERATION
+          SET FEE_AMOUNT = :WS-FEE-AMOUNT,
+              TAX_AMOUNT = :WS-TAX-AMOUNT,
+              AMOUNT_NET = :WS-AMOUNT-NET,
+              RISK_SCORE = :WS-RISK-SCORE,
+              RISK_LEVEL = :WS-RISK-LEVEL,
+              COMPLIANCE_STATUS = :WS-COMPLIANCE-STATUS,
+              COMPLIANCE_REASON = :WS-COMPLIANCE-REASON
+          WHERE OP_ID = :WS-OP-ID
+    display_lines: []
+    required_statements: []
+    related_exigences: [R1, R2, R3, R4, R5, R6, R7, R8, R9]
+
+  - name: DAL-END
+    programme: OPERATION-DAL-DB
+    layer: dal
+    entity: OPERATION
+    visibility: public
+    description: "Fermer le curseur C_OPS, COMMIT la transaction, DISCONNECT de la base."
+    inputs: []
+    outputs: []
+    modifies: [WS-CURSOR-OPEN, WS-CONNECTED]
+    sql_actions: [close_cursor, commit, disconnect]
+    sql: {}
+    display_lines:
+      - "Curseur C_OPS ferme"
+      - "Transaction validee"
+      - "Fermeture connexion"
+    required_statements: []
+    related_exigences: []
+
+  - name: MAIN-PROCESS
+    programme: OPERATION-LOGIC
+    layer: logic
+    entity: OPERATION
+    visibility: public
+    description: "Traitement batch principal: lire toutes les operations, calculer frais/taxes/net, evaluer risque, valider conformite, sauvegarder, afficher."
+    inputs: []
+    outputs: []
+    modifies: [OPERATION-REC, WS-COUNT-TOTAL, WS-COUNT-OK, WS-COUNT-REVIEW, WS-COUNT-BLOCKED, WS-COUNT-ERROR]
+    sql_actions: []
+    sql: {}
+    display_lines:
+      - "=========================================="
+      - "DEBUT TRAITEMENT BATCH OPERATIONS BANCAIRES"
+      - "=========================================="
+      - "FIN TRAITEMENT BATCH OPERATIONS BANCAIRES"
+      - "Nombre operations traitees: "
+      - "Operations conformes (OK): "
+      - "Operations en revue (REVIEW): "
+      - "Operations bloquees (BLOCKED): "
+      - "Operations en erreur: "
+      - "=========================================="
+    required_statements: [STOP RUN]
+    related_exigences: []
+
+  - name: CALCULATE-FEES
+    programme: OPERATION-LOGIC
+    layer: logic
+    entity: OPERATION
+    visibility: internal
+    description: "Calculer FEE_AMOUNT (AMOUNT_BRUT * FEE_RATE / 100), TAX_AMOUNT (FEE_AMOUNT * TAX_RATE / 100), AMOUNT_NET (selon OP_TYPE: DEBIT = brut + frais + taxes, CREDIT = brut - frais - taxes)."
+    inputs: [AMOUNT-BRUT, FEE-RATE, TAX-RATE, OP-TYPE]
+    outputs: [FEE-AMOUNT, TAX-AMOUNT, AMOUNT-NET]
+    modifies: [FEE-AMOUNT, TAX-AMOUNT, AMOUNT-NET]
+    sql_actions: []
+    sql: {}
+    display_lines: []
+    required_statements: []
+    related_exigences: [R1, R2, R3]
+
+  - name: EVALUATE-RISK
+    programme: OPERATION-LOGIC
+    layer: logic
+    entity: OPERATION
+    visibility: internal
+    description: "Determiner COUNTRY_RISK_FACTOR selon COUNTRY_DEST (3.0 pour pays embargo, 2.0 pour pays a risque, 1.0 sinon), calculer RISK_SCORE ((AMOUNT_NET / CLIENT_LIMIT) * COUNTRY_RISK_FACTOR), determiner RISK_LEVEL (HIGH si >= 2.0, MEDIUM si >= 1.0, LOW sinon)."
+    inputs: [COUNTRY-DEST, AMOUNT-NET, CLIENT-LIMIT]
+    outputs: [RISK-SCORE, RISK-LEVEL]
+    modifies: [WS-COUNTRY-RISK-FACTOR, RISK-SCORE, RISK-LEVEL]
+    sql_actions: []
+    sql: {}
+    display_lines: []
+    required_statements: []
+    related_exigences: [R4, R5, R6]
+
+  - name: VALIDATE-COMPLIANCE
+    programme: OPERATION-LOGIC
+    layer: logic
+    entity: OPERATION
+    visibility: internal
+    description: "Valider conformite: si AMOUNT_NET > 100000 alors BLOCKED (limite transaction), si COUNTRY_DEST dans liste embargo alors BLOCKED (pays restrictif), si AMOUNT_NET > DAILY_LIMIT alors REVIEW (limite quotidienne), sinon OK."
+    inputs: [AMOUNT-NET, COUNTRY-DEST, DAILY-LIMIT]
+    outputs: [COMPLIANCE-STATUS, COMPLIANCE-REASON]
+    modifies: [COMPLIANCE-STATUS, COMPLIANCE-REASON, WS-COUNT-OK, WS-COUNT-REVIEW, WS-COUNT-BLOCKED]
+    sql_actions: []
+    sql: {}
+    display_lines:
+      - "ANOMALIE: Limite transaction depassee"
+      - "ANOMALIE: Pays sous embargo"
+      - "AVERTISSEMENT: Limite quotidienne depassee"
+    required_statements: []
+    related_exigences: [R7, R8, R9]
+
+  - name: DISPLAY-OPERATION
+    programme: OPERATION-BUSINESS
+    layer: business
+    entity: OPERATION
+    visibility: public
+    description: "Afficher tous les details d'une operation: ID, client, type, pays, montants, frais, taxes, risque, conformite, limites."
+    inputs: [LK-OPERATION-REC]
+    outputs: []
+    modifies: []
+    sql_actions: []
+    sql: {}
+    display_lines:
+      - "DISPLAY '----------------------------------------'"
+      - "DISPLAY 'OPERATION : ' LK-OP-ID"
+      - "DISPLAY 'CLIENT    : ' LK-CLIENT-NAME ' (' LK-CLIENT-ID ')'"
+      - "DISPLAY 'STATUT CLI: ' LK-CLIENT-STATUS"
+      - "DISPLAY 'TYPE OP   : ' LK-OP-TYPE"
+      - "DISPLAY 'PAYS ORIG : ' LK-COUNTRY-ORIG"
+      - "DISPLAY 'PAYS DEST : ' LK-COUNTRY-DEST"
+      - "DISPLAY 'MONT. BRUT: ' LK-AMOUNT-BRUT"
+      - "DISPLAY 'FRAIS     : ' LK-FEE-AMOUNT ' (' LK-FEE-RATE '%)')"
+      - "DISPLAY 'TAXE      : ' LK-TAX-AMOUNT ' (' LK-TAX-RATE '%)')"
+      - "DISPLAY 'MONT. NET : ' LK-AMOUNT-NET"
+      - "DISPLAY 'RISQUE    : ' LK-RISK-LEVEL ' (score: ' LK-RISK-SCORE ')'"
+      - "DISPLAY 'CONFORMITE: ' LK-COMPLIANCE-STATUS"
+      - "DISPLAY 'RAISON    : ' LK-COMPLIANCE-REASON"
+      - "DISPLAY 'LIMITE CLI: ' LK-CLIENT-LIMIT"
+      - "DISPLAY 'LIM. QUOTI: ' LK-DAILY-LIMIT"
+      - "DISPLAY '----------------------------------------'"
+    required_statements: [GOBACK]
+    related_exigences: []

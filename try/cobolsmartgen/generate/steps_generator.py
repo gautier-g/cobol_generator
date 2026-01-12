@@ -165,6 +165,25 @@ def _extract_ws_names(lines: List[str]) -> List[str]:
     return sorted(set(names))
 
 
+def _extract_01_structures(lines: List[str]) -> List[str]:
+    """
+    Extract 01-level structure names from WORKING-STORAGE lines.
+    Returns names of group items (01 level with sub-fields).
+    """
+    structures: List[str] = []
+    for i, l in enumerate(lines or []):
+        # Match 01 level items (not 01 standalone vars like "01 VAR PIC X.")
+        m = re.match(r"\s*01\s+([A-Z0-9-]+)\.?\s*$", l.strip().upper())
+        if m:
+            struct_name = m.group(1)
+            # Check if next line has 05 (indicating it's a group structure)
+            if i + 1 < len(lines):
+                next_line = lines[i + 1].strip().upper()
+                if re.match(r"\s*05\s+", next_line):
+                    structures.append(struct_name)
+    return structures
+
+
 def _extract_linkage_names(prog_info: Dict) -> List[str]:
     """
     Extract linkage parameter names from program call interface.
@@ -217,6 +236,9 @@ def _extract_call_targets(spec: Dict, current_program: str) -> Dict[str, List[st
 
     ADDED (2026-01-07): Explicit CALL targets to prevent LLM from inventing targets.
     UPDATED (2026-01-08): Extract complete call_interface for each program.
+    CRITICAL FIX (2026-01-11): Ne plus suggérer OCESQL runtime API en mode précompilé.
+    Avec OCESQL précompilation (ocesql file.cbl file.cob), le .cbl doit contenir du
+    SQL embarqué standard (EXEC SQL CONNECT...), pas des CALL 'OCESQLConnect'.
     """
     programs = []
     interfaces = {}
@@ -234,25 +256,34 @@ def _extract_call_targets(spec: Dict, current_program: str) -> Dict[str, List[st
             if call_iface:
                 interfaces[prog_name] = call_iface
 
-    # Check if any SQL is used in spec → add OCESQL functions
-    has_sql = False
-    for fn in spec.get("fonctions", []) or []:
-        if fn.get("sql") or fn.get("layer") == "dal":
-            has_sql = True
-            break
+    # CRITICAL FIX (2026-01-11): Ne PAS suggérer les fonctions OCESQL runtime en mode précompilé
+    # Le SQL doit être écrit avec EXEC SQL, pas avec CALL 'OCESQL*'
+    # Vérifier si le mode SQL est "direct" (appels runtime) ou "precompile" (défaut)
+    sql_config = spec.get("sql", {}) or {}
+    sql_method = (sql_config.get("connection", {}) or {}).get("method", "precompile")
 
-    if has_sql:
-        ocesql_funcs = [
-            "OCESQLStartSQL",
-            "OCESQLConnect",
-            "OCESQLExec",
-            "OCESQLEndSQL",
-            "OCESQLDisconnect",
-            "OCESQLCursorDeclare",
-            "OCESQLCursorOpen",
-            "OCESQLCursorFetchOne",
-            "OCESQLCursorClose",
-        ]
+    # Seulement si mode "direct" (appels runtime OCESQL), ajouter les fonctions
+    # En mode "precompile" (défaut), ocesql_funcs reste vide []
+    if sql_method == "direct":
+        # Mode direct: le code .cbl appelle directement l'API OCESQL (rare)
+        has_sql = False
+        for fn in spec.get("fonctions", []) or []:
+            if fn.get("sql") or fn.get("layer") == "dal":
+                has_sql = True
+                break
+
+        if has_sql:
+            ocesql_funcs = [
+                "OCESQLStartSQL",
+                "OCESQLConnect",
+                "OCESQLExec",
+                "OCESQLEndSQL",
+                "OCESQLDisconnect",
+                "OCESQLCursorDeclare",
+                "OCESQLCursorOpen",
+                "OCESQLCursorFetchOne",
+                "OCESQLCursorClose",
+            ]
 
     # System functions (if needed)
     # system_funcs = ["ACCEPT", "DISPLAY"]  # Already COBOL keywords
@@ -659,9 +690,63 @@ def _validate_steps(
     Returns list of error messages (empty if all valid).
 
     IMPROVED (2026-01-07): Added validation for forbidden keywords (FUNCTION, END-COMPUTE, IS NEGATIVE, etc.)
+    IMPROVED (2026-01-11): Auto-add SQL identifiers (SQLCA, SQLCODE, etc.) when SQL is enabled
     """
     errors: List[str] = []
     allowed_set = {a.upper() for a in allowed_ids if a}
+
+    # CRITICAL FIX (2026-01-11): Auto-add SQL identifiers when SQL is enabled
+    # This prevents retry loops that remove SQLCA from CALL statements
+    if sql_actions or cursor_name:
+        sql_identifiers = {"SQLCA", "SQLCODE", "SQLSTATE", "SQLERRM", "SQLERRMC"}
+        allowed_set.update(sql_identifiers)
+
+    # CRITICAL FIX (2026-01-11): Forbid INCLUDE SQLCA in steps
+    # SQLCA is already injected in WORKING-STORAGE by headers
+    for idx, line in enumerate(steps, start=1):
+        if "INCLUDE" in line.upper() and "SQLCA" in line.upper():
+            errors.append(f"line {idx}: EXEC SQL INCLUDE SQLCA forbidden in steps (already in WORKING-STORAGE)")
+            break
+
+    # CRITICAL FIX (2026-01-11): Validate OCESQL signatures
+    # Ensure OCESQL calls have correct parameters
+    for idx, line in enumerate(steps, start=1):
+        upper = line.upper()
+
+        # OCESQLStartSQL must have USING SQLCA
+        if "CALL 'OCESQLSTARTSQL'" in upper or 'CALL "OCESQLSTARTSQL"' in upper:
+            if "USING SQLCA" not in upper:
+                errors.append(f"line {idx}: CALL 'OCESQLStartSQL' must include USING SQLCA")
+
+        # OCESQLConnect must have SQLCA as first parameter
+        if "CALL 'OCESQLCONNECT'" in upper or 'CALL "OCESQLCONNECT"' in upper:
+            if "USING SQLCA" not in upper:
+                errors.append(f"line {idx}: CALL 'OCESQLConnect' must include USING SQLCA as first parameter")
+
+        # CRITICAL FIX (2026-01-11): Detect host vars using group instead of elementary field
+        # Common pattern: WS-DB-USER (group) instead of WS-DB-USER-TEXT (elementary)
+        if "EXEC SQL" in upper and "CONNECT" in upper:
+            if ":WS-DB-USER " in upper or ":WS-DB-USER)" in upper or ":WS-DB-USER," in upper:
+                errors.append(f"line {idx}: use :WS-DB-USER-TEXT (elementary field), not :WS-DB-USER (group)")
+            if ":WS-DB-PASSWORD " in upper or ":WS-DB-PASSWORD)" in upper or ":WS-DB-PASSWORD," in upper:
+                errors.append(f"line {idx}: use :WS-DB-PASSWORD-TEXT (elementary field), not :WS-DB-PASSWORD (group)")
+            if ":WS-DB-NAME " in upper or ":WS-DB-NAME)" in upper or ":WS-DB-NAME," in upper:
+                errors.append(f"line {idx}: use :WS-DB-NAME-TEXT (elementary field), not :WS-DB-NAME (group)")
+
+        # CRITICAL FIX (2026-01-11): Detect UPDATE without RTRIM on enum/status columns
+        # Prevents trailing spaces in database (LOW -> 'LOW       ')
+        if "EXEC SQL" in upper and "UPDATE" in upper:
+            enum_columns = ["RISK_LEVEL", "COMPLIANCE_STATUS", "RISK-LEVEL", "COMPLIANCE-STATUS"]
+            for col in enum_columns:
+                # Check if column is assigned without RTRIM/TRIM
+                if f"{col} =" in upper:
+                    # Extract the line to check for RTRIM
+                    if "RTRIM(" not in upper and "TRIM(" not in upper:
+                        # Check if it's a host var assignment (not a constant)
+                        if ":WS-" in upper or ":LK-" in upper:
+                            errors.append(f"line {idx}: use RTRIM(:hostvar) for {col} to avoid trailing spaces")
+                            break
+
     in_sql_block = False
 
     for idx, line in enumerate(steps, start=1):
@@ -924,6 +1009,7 @@ def _build_prompt(
     sql_text = "\n".join(sql_lines) if sql_lines else "(aucun)"
     sql_actions = fn.get("sql_actions") or []
     sql_actions_text = " -> ".join(sql_actions) if sql_actions else "(aucune)"
+    cursor_name = _extract_cursor_name(sql_block)
 
     # ADDED 2026-01-07: Extract and clarify business rules
     # Separate validation rules from business logic rules
@@ -1239,6 +1325,10 @@ def _build_prompt(
     # ADDED 2026-01-10: Add GnuCOBOL intrinsic functions guide (hardcoded in Python, not in spec)
     instructions.extend(["", cobol_constraints.get_gnucobol_intrinsic_functions_guide(), ""])
 
+    # ADDED 2026-01-11: Add OCESQL embedded SQL guide when SQL is detected
+    if sql_actions or cursor_name:
+        instructions.extend(["", cobol_constraints.get_ocesql_embedded_sql_guide(), ""])
+
     # Add specific 88-level interdictions if applicable
     if conditions_88_text and "SANS clause FALSE" in conditions_88_text:
         no_false_conditions = [name for name, info in conditions_88.items() if not info['has_false_clause']]
@@ -1350,6 +1440,25 @@ def _build_prompt(
         ws_lines or "(vide)",
         "",
     ])
+
+    # ADDED 2026-01-11: Add field qualification note for 01-level structures
+    structures_01 = _extract_01_structures(ws_lines_list)
+    if structures_01:
+        qual_note = "=== QUALIFICATION DES CHAMPS (CRITIQUE) ===\n"
+        qual_note += f"ATTENTION: Les structures suivantes contiennent des sous-champs: {', '.join(structures_01)}\n"
+        qual_note += "REGLE ABSOLUE: Tous les sous-champs DOIVENT etre qualifies avec 'OF <structure>'.\n\n"
+        for struct in structures_01:
+            qual_note += f"Exemple pour {struct}:\n"
+            qual_note += f"  CORRECT:   MOVE 100 TO FIELD-NAME OF {struct}\n"
+            qual_note += f"  CORRECT:   COMPUTE RESULT OF {struct} = VALUE1 OF {struct} + VALUE2 OF {struct}\n"
+            qual_note += f"  INCORRECT: MOVE 100 TO FIELD-NAME  <-- ERREUR AMBIGUITE\n\n"
+        qual_note += "IMPORTANT: Dans les regles metier ci-dessous, les noms de champs (ex: FEE-AMOUNT, AMOUNT-BRUT)\n"
+        qual_note += f"font reference aux sous-champs de {structures_01[0] if len(structures_01) == 1 else 'la structure appropriee'}.\n"
+        qual_note += "Tu DOIS toujours qualifier ces champs avec 'OF <structure>' dans ton code COBOL."
+        prompt_parts.extend([
+            qual_note,
+            "",
+        ])
 
     # ADDED 2026-01-08: Add 88-level condition manipulation instructions
     if conditions_88_text:

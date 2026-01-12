@@ -92,7 +92,12 @@ def _build_linkage_struct(prog_info: Dict, entity: str, entity_struct: str) -> s
             ppic = p.get("pic", "")
             if not pname:
                 continue
-            if isinstance(ppic, str) and "groupe" in ppic.lower():
+            # If the spec indicates a group/structure (eg. '01 level structure',
+            # 'group', 'groupe', 'level', 'structure'), render the full entity
+            # structure under this linkage name so PIC clauses come from the
+            # entity copybook (entity_struct). This handles vague descriptors
+            # produced by normalization instead of concrete PIC clauses.
+            if isinstance(ppic, str) and re.search(r"\b(groupe|group|01|level|structure)\b", ppic.lower()):
                 lines.append(f"01 {pname}.")
                 if entity_struct:
                     prefix = "LK-" if pname.upper().startswith("LK-") else ""
@@ -789,41 +794,146 @@ Les erreurs suivantes ont été détectées, corrige-les strictement sans ajoute
     return clean, last_prompt
 
 
+def _extract_select_columns_from_sql(sql_query: str) -> List[str]:
+    """Parse un SELECT pour extraire les noms de colonnes."""
+    columns = []
+    # Trouver la partie SELECT ... FROM
+    match = re.search(r'SELECT\s+(.*?)\s+FROM', sql_query, re.IGNORECASE | re.DOTALL)
+    if not match:
+        return columns
+
+    select_part = match.group(1)
+    # Découper par virgules et nettoyer
+    for col in select_part.split(','):
+        col = col.strip()
+        # Extraire le nom de colonne (supporter o.OP_ID, CLIENT_NAME, etc.)
+        # Prendre la dernière partie après le point si présent
+        if '.' in col:
+            col = col.split('.')[-1].strip()
+        columns.append(col)
+
+    return columns
+
+def _build_linkage_fields_from_select(select_columns: List[str], norm: Dict) -> List[str]:
+    """Construit les lignes de champs LINKAGE à partir des colonnes SELECT et du MCD."""
+    fields_lines: List[str] = []
+
+    # Construire un dictionnaire de tous les attributs de toutes les entités
+    all_attrs = {}
+    for ent in norm.get("mcd", {}).get("entites", []):
+        for attr in ent.get("attrs", []):
+            attr_name = attr.get("name", "")
+            if attr_name:
+                all_attrs[attr_name] = attr
+
+    # Pour chaque colonne du SELECT, trouver son type
+    for col in select_columns:
+        col_upper = col.upper().replace("-", "_")
+
+        # Chercher l'attribut dans le dictionnaire
+        attr = all_attrs.get(col_upper)
+        if not attr:
+            # Si pas trouvé, chercher avec des variantes
+            for key, val in all_attrs.items():
+                if key.replace("_", "") == col_upper.replace("_", ""):
+                    attr = val
+                    break
+
+        # Construire le nom COBOL (remplacer _ par -)
+        name = col_upper.replace("_", "-")
+
+        # Déterminer le PIC
+        if attr:
+            pic = attr.get("cobol_pic") or attr.get("pic") or attr.get("cobol_type")
+            if not pic:
+                t = (attr.get("type", "") or "").upper()
+                if "INT" in t:
+                    pic = "9(8)" if "ID" in name else "9(4)"
+                elif "VARCHAR" in t:
+                    m = re.search(r'VARCHAR\((\d+)\)', t)
+                    l = m.group(1) if m else "30"
+                    pic = f"X({l})"
+                elif "DECIMAL" in t:
+                    m = re.search(r'DECIMAL\((\d+),(\d+)\)', t)
+                    if m:
+                        p, s = m.group(1), m.group(2)
+                        pic = f"S9({int(p)-int(s)})V99" if int(s) > 0 else f"9({p})"
+                    else:
+                        pic = "9(6)V99"
+                else:
+                    pic = "X(30)"
+        else:
+            # Fallback si attribut non trouvé
+            pic = "X(30)"
+
+        if not pic.upper().startswith("PIC"):
+            pic = f"PIC {pic}"
+        fields_lines.append(f"    05 {name:<15} {pic}.")
+
+    return fields_lines
+
 def _build_strict_prompt(program_id: str, layer: str, entity: str, norm: Dict, io_map: Dict,
                          contract: Dict = None, plan: Dict = None) -> str:
     """Construit un prompt contractuel (pas de code donné) pour 8.2/8.3/8.4 en lisant la spec YAML normalisée."""
     prog_info = _extract_program_info(norm, program_id)
     prompting = norm.get("prompting", {}) or {}
 
-    # Extraire l'entité et ses attributs (avec cobol_pic)
+    # CRITICAL FIX (2026-01-11): Pour les programmes DAL avec JOIN, extraire TOUS les champs du SELECT
+    # Pas seulement les champs de l'entité principale
+    fields_lines: List[str] = []
+
+    # Chercher si ce programme a un SELECT avec JOIN
+    select_query = None
+    fonctions = norm.get("fonctions", []) or []
+    for fn in fonctions:
+        if fn.get("programme") == program_id:
+            sql = fn.get("sql", {}) or {}
+            select_list = sql.get("select", []) or []
+            if select_list and isinstance(select_list, list):
+                for sel in select_list:
+                    if isinstance(sel, str) and "JOIN" in sel.upper():
+                        select_query = sel
+                        break
+            if select_query:
+                break
+
+    # Chercher l'entité principale pour table_signature et entity_fields_list (toujours nécessaire)
     entity_fields = {}
     for ent in norm.get("mcd", {}).get("entites", []):
         if ent.get("name") == entity or ent.get("normalized_name") == entity:
             entity_fields = ent
             break
 
-    fields_lines: List[str] = []
-    for attr in entity_fields.get("attrs", []):
-        name = attr.get("name", "").replace("_", "-")
-        pic = attr.get("cobol_pic") or attr.get("pic") or attr.get("cobol_type")
-        if not pic:
-            t = (attr.get("type", "") or "").upper()
-            if "INT" in t:
-                pic = "9(4)"
-            elif "VARCHAR" in t:
-                m = re.search(r'VARCHAR\((\d+)\)', t)
-                l = m.group(1) if m else "30"
-                pic = f"X({l})"
-            elif "DECIMAL" in t:
-                pic = "9(6)V99"
-            else:
-                pic = "X(30)"
-        if not pic.upper().startswith("PIC"):
-            pic = f"PIC {pic}"
-        fields_lines.append(f"    05 {name:<15} {pic}.")
+    if select_query:
+        # Parser le SELECT pour extraire toutes les colonnes
+        select_columns = _extract_select_columns_from_sql(select_query)
+        if select_columns:
+            fields_lines = _build_linkage_fields_from_select(select_columns, norm)
+
+    # Fallback: si pas de SELECT avec JOIN trouvé, utiliser l'ancienne méthode (entité unique)
+    if not fields_lines:
+        for attr in entity_fields.get("attrs", []):
+            name = attr.get("name", "").replace("_", "-")
+            pic = attr.get("cobol_pic") or attr.get("pic") or attr.get("cobol_type")
+            if not pic:
+                t = (attr.get("type", "") or "").upper()
+                if "INT" in t:
+                    pic = "9(4)"
+                elif "VARCHAR" in t:
+                    m = re.search(r'VARCHAR\((\d+)\)', t)
+                    l = m.group(1) if m else "30"
+                    pic = f"X({l})"
+                elif "DECIMAL" in t:
+                    pic = "9(6)V99"
+                else:
+                    pic = "X(30)"
+            if not pic.upper().startswith("PIC"):
+                pic = f"PIC {pic}"
+            fields_lines.append(f"    05 {name:<15} {pic}.")
+
     entity_struct = "\n".join(fields_lines)
 
-    fonctions = norm.get("fonctions", []) or []
+    # Récupérer les fonctions pour ce programme (déjà chargé plus haut)
     program_funcs = [fn for fn in fonctions if fn.get("programme") == program_id]
     public_funcs = [fn for fn in program_funcs if fn.get("visibility", "public") != "internal"]
     internal_funcs = [fn for fn in program_funcs if fn.get("visibility") == "internal"]
@@ -853,6 +963,7 @@ def _build_strict_prompt(program_id: str, layer: str, entity: str, norm: Dict, i
         (prog_info.get("cobol_sections", {}) or {})
         .get("procedure_division", {})
         .get("entry_paragraph", "")
+        or prog_info.get("entry_paragraph", "")
     )
     using_clause = (
         (prog_info.get("cobol_sections", {}) or {})
@@ -1124,7 +1235,8 @@ def _build_strict_prompt(program_id: str, layer: str, entity: str, norm: Dict, i
         "constraints": [
             "Interdictions: {forbidden_items}",
             "Paragraphes publics attendus: {public_paragraphs}",
-            "Paragraphes internes autorises: {internal_paragraphs}"
+            "Paragraphes internes autorises: {internal_paragraphs}",
+            "Entry paragraph: {entry_paragraph}"
         ],
         "fonctions": [
             "{function_details}"
@@ -1139,6 +1251,15 @@ def _build_strict_prompt(program_id: str, layer: str, entity: str, norm: Dict, i
     # ADDED 2026-01-10: Add hardcoded COBOL constraints (not in specs)
     prompt_parts.append("")
     prompt_parts.append(cobol_constraints.get_gnucobol_intrinsic_functions_guide())
+
+    # ADDED 2026-01-11: Add OCESQL embedded SQL guide when SQL is detected
+    has_sql = any(
+        fn.get("sql_actions") or fn.get("sql")
+        for fn in program_funcs
+    )
+    if has_sql:
+        prompt_parts.append("")
+        prompt_parts.append(cobol_constraints.get_ocesql_embedded_sql_guide())
 
     # ADDED 2026-01-10: Add strict BUSINESS layer rules if applicable
     if layer == "business":
@@ -1204,6 +1325,7 @@ def _validate_program(code: str, program_id: str, layer: str, entity: str, norm:
         (prog_info.get("cobol_sections", {}) or {})
         .get("procedure_division", {})
         .get("entry_paragraph")
+        or prog_info.get("entry_paragraph")
     )
     allowed = set(public_required + internal_allowed + (prog_info.get("internal_paragraphs", []) or []))
     if entry_para:
@@ -1430,6 +1552,22 @@ def _validate_program(code: str, program_id: str, layer: str, entity: str, norm:
     if allow_source is False and "SOURCE FORMAT" in upper_code:
         errors.append("Directive SOURCE FORMAT interdite par la spec.")
 
+    # ADDED 2026-01-11: Validations CRITIQUES
+    in_procedure = False
+    for i, l in enumerate(lines):
+        # Detecter PROCEDURE DIVISION
+        if "PROCEDURE DIVISION" in l.upper():
+            in_procedure = True
+            continue
+
+        # CRITIQUE: Pas de ligne avec juste un point dans PROCEDURE DIVISION
+        if in_procedure and re.match(r"^\s*\.\s*$", l):
+            errors.append("Point final interdit sur instruction (utiliser '.' uniquement sur ligne seule).")
+
+        # CRITIQUE: EXEC SQL INCLUDE SQLCA doit avoir un point
+        if "EXEC SQL INCLUDE SQLCA END-EXEC" in l.upper() and not l.strip().endswith("."):
+            errors.append("EXEC SQL INCLUDE SQLCA END-EXEC doit se terminer par un point.")
+
     # Contraintes de bloc dans le paragraphe d'entree
     entry_block_rules = prog_info.get("entry_block_rules", []) or []
     if entry_block_rules and prog_info.get("cobol_sections", {}).get("procedure_division", {}):
@@ -1437,6 +1575,7 @@ def _validate_program(code: str, program_id: str, layer: str, entity: str, norm:
             (prog_info.get("cobol_sections", {}) or {})
             .get("procedure_division", {})
             .get("entry_paragraph")
+            or prog_info.get("entry_paragraph")
         )
 
         def _paragraph_ranges(lines_list: List[str]) -> Dict[str, tuple]:

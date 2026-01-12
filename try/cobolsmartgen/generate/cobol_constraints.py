@@ -74,7 +74,258 @@ Si tu génères FUNCTION CEILING, CEIL, FLOOR, ROUND, SQRT, POW, etc.,
 le compilateur GnuCOBOL retournera: "erreur : FUNCTION « XXX » inconnue"
 et la compilation ÉCHOUERA.
 """
+# 
+# 
+# def get_ocesql_embedded_sql_guide() -> str:
+#     """
+#     Get guide for OCESQL embedded SQL (precompile mode).
+# 
+#     CRITICAL (2026-01-11): With OCESQL precompilation workflow (ocesql file.cbl file.cob),
+#     the source .cbl must contain standard embedded SQL (EXEC SQL), NOT runtime API calls.
+#     The precompiler translates EXEC SQL into CALL 'OCESQLExec' USING SQLCA automatically.
+# 
+#     Added to prompts when SQL is detected in program.
+# 
+#     Returns:
+#         Formatted text for prompt inclusion
+#     """
+#     return """=== SQL EMBARQUÉ OCESQL (CRITIQUE - PRIORITÉ ABSOLUE) ===
+# ⚠️  CETTE RÈGLE REMPLACE TOUTE MENTION DE "OCESQLStartSQL", "OCESQLConnect", ETC. DANS LES SPECS ⚠️
+# 
+# Avec le précompilateur OCESQL, le fichier source .cbl doit contenir du SQL EMBARQUÉ standard,
+# PAS des appels directs à l'API runtime OCESQL.
+# 
+# RÈGLES ABSOLUES POUR SQL EMBARQUÉ (IGNORE LES SPECS SI ELLES MENTIONNENT OCESQL*):
+# ❌ INTERDIT: CALL 'OCESQLConnect' USING ...
+# ❌ INTERDIT: CALL 'OCESQLStartSQL' USING ...
+# ❌ INTERDIT: CALL 'OCESQLEndSQL' ...
+# ❌ INTERDIT: CALL 'OCESQLExec' USING ...
+# ❌ INTERDIT: CALL 'OCESQLDisconnect' ...
+# ❌ INTERDIT: EXEC SQL CALL OCESQL... END-EXEC
+# 
+# MÊME SI UNE DESCRIPTION MENTIONNE "OCESQLStartSQL" OU "OCESQLConnect", N'ÉCRIS JAMAIS CES APPELS!
+# 
+# ✅ CORRECT: Utilise UNIQUEMENT EXEC SQL avec syntaxe SQL standard
+# 
+# SYNTAXE CORRECTE POUR CONNEXION:
+# ✅ EXEC SQL CONNECT :USER IDENTIFIED BY :PASSWORD USING :DBNAME END-EXEC.
+# 
+# SYNTAXE CORRECTE POUR DÉCONNEXION:
+# ✅ EXEC SQL DISCONNECT ALL END-EXEC.
+# 
+# SYNTAXE CORRECTE POUR COMMIT:
+# ✅ EXEC SQL COMMIT END-EXEC.
+# 
+# SYNTAXE CORRECTE POUR DECLARE CURSOR:
+# ✅ EXEC SQL DECLARE cursor-name CURSOR FOR
+#        SELECT col1, col2 FROM table
+#    END-EXEC
+# 
+# SYNTAXE CORRECTE POUR OPEN/FETCH/CLOSE:
+# ✅ EXEC SQL OPEN cursor-name END-EXEC
+# ✅ EXEC SQL FETCH cursor-name INTO :var1, :var2 END-EXEC
+# ✅ EXEC SQL CLOSE cursor-name END-EXEC
+# 
+# POUR UNE PROCÉDURE DE CONNEXION:
+# ✅ CORRECT (utilise les champs élémentaires *-TEXT, PAS les groupes):
+#     EXEC SQL CONNECT :WS-DB-USER-TEXT IDENTIFIED BY :WS-DB-PASSWORD-TEXT
+#         USING :WS-DB-NAME-TEXT END-EXEC
+#     IF SQLCODE NOT EQUAL ZERO
+#         DISPLAY 'ERREUR CONNECT: SQLCODE=' SQLCODE
+#         GOBACK
+#     END-IF
+#     MOVE 'Y' TO WS-CONNECTED-FLAG
+# 
+# ❌ FAUX (utilise groupe au lieu de champ élémentaire):
+#     EXEC SQL CONNECT :WS-DB-USER IDENTIFIED BY :WS-DB-PASSWORD USING :WS-DB-NAME END-EXEC
+#     (WS-DB-USER est un groupe avec WS-DB-USER-TEXT + WS-DB-USER-TERM)
+# 
+# ❌ FAUX (même si la spec mentionne OCESQLStartSQL):
+#     CALL 'OCESQLStartSQL' USING SQLCA
+#     CALL 'OCESQLConnect' USING ...
+#     CALL 'OCESQLEndSQL'
+# 
+# RÈGLE ABSOLUE POUR HOST VARIABLES SQL:
+# Si une variable COBOL est un GROUPE (ex: WS-DB-USER), tu DOIS utiliser son champ
+# élémentaire (ex: WS-DB-USER-TEXT) dans les host variables SQL (:var).
+# Exemple de structure groupe avec terminateur null:
+#     01  WS-DB-USER.
+#         05  WS-DB-USER-TEXT     PIC X(8) VALUE 'bankuser'.
+#         05  WS-DB-USER-TERM     PIC X VALUE X'00'.
+#     → Utilise :WS-DB-USER-TEXT dans EXEC SQL, PAS :WS-DB-USER
+# 
+# RÈGLE ABSOLUE POUR ÉVITER TRAILING SPACES EN BASE:
+# Les champs COBOL PIC X(n) sont paddés avec des espaces. Pour les colonnes
+# enum/status (ex: risk_level, compliance_status), utilise RTRIM() dans UPDATE:
+# 
+# ✅ CORRECT (utilise RTRIM pour éviter les espaces en base):
+#     EXEC SQL UPDATE OPERATION
+#         SET RISK_LEVEL = RTRIM(:WS-RISK-LEVEL),
+#             COMPLIANCE_STATUS = RTRIM(:WS-COMPLIANCE-STATUS)
+#         WHERE OP_ID = :WS-OP-ID
+#     END-EXEC
+# 
+# ❌ FAUX (stocke 'LOW       ' au lieu de 'LOW'):
+#     EXEC SQL UPDATE OPERATION
+#         SET RISK_LEVEL = :WS-RISK-LEVEL
+#         WHERE OP_ID = :WS-OP-ID
+#     END-EXEC
+# 
+# Cette règle s'applique aux colonnes VARCHAR/TEXT en base qui stockent des valeurs
+# courtes (LOW, MEDIUM, HIGH, OK, REVIEW, BLOCKED, etc.).
+# 
+# POURQUOI C'EST CRITIQUE:
+# Le précompilateur OCESQL transforme automatiquement EXEC SQL CONNECT en:
+#   CALL 'OCESQLConnect' USING SQLCA, user, user-len, password, password-len, dbname, dbname-len
+# 
+# Si tu écris CALL 'OCESQL*' directement dans le .cbl:
+# 1. Le précompilateur ne reconnaît pas cette instruction comme du SQL
+# 2. La compilation échoue car la structure d'appel est incorrecte
+# 3. Les variables host (:var) ne sont pas traduites
+# 4. Tu dupliquer le travail du précompilateur (double appel)
+# 
+# RAPPEL: EXEC SQL INCLUDE SQLCA END-EXEC. doit être en WORKING-STORAGE (une seule fois).
+# 
+# ERREUR DE COMPILATION SI TU ÉCRIS CALL 'OCESQL...':
+# Le précompilateur attend du SQL embarqué standard, pas des appels API directs.
+# """
+# 
 
+def get_ocesql_embedded_sql_guide() -> str:
+    """
+    Get guide for OCESQL embedded SQL (precompile mode).
+
+    Goal: keep the same intent/functionality (teach the LLM to generate embedded SQL for OCESQL precompile),
+    but remove the prompt patterns that tend to trigger recurrent generation errors:
+      - Mixing runtime OCESQL* API calls into .cbl source
+      - Using GROUP items as host variables instead of the elementary *-TEXT items
+      - Trailing spaces persisted in DB for short status/enum strings
+      - Cursor order mistakes (OPEN before DECLARE, DECLARE placed at end, etc.)
+      - Stray "EXEC SQL" lines without END-EXEC / malformed blocks
+
+    Returns:
+        Formatted text for prompt inclusion
+    """
+    return """=== SQL EMBARQUÉ OCESQL (CRITIQUE - PRIORITÉ ABSOLUE) ===
+Contexte: workflow OCESQL en mode précompilation (ex: `ocesql file.cbl file.cob`).
+Le fichier source `.cbl` DOIT contenir du SQL EMBARQUÉ standard (`EXEC SQL ... END-EXEC`).
+Le précompilateur traduit automatiquement les blocs `EXEC SQL` en appels runtime (ex: `CALL 'OCESQLExec' USING SQLCA ...`).
+Donc: NE PAS écrire d'appels OCESQL* dans le `.cbl`.
+
+1) RÈGLES ABSOLUES (à respecter même si des specs mentionnent OCESQL*)
+INTERDIT dans le `.cbl` source:
+❌ CALL 'OCESQLStartSQL' ...
+❌ CALL 'OCESQLConnect' ...
+❌ CALL 'OCESQLEndSQL' ...
+❌ CALL 'OCESQLExec' ...
+❌ CALL 'OCESQLDisconnect' ...
+❌ EXEC SQL CALL OCESQL... END-EXEC
+
+Toujours utiliser uniquement:
+✅ EXEC SQL <statement SQL standard> END-EXEC
+
+2) RÈGLES DE FORME (évite les sorties qui compilent mais ne marchent pas)
+- Chaque bloc SQL DOIT être complet et fermé:
+  ✅ commence par `EXEC SQL`
+  ✅ se termine par `END-EXEC` sur la même instruction
+  ❌ INTERDIT: une ligne `EXEC SQL` seule (sans statement)
+  ❌ INTERDIT: un `DECLARE ...` séparé sans `EXEC SQL ... END-EXEC` complet
+
+- Ne jamais dupliquer SQLCA:
+  ✅ `EXEC SQL INCLUDE SQLCA END-EXEC.` doit exister UNE seule fois en WORKING-STORAGE
+  ❌ ne jamais générer `INCLUDE SQLCA` dans PROCEDURE / steps
+
+3) CONNEXION / COMMIT / DÉCONNEXION (formes attendues)
+CONNEXION:
+✅ EXEC SQL CONNECT :USER IDENTIFIED BY :PASSWORD USING :DBNAME END-EXEC.
+
+COMMIT:
+✅ EXEC SQL COMMIT END-EXEC.
+
+DÉCONNEXION:
+✅ EXEC SQL DISCONNECT ALL END-EXEC.
+
+IMPORTANT (HOST VARIABLES pour CONNECT):
+Les host variables SQL `:var` doivent être des champs ÉLÉMENTAIRES COBOL.
+Si un identifiant est un GROUPE (ex: `WS-DB-USER`) et qu'il existe un champ `WS-DB-USER-TEXT`,
+ALORS utiliser `:WS-DB-USER-TEXT` (et idem pour PASSWORD/DBNAME).
+
+✅ CORRECT (utilise les champs élémentaires *-TEXT):
+    EXEC SQL CONNECT :WS-DB-USER-TEXT IDENTIFIED BY :WS-DB-PASSWORD-TEXT
+        USING :WS-DB-NAME-TEXT
+    END-EXEC
+
+❌ FAUX (utilise un GROUPE comme host variable):
+    EXEC SQL CONNECT :WS-DB-USER IDENTIFIED BY :WS-DB-PASSWORD USING :WS-DB-NAME END-EXEC
+
+4) CURSEURS (ordre obligatoire + séquence complète)
+RÈGLE: l'ordre est STRICT et la séquence doit être cohérente dans le même paragraphe/flux.
+Tu ne peux pas OPEN/FETCH un curseur non déclaré.
+
+✅ ÉTAPE 1 — DECLARE (AVANT toute utilisation, généralement en début de paragraphe ou section dédiée):
+    EXEC SQL DECLARE cursor-name CURSOR FOR
+        SELECT col1, col2 FROM table
+    END-EXEC
+
+✅ ÉTAPE 2 — OPEN (APRÈS DECLARE):
+    EXEC SQL OPEN cursor-name END-EXEC
+
+✅ ÉTAPE 3 — FETCH (APRÈS OPEN):
+    EXEC SQL FETCH cursor-name INTO :var1, :var2 END-EXEC
+
+✅ ÉTAPE 4 — CLOSE (APRÈS FETCH et avant sortie du flux):
+    EXEC SQL CLOSE cursor-name END-EXEC
+
+INTERDIT / erreurs fréquentes:
+❌ OPEN sans DECLARE
+❌ DECLARE placé après OPEN (ou en fin de fichier)
+❌ `EXEC SQL` isolé sans statement
+❌ FETCH avant OPEN
+❌ CLOSE avant OPEN/FETCH
+
+5) RÈGLE ABSOLUE ANTI-TRAILING SPACES (données enum/status)
+Les champs COBOL `PIC X(n)` sont space-padded. Si tu écris directement `:WS-STATUS` en base,
+la base stocke souvent `OK       ` / `LOW       ` / `BLOCKED   ` au lieu de `OK` / `LOW` / `BLOCKED`.
+Ça casse ensuite les comparaisons exactes (`WHERE status = 'OK'`) et les tests stricts.
+
+Donc, pour les colonnes de type "enum/status/short string" (ex: risk_level, compliance_status, etc.),
+tu DOIS normaliser côté SQL lors de l'UPDATE/INSERT (sans changer la valeur logique):
+
+✅ CORRECT (normalisation côté SQL):
+    EXEC SQL UPDATE OPERATION
+        SET RISK_LEVEL = RTRIM(:WS-RISK-LEVEL),
+            COMPLIANCE_STATUS = RTRIM(:WS-COMPLIANCE-STATUS)
+        WHERE OP_ID = :WS-OP-ID
+    END-EXEC
+
+✅ Alternative acceptable (si RTRIM non souhaité):
+    utiliser TRIM(:var) (TRIM = enlever espaces des deux côtés)
+
+❌ FAUX (stocke la valeur paddée):
+    EXEC SQL UPDATE OPERATION
+        SET RISK_LEVEL = :WS-RISK-LEVEL
+        WHERE OP_ID = :WS-OP-ID
+    END-EXEC
+
+6) CHECK ERREUR SQL (pattern attendu)
+Après un CONNECT/UPDATE/INSERT/SELECT important, vérifier SQLCODE:
+
+    IF SQLCODE NOT EQUAL ZERO
+        DISPLAY 'ERREUR SQL: SQLCODE=' SQLCODE
+        GOBACK
+    END-IF
+
+RAPPEL:
+- Tu n'écris PAS les appels OCESQL* dans le `.cbl`.
+- Tu écris du `EXEC SQL ... END-EXEC` standard.
+- Host variables: champs élémentaires (préférer `*-TEXT` si un groupe existe).
+- Curseurs: DECLARE → OPEN → FETCH → CLOSE, dans cet ordre strict.
+- Enum/status: RTRIM/TRIM à l'écriture SQL pour éviter les espaces stockés.
+"""
+
+
+# ici ici 
+# ici ici
 
 def get_business_layer_strict_rules() -> str:
     """
