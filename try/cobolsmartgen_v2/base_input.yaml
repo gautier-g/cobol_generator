@@ -1,4 +1,4 @@
-generation_name: test
+generation_name: base_example
 
 puml_diagram: |
   @startuml

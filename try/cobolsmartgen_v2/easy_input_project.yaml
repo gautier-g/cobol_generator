@@ -1,0 +1,21 @@
+generation_name: project
+
+puml_diagram: |
+  @startuml
+  class Project {
+    PROJ_ID : integer (needed)
+    PROJ_NAME : varchar(60) (needed)
+    BUDGET : numeric(10,2) (needed)
+  }
+  @enduml
+
+database_operations_string: |
+  Donne moi un programme COBOL pour lire et sauvegarder
+  un projet.
+
+layer_operations_string: |
+  Donne moi un programme COBOL qui affiche un projet.
+
+basic_functionality_string: |
+  Donne moi un programme COBOL qui parcours les projets
+  et affiche leur budget.

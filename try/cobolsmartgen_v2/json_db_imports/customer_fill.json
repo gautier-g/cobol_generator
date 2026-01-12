@@ -1,0 +1,5 @@
+[
+  { "cust_id": 1, "cust_name": "Dupont",  "cust_city": "Paris" },
+  { "cust_id": 2, "cust_name": "Martin",  "cust_city": "Lyon" },
+  { "cust_id": 3, "cust_name": "Durand",  "cust_city": "Marseille" }
+]

@@ -1,0 +1,21 @@
+generation_name: payment
+
+puml_diagram: |
+  @startuml
+  class Payment {
+    PAY_ID : integer (needed)
+    ORDER_ID : integer (needed)
+    PAY_AMOUNT : numeric(8,2) (needed)
+  }
+  @enduml
+
+database_operations_string: |
+  Donne moi un programme COBOL pour lire et sauvegarder
+  un paiement.
+
+layer_operations_string: |
+  Donne moi un programme COBOL qui affiche un paiement.
+
+basic_functionality_string: |
+  Donne moi un programme COBOL qui parcours les paiements
+  et affiche les montants payés.

@@ -1,0 +1,23 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PROJECT-LISTER.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-ENDOFFILE           PIC X VALUE 'N'.
+       01 WS-PROJECT.
+           05 WS-PROJID          PIC 9(9).
+           05 WS-PROJNAME        PIC X(60).
+           05 WS-BUDGET          PIC 9(10)V99.
+       01 WS-OPERATION           PIC X(4) VALUE 'READ'.
+
+       PROCEDURE DIVISION.
+       MAINLOGIC.
+           PERFORM UNTIL WS-ENDOFFILE = 'Y'
+               CALL 'PROJECT-DAL-DB' USING WS-OPERATION WS-ENDOFFILE
+                   WS-PROJECT
+               IF WS-ENDOFFILE = 'N'
+                   CALL 'PROJECT-DISPLAY' USING 'DISP' WS-PROJECT
+               END-IF
+           END-PERFORM.
+
+           CALL 'PROJECT-DAL-DB' USING 'END ' WS-ENDOFFILE WS-PROJECT.
+           STOP RUN.

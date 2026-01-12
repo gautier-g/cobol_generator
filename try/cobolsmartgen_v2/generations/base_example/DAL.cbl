@@ -24,32 +24,36 @@
 
        LINKAGE SECTION.
        01 LK-OPERATION           PIC X(4).
-       01 LK-EOF                 PIC X.
+       01 LK-END-OF-FILE         PIC X.
        01 LK-EMPLOYEE.
            05 LK-EMPID           PIC 9(4).
            05 LK-EMPNAME         PIC X(30).
            05 LK-SALARYBRUT      PIC 9(6)V99.
            05 LK-SALARYNET       PIC 9(6)V99.
 
-       PROCEDURE DIVISION USING LK-OPERATION LK-EOF LK-EMPLOYEE.
-       MAIN.
+       PROCEDURE DIVISION USING LK-OPERATION LK-END-OF-FILE
+           LK-EMPLOYEE.
+       MAINLOGIC.
            EVALUATE LK-OPERATION
                WHEN 'READ'
-                   PERFORM READ-EMP
+                   PERFORM READPROC
                WHEN 'SAVE'
-                   PERFORM SAVE-EMP
+                   PERFORM SAVEPROC
                WHEN 'END '
-                   PERFORM END-DAL
+                   PERFORM ENDPROC
            END-EVALUATE.
            EXIT PROGRAM.
 
-       READ-EMP.
+       READPROC.
            IF WS-CONNECTED = 'N'
                EXEC SQL
                    CONNECT :USERNAME IDENTIFIED BY :PASSWD USING :DBNAME
                END-EXEC
+               EXEC SQL
+                   SET client_encoding TO 'LATIN1'
+               END-EXEC
                IF SQLCODE NOT = 0
-                   MOVE 'Y' TO LK-EOF
+                   MOVE 'Y' TO LK-END-OF-FILE
                    EXIT PARAGRAPH
                END-IF
                MOVE 'Y' TO WS-CONNECTED
@@ -65,7 +69,7 @@
                    OPEN CEMP
                END-EXEC
                IF SQLCODE NOT = 0
-                   MOVE 'Y' TO LK-EOF
+                   MOVE 'Y' TO LK-END-OF-FILE
                    EXIT PARAGRAPH
                END-IF
                MOVE 'Y' TO WS-CURSOR-OPEN
@@ -73,21 +77,24 @@
 
            EXEC SQL
                FETCH CEMP INTO
-                   :WS-EMPID, :WS-EMPNAME, :WS-SALARYBRUT, :WS-SALARYNET
+                   :WS-EMPID,
+                   :WS-EMPNAME,
+                   :WS-SALARYBRUT,
+                   :WS-SALARYNET
            END-EXEC.
 
            IF SQLCODE NOT = 0
-               MOVE 'Y' TO LK-EOF
+               MOVE 'Y' TO LK-END-OF-FILE
            ELSE
-               MOVE WS-EMPID      TO LK-EMPID
-               MOVE WS-EMPNAME    TO LK-EMPNAME
-               MOVE WS-SALARYBRUT TO LK-SALARYBRUT
-               MOVE WS-SALARYNET  TO LK-SALARYNET
+               MOVE WS-EMPID        TO LK-EMPID
+               MOVE WS-EMPNAME      TO LK-EMPNAME
+               MOVE WS-SALARYBRUT   TO LK-SALARYBRUT
+               MOVE WS-SALARYNET    TO LK-SALARYNET
            END-IF.
 
-       SAVE-EMP.
-           MOVE LK-EMPID      TO WS-EMPID.
-           MOVE LK-SALARYNET  TO WS-SALARYNET.
+       SAVEPROC.
+           MOVE LK-EMPID        TO WS-EMPID.
+           MOVE LK-SALARYNET    TO WS-SALARYNET.
 
            EXEC SQL
                UPDATE EMPLOYEE
@@ -95,7 +102,7 @@
                WHERE EMP_ID = :WS-EMPID
            END-EXEC.
 
-       END-DAL.
+       ENDPROC.
            IF WS-CURSOR-OPEN = 'Y'
                EXEC SQL
                    CLOSE CEMP

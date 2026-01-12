@@ -1,0 +1,4 @@
+[
+  { "inv_id": 5001, "inv_date": "2025-01-10", "total_ht": 300.00, "total_ttc": null },
+  { "inv_id": 5002, "inv_date": "2025-01-12", "total_ht": 150.00, "total_ttc": null }
+]

@@ -12,7 +12,7 @@ def generate_cobol(yaml_filename):
         raise ValueError("La clé API MISTRAL n'est pas valide.")
     
     # INITIALISATION DES VARIABLES ET DE MISTRAL
-    with open("input.yaml", "r", encoding="utf-8") as file:
+    with open(yaml_filename, "r", encoding="utf-8") as file:
         input_data = yaml.safe_load(file)
 
     generation_name = input_data["generation_name"]
@@ -93,7 +93,7 @@ def generate_cobol(yaml_filename):
     logic_template = logic_template.replace("basic_functionality", basic_functionality_string)
     
     print("Envoi de la requête pour la couche logique...")
-    business_response = client.chat.complete(
+    logic_response = client.chat.complete(
         model="mistral-large-latest",
         messages=[
             {
@@ -105,7 +105,7 @@ def generate_cobol(yaml_filename):
     
     print(f"✓ Création du fichier LOGIC.cbl...")
     with open('generations/' + generation_name + '/LOGIC.cbl', "w", encoding="utf-8") as f:
-        f.write(business_response)
+        f.write(logic_response)
     
     gen_dir = os.path.join("generations", generation_name)
 
@@ -119,7 +119,7 @@ def generate_cobol(yaml_filename):
     compute_bash_command(["cobc",
                           "-x",
                           "-o", 
-                          "EMPLOYEE",
+                          generation_name,
                           "preeqlLOGIC.cob",
                           "preeqlBUSINESS.cob",
                           "preeqlDAL.cob",

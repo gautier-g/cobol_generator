@@ -1,0 +1,20 @@
+generation_name: department
+
+puml_diagram: |
+  @startuml
+  class Department {
+    DEPT_ID : integer (needed)
+    DEPT_NAME : varchar(40) (needed)
+  }
+  @enduml
+
+database_operations_string: |
+  Donne moi un programme COBOL pour lire et sauvegarder
+  un département.
+
+layer_operations_string: |
+  Donne moi un programme COBOL qui affiche un département.
+
+basic_functionality_string: |
+  Donne moi un programme COBOL qui parcours tous les départements
+  et affiche leurs noms.

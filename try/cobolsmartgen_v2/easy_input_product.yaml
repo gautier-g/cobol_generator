@@ -1,0 +1,24 @@
+generation_name: product
+
+puml_diagram: |
+  @startuml
+  class Product {
+    PROD_ID : integer (needed)
+    PROD_NAME : varchar(50) (needed)
+    PRICE_HT : numeric(8,2) (needed)
+    PRICE_TTC : numeric(8,2) (optional)
+  }
+  @enduml
+
+database_operations_string: |
+  Donne moi un programme COBOL qui permet de parcourir la table product
+  et qui fournit des procédures pour sauvegarder un produit
+  ou lire un produit par identifiant.
+
+layer_operations_string: |
+  Donne moi un programme COBOL qui permet d'afficher un produit.
+
+basic_functionality_string: |
+  Donne moi un programme COBOL qui parcours les produits
+  et qui calcule le prix TTC à partir du prix HT
+  puis sauvegarde la valeur calculée.
