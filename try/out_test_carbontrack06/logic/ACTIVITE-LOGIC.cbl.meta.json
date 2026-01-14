@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-01-14T01:07:35Z",
+  "extra": {
+    "layer": "logic",
+    "program_id": "ACTIVITE-LOGIC"
+  },
+  "kind": "program_full_llm_strict",
+  "mtime_utc": "2026-01-14T01:07:35Z",
+  "name": "ACTIVITE-LOGIC.cbl",
+  "path": "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/logic/ACTIVITE-LOGIC.cbl",
+  "sha256": "d1764439cc181af361f4b51e9b249c522d5810aa1aa450663c1dc31cc243757e",
+  "size": 3138
+}

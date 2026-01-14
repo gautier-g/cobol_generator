@@ -1,0 +1,387 @@
+Tu generes UNIQUEMENT une liste JSON de lignes de steps (liste de strings).
+Pas de Markdown, pas d'explications, pas de code complet.
+Chaque ligne doit tenir sur 72 colonnes max (format fixed).
+Si une condition est longue, decoupe en IF imbriques ou EVALUATE.
+Utilise END-IF/END-PERFORM/END-EVALUATE.
+
+=== REGLES STRICTES (CRITIQUE) ===
+1. Format JSON uniquement: ["step1", "step2", ...]
+2. Pas d'indentation dans les steps (sera ajoutee plus tard)
+3. Maximum 72 colonnes par ligne
+4. N'invente JAMAIS de variables ou CALL targets
+5. Utilise UNIQUEMENT les mots-cles COBOL minimaux (voir liste ci-dessous)
+
+=== MOTS-CLES COBOL AUTORISES ===
+IF, ELSE, END-IF, END-CALL, MOVE, COMPUTE, ROUNDED, ADD, SUBTRACT, MULTIPLY, DIVIDE,
+DISPLAY, PERFORM, CALL, EVALUATE, WHEN, END-EVALUATE, END-PERFORM, FUNCTION,
+EXEC SQL, END-EXEC, OPEN, FETCH, CLOSE, COMMIT, ROLLBACK,
+IS NUMERIC, IS NOT NUMERIC, EQUAL, NOT EQUAL, GREATER, LESS, ZERO, OF, IN,
+CONTINUE, GOBACK, STOP RUN, INITIALIZE, SET, ACCEPT
+
+=== IDENTIFIANTS (CRITIQUE) ===
+N'invente JAMAIS de variables: utilise UNIQUEMENT les identifiants de la liste 'IDENTIFIANTS AUTORISES'.
+Chaque identifiant (WS-*, LK-*, nom de champ) doit exister dans cette liste.
+Syntaxe structure: AUTORISE 'FIELD OF STRUCTURE' ou champ direct 'FIELD'.
+INTERDIT: notation pointee (STRUCTURE.FIELD), identifiants non declares.
+NOTE: Si tu vois SALARY-BRUT et EMPLOYEE dans la liste, tu peux utiliser:
+  - 'SALARY-BRUT' seul (prefere)
+  - 'SALARY-BRUT OF EMPLOYEE' (acceptable si necessaire pour clarte)
+
+=== EXEMPLES VALIDES ===
+  MOVE SALARY-BRUT TO WS-BRUT
+  MOVE SALARY-BRUT OF EMPLOYEE TO WS-BRUT
+  COMPUTE SALARY-NET ROUNDED = WS-BRUT * 0.7
+  IF WS-BRUT IS NOT NUMERIC
+  IF WS-TOTAL < 0
+  DISPLAY 'Erreur: salaire invalide'
+  CALL 'PROGRAM-NAME' USING PARAM1 PARAM2 PARAM3  <- Utilise TOUS les params de l'interface
+  PERFORM CALCULATE-TOTAL
+  END-IF
+
+=== EXEMPLES INVALIDES ===
+  MOVE EMPLOYEE.SALARY TO WS-TOTAL  <- INTERDIT (notation pointee)
+  COMPUTE WS-NEW-VAR = 100  <- INTERDIT (WS-NEW-VAR non declare)
+  IF SALARY IS NEGATIVE  <- INTERDIT (n'existe pas, utilise: IF SALARY < 0)
+  IF SALARY IS NOT NULL  <- INTERDIT hors SQL (utilise IS NOT NUMERIC)
+  CALL 'INVENTED-PROGRAM'  <- INTERDIT (pas dans liste CALL TARGETS)
+  CALL 'PROGRAM' USING PARAM1  <- INTERDIT si l'interface definit 3 params (manque PARAM2, PARAM3)
+  PERFORM DAL-SAVE dans LOGIC  <- INTERDIT (CALL le programme DAL, pas PERFORM)
+
+=== INTERDICTIONS (CRITIQUE) ===
+INTERDIT: divisions/sections, PROGRAM-ID, paragraphes (labels avec point), DATA/WS/LINKAGE.
+INTERDIT: ligne avec un seul point.
+INTERDIT: identifiants non declares ou inventes.
+INTERDIT: IS NEGATIVE, IS POSITIVE (n'existent pas en COBOL, utilise < 0, > 0).
+INTERDIT: IS NULL hors EXEC SQL (dans COBOL normal, utilise IS NOT NUMERIC).
+INTERDIT: CALL vers programme non liste dans CALL TARGETS.
+SCOPE: uniquement les instructions du paragraphe courant (pas de nouveaux paragraphes).
+
+=== BONNES PRATIQUES (recommandations) ===
+PREFERE: COMPUTE ROUNDED au lieu de FUNCTION ROUND (plus simple).
+PREFERE: Pas de END-COMPUTE (pas necessaire en COBOL, juste COMPUTE suffit).
+AUTORISE mais moins bien: FUNCTION ROUND(...) est valide mais verbose.
+
+=== FORMAT DE SORTIE ===
+JSON uniquement, pas d'espaces en debut de ligne (l'indentation sera ajoutee plus tard).
+Format: ["instruction 1", "instruction 2", ...]
+Les steps doivent etre exploitables par un generateur COBOL.
+
+=== PRINCIPE DE MINIMALISME ===
+Genere le minimum d'instructions necessaires pour satisfaire les exigences.
+Evite les variables intermediaires inutiles.
+Privilegie les COMPUTE directs plutot que MOVE + ADD + MOVE.
+
+=== FONCTIONS INTRINSÈQUES GNUCOBOL (CRITIQUE) ===
+GnuCOBOL supporte un ensemble LIMITÉ de fonctions intrinsèques.
+
+FONCTIONS DISPONIBLES (utilise UNIQUEMENT ces fonctions):
+- FUNCTION INTEGER(x)      : Partie entière (tronque vers zéro)
+- FUNCTION ANINT(x)        : Arrondi au plus proche
+- FUNCTION MOD(x, y)       : Modulo
+- FUNCTION MAX(x, y, ...)  : Maximum
+- FUNCTION MIN(x, y, ...)  : Minimum
+- FUNCTION ABS(x)          : Valeur absolue
+- FUNCTION LENGTH(x)       : Longueur chaîne
+- FUNCTION UPPER-CASE(x)   : Majuscules
+- FUNCTION LOWER-CASE(x)   : Minuscules
+- FUNCTION TRIM(x)         : Supprimer espaces
+- FUNCTION CURRENT-DATE    : Date/heure système
+- FUNCTION WHEN-COMPILED   : Date compilation
+- FUNCTION NUMVAL(x)       : Convertir string en numérique
+
+FONCTIONS NON DISPONIBLES (N'EXISTENT PAS):
+❌ FUNCTION CEILING(x)  : N'existe pas! Utilise INTEGER(x + 0.999) à la place
+❌ FUNCTION CEIL(x)     : N'existe pas! Utilise INTEGER(x + 0.999) à la place
+❌ FUNCTION FLOOR(x)    : N'existe pas! Utilise INTEGER(x) à la place
+❌ FUNCTION ROUND(x, n) : N'existe pas! Utilise COMPUTE ... ROUNDED à la place
+❌ FUNCTION SQRT(x)     : N'existe pas!
+❌ FUNCTION POW(x, y)   : N'existe pas!
+❌ FUNCTION EXP(x)      : N'existe pas!
+❌ FUNCTION LOG(x)      : N'existe pas!
+❌ IF var NUMERIC = FALSE : N'existe pas! Utilise IF var IS NOT NUMERIC à la place
+
+ARRONDI SUPÉRIEUR (équivalent CEILING):
+Pour arrondir au supérieur, utilise cette technique:
+  COMPUTE result = FUNCTION INTEGER(value + 0.999)
+
+EXEMPLE CEILING:
+  value = 5.2  → FUNCTION INTEGER(5.2 + 0.999) = INTEGER(6.199) = 6  ✓
+  value = 5.0  → FUNCTION INTEGER(5.0 + 0.999) = INTEGER(5.999) = 5  ✓
+  value = -3.5 → FUNCTION INTEGER(-3.5 + 0.999) = INTEGER(-2.501) = -2  ✓
+
+ARRONDI STANDARD:
+Préfère toujours COMPUTE ... ROUNDED au lieu de FUNCTION:
+  ✅ CORRECT:   COMPUTE result ROUNDED = value1 * value2
+  ❌ INTERDIT:  COMPUTE result = FUNCTION ROUND(value1 * value2)
+
+VALIDATION NUMERIC:
+Utilise IS NUMERIC ou IS NOT NUMERIC pour tester si un champ alphanumérique contient des chiffres:
+  ✅ CORRECT:   IF var IS NUMERIC THEN ...
+  ✅ CORRECT:   IF var IS NOT NUMERIC THEN ...
+  ❌ INTERDIT:  IF var NUMERIC = FALSE ...
+
+IMPORTANT: Si tu dois arrondir, utilise COMPUTE ROUNDED, PAS FUNCTION ROUND.
+
+ERREUR DE COMPILATION SI TU UTILISES UNE FONCTION INEXISTANTE:
+Si tu génères FUNCTION CEILING, CEIL, FLOOR, ROUND, SQRT, POW, etc.,
+le compilateur GnuCOBOL retournera: "erreur : FUNCTION « XXX » inconnue"
+et la compilation ÉCHOUERA.
+
+
+
+=== CONTEXTE ===
+Programme: REPAS-BUSINESS
+Couche: business
+Entite: REPAS
+Fonction: DISPLAY-REPAS (required=True)
+Description: Affiche les informations principales du repas courant sur la console.
+
+=== SEPARATION DES COUCHES (CRITIQUE) ===
+COUCHE BUSINESS: Tu generes uniquement de l'affichage.
+- AUTORISE: DISPLAY, formatage de sortie
+- INTERDIT: SQL, calculs, PERFORM/CALL
+- SCOPE: Presentation des donnees uniquement
+
+=== COUCHE BUSINESS : PRÉSENTATION UNIQUEMENT (CRITIQUE) ===
+La couche BUSINESS génère UNIQUEMENT de l'affichage (présentation des données).
+
+RÈGLES STRICTES POUR BUSINESS:
+1. WORKING-STORAGE SECTION doit être VIDE (aucune variable)
+2. UN SEUL paragraphe : celui spécifié dans fonctions (ex: DISPLAY-OPERATION)
+3. UNIQUEMENT des instructions DISPLAY
+4. UNIQUEMENT le statement obligatoire final (GOBACK)
+
+AUTORISÉ DANS BUSINESS:
+- DISPLAY 'texte'
+- DISPLAY variable-linkage
+- DISPLAY 'label' variable-linkage
+- GOBACK (ou STOP RUN si spécifié)
+
+STRICTEMENT INTERDIT DANS BUSINESS:
+- ❌ COMPUTE, ADD, SUBTRACT, MULTIPLY, DIVIDE (calculs → LOGIC)
+- ❌ IF, ELSE, EVALUATE, WHEN (logique → LOGIC)
+- ❌ PERFORM (appels → LOGIC)
+- ❌ CALL (appels → LOGIC)
+- ❌ MOVE (sauf MOVE ... TO variable de travail, mais pas de variables de travail!)
+- ❌ EXEC SQL (SQL → DAL)
+- ❌ Variables WORKING-STORAGE (doivent rester vides)
+- ❌ Paragraphes multiples (un seul paragraphe autorisé)
+- ❌ Logique métier (toutes les règles R1-R7 doivent être en LOGIC)
+- ❌ Validations (IF pour contrôler valeurs → LOGIC)
+
+ARCHITECTURE 3 COUCHES:
+- DAL (Data Access Layer)    : EXEC SQL, accès base de données
+- LOGIC (Orchestration)       : PERFORM, CALL, calculs métier, validations
+- BUSINESS (Presentation)     : DISPLAY uniquement
+
+EXEMPLE CORRECT (BUSINESS):
+```cobol
+DISPLAY-OPERATION.
+    DISPLAY '----------------------------------------'
+    DISPLAY 'PRODUIT   : ' LK-PROD-NAME
+    DISPLAY 'STOCK ACT.: ' LK-STOCK-CURRENT
+    DISPLAY 'QTE REAPP.: ' LK-REORDER-QTY
+    DISPLAY '----------------------------------------'
+    GOBACK
+    .
+```
+
+EXEMPLE INCORRECT (BUSINESS):
+```cobol
+DISPLAY-OPERATION.
+    PERFORM CALCULATE-REORDER    ← INTERDIT! Pas de PERFORM
+    IF LK-STOCK-CURRENT < 0      ← INTERDIT! Pas de validation
+        MOVE 'ERROR' TO STATUS   ← INTERDIT! Pas de logique
+    END-IF
+    COMPUTE REORDER-QTY = ...    ← INTERDIT! Pas de calcul
+    DISPLAY 'PRODUIT   : ' LK-PROD-NAME
+    GOBACK
+    .
+```
+
+SI TU GÉNÈRES DE LA LOGIQUE DANS BUSINESS:
+- Le code sera rejeté lors de la validation
+- Tous les calculs, validations, et appels doivent être dans LOGIC
+- BUSINESS reçoit des données déjà calculées via LINKAGE et les affiche
+
+RAPPEL: Si les requirements contiennent des règles métier (R1-R7),
+ces règles sont pour la couche LOGIC, PAS pour BUSINESS.
+BUSINESS affiche simplement le résultat des calculs effectués par LOGIC.
+
+
+NOTE BUSINESS: Si display_lines sont fournies, les steps DOIVENT etre exactement ces lignes,
+dans le meme ordre, puis ajouter uniquement les statements obligatoires (ex: GOBACK).
+AUCUN calcul, AUCUN IF, AUCUN CALL, AUCUN SQL.
+NOTE BUSINESS (display spec): Si display (structure) est fourni et display_lines est vide,
+genere UNIQUEMENT des DISPLAY a partir du spec: label + champ cobol_name, dans le meme ordre.
+Ajouter uniquement les statements obligatoires (ex: GOBACK).
+
+=== POLITIQUE COMMIT POUR DISPLAY-REPAS ===
+⚠️  ATTENTION: cursor_commit_policy = no_commit_while_open
+Si cette fonction fait partie d'un traitement avec curseur ouvert,
+N'UTILISE PAS: EXEC SQL COMMIT END-EXEC (sauf si fonction de cloture/fin)
+
+
+=== CALL TARGETS AUTORISES ===
+Programmes COBOL:
+  - ACTIVITE-BUSINESS
+    Interface: CALL 'ACTIVITE-BUSINESS' USING LK-ACTIVITE.
+    Parametres USING (dans l'ordre):
+      LK-ACTIVITE [groupe ACTIVITE] (in)
+
+  - ACTIVITE-DAL-DB
+    Interface: CALL 'ACTIVITE-DAL-DB' USING OPERATION, END-OF-FILE, ACTIVITE.
+    Parametres USING (dans l'ordre):
+      LK-OPERATION [X(4)] (in)
+      LK-END-OF-FILE [X] (inout)
+      LK-ACTIVITE [groupe ACTIVITE] (inout)
+
+  - ACTIVITE-LOGIC
+  - ANTENNE-BUSINESS
+    Interface: CALL 'ANTENNE-BUSINESS' USING LK-ANTENNE.
+    Parametres USING (dans l'ordre):
+      LK-ANTENNE [groupe ANTENNE] (in)
+
+  - ANTENNE-DAL-DB
+    Interface: CALL 'ANTENNE-DAL-DB' USING OPERATION, END-OF-FILE, ANTENNE.
+    Parametres USING (dans l'ordre):
+      LK-OPERATION [X(4)] (in)
+      LK-END-OF-FILE [X] (inout)
+      LK-ANTENNE [groupe ANTENNE] (inout)
+
+  - ANTENNE-LOGIC
+  - HEBERGEMENT-BUSINESS
+    Interface: CALL 'HEBERGEMENT-BUSINESS' USING LK-HEBERGEMENT.
+    Parametres USING (dans l'ordre):
+      LK-HEBERGEMENT [groupe HEBERGEMENT] (in)
+
+  - HEBERGEMENT-DAL-DB
+    Interface: CALL 'HEBERGEMENT-DAL-DB' USING OPERATION, END-OF-FILE, HEBERGEMENT.
+    Parametres USING (dans l'ordre):
+      LK-OPERATION [X(4)] (in)
+      LK-END-OF-FILE [X] (inout)
+      LK-HEBERGEMENT [groupe HEBERGEMENT] (inout)
+
+  - HEBERGEMENT-LOGIC
+  - PARTICIPATION-BUSINESS
+    Interface: CALL 'PARTICIPATION-BUSINESS' USING LK-PARTICIPATION.
+    Parametres USING (dans l'ordre):
+      LK-PARTICIPATION [groupe PARTICIPATION] (in)
+
+  - PARTICIPATION-DAL-DB
+    Interface: CALL 'PARTICIPATION-DAL-DB' USING OPERATION, END-OF-FILE, PARTICIPATION.
+    Parametres USING (dans l'ordre):
+      LK-OPERATION [X(4)] (in)
+      LK-END-OF-FILE [X] (inout)
+      LK-PARTICIPATION [groupe PARTICIPATION] (inout)
+
+  - PARTICIPATION-LOGIC
+  - REPAS-DAL-DB
+    Interface: CALL 'REPAS-DAL-DB' USING OPERATION, END-OF-FILE, REPAS.
+    Parametres USING (dans l'ordre):
+      LK-OPERATION [X(4)] (in)
+      LK-END-OF-FILE [X] (inout)
+      LK-REPAS [groupe REPAS] (inout)
+
+  - REPAS-LOGIC
+  - UTILISATEUR-BUSINESS
+    Interface: CALL 'UTILISATEUR-BUSINESS' USING LK-UTILISATEUR.
+    Parametres USING (dans l'ordre):
+      LK-UTILISATEUR [groupe UTILISATEUR] (in)
+
+  - UTILISATEUR-DAL-DB
+    Interface: CALL 'UTILISATEUR-DAL-DB' USING OPERATION, END-OF-FILE, UTILISATEUR.
+    Parametres USING (dans l'ordre):
+      LK-OPERATION [X(4)] (in)
+      LK-END-OF-FILE [X] (inout)
+      LK-UTILISATEUR [groupe UTILISATEUR] (inout)
+
+  - UTILISATEUR-LOGIC
+IMPORTANT: N'utilise QUE les programmes listes ci-dessus. Inventer un CALL est INTERDIT.
+
+CRITIQUE: Pour chaque CALL vers un programme, tu DOIS passer TOUS les parametres listes
+dans 'Parametres USING (dans l'ordre)' ci-dessus, dans le MEME ORDRE, a CHAQUE appel.
+Exemple: Si un programme attend 3 parametres (A, B, C), tu dois TOUJOURS faire:
+  CALL 'PROGRAMME' USING A B C
+JAMAIS juste 'CALL PROGRAMME USING A' ou 'CALL PROGRAMME USING A B'.
+Les parametres sont OBLIGATOIRES et definis par la LINKAGE SECTION du programme appele.
+
+=== PARAGRAPHES AUTORISES (PERFORM) ===
+DISPLAY-REPAS
+IMPORTANT: Utilise PERFORM uniquement vers les paragraphes listes ci-dessus.
+
+=== ENTREES / SORTIES (noms COBOL uniquement) ===
+Inputs: (aucun)
+Outputs: (aucun)
+Modifies: (aucun)
+
+=== CHAMPS / STRUCTURE ===
+REPAS-ID [9(9)] (INT, not null)
+REPAS-ID-ACTIVITE [9(9)] (INT, not null)
+REPAS-TYPE [9(2)] (INT, not null)
+REPAS-NBREPAS [S9(5)] (INT, not null)
+
+=== WORKING-STORAGE (verbatim) ===
+WORKING-STORAGE SECTION.
+
+=== LINKAGE PARAMETERS ===
+LK-REPAS [groupe REPAS] (in)
+IMPORTANT: Utilise ces noms exacts dans USING et dans les steps.
+
+=== SQL ACTIONS (ordre obligatoire) ===
+(aucune)
+
+=== SQL (si applicable) ===
+(aucun)
+
+=== DISPLAY SPEC (structure) ===
+separator: '----------------------------------------'
+1. label='REPAS    : ', field=REPAS.REPAS_ID, cobol_name=LK-REPAS-ID
+2. label='ACTIVITE : ', field=REPAS.REPAS_ID_ACTIVITE, cobol_name=LK-REPAS-ID-ACTIVITE
+3. label='TYPE     : ', field=REPAS.REPAS_TYPE, cobol_name=LK-REPAS-TYPE
+4. label='NBREPAS  : ', field=REPAS.REPAS_NBREPAS, cobol_name=LK-REPAS-NBREPAS
+
+=== DISPLAY LINES (verbatim) ===
+(aucune)
+
+=== STATEMENTS OBLIGATOIRES ===
+GOBACK
+
+=== REGLES METIER (calculs et transformations) ===
+Aucune
+NOTE: Ces regles definissent les calculs a effectuer (ex: SALARY_NET = BRUT * 0.7).
+
+=== REGLES DE VALIDATION (controles) ===
+Aucune
+NOTE: Ces regles definissent les controles a effectuer AVANT calcul.
+Pour tester NULL/invalide en COBOL normal: utilise 'IS NOT NUMERIC' (pas 'IS NULL').
+Exemple: IF SALARY-BRUT IS NOT NUMERIC → traiter comme invalide.
+
+
+=== LOGGING ===
+----------------------------------------
+REPAS    : 
+ID       : 
+ACTIVITE : 
+TYPE     : 
+NBREPAS  : 
+
+=== FORMAT ===
+Format FIXED: instructions commencent en colonne 8 (prefixe de 7 espaces).
+Commentaires: '*' en colonne 7 (6 espaces + '*'), pas de commentaires '*>'.
+Ne pas utiliser '>>SOURCE FORMAT FREE'.
+PARAGRAPHES: Nom + point sur meme ligne. Format: MAIN-PROCESS. JAMAIS de point seul sur ligne.
+En DATA DIVISION, chaque ligne 01/05/77/88 avec PIC ou VALUE se termine par un point.
+Aucune ligne ne doit depasser 72 colonnes (format FIXED).
+Si une instruction depasse 72 colonnes, la scinder sur plusieurs lignes.
+Pour EXEC SQL FETCH/SELECT/UPDATE: mettre chaque variable hote sur sa propre ligne.
+Ne pas mettre de point en fin de DISPLAY/GOBACK/STOP RUN/CALL/MOVE/IF (sauf EXEC SQL INCLUDE SQLCA END-EXEC.).
+Utiliser des guillemets simples pour les messages DISPLAY.
+Respecter l'ordre: IDENTIFICATION -> ENVIRONMENT -> DATA -> PROCEDURE.
+Dans DATA: WORKING-STORAGE puis LINKAGE (si present).
+
+=== IDENTIFIANTS AUTORISES ===
+DISPLAY-REPAS, LK-REPAS, REPAS, REPAS-ID, REPAS-ID-ACTIVITE, REPAS-NBREPAS, REPAS-TYPE, SQLCA, SQLCODE, SQLERRMC, SQLSTATE
+
+=== SORTIE ATTENDUE ===
+Retourne un JSON valide: ["step 1", "step 2", ...]

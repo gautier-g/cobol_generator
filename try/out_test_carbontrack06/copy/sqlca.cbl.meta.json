@@ -1,0 +1,12 @@
+{
+  "created_utc": "2026-01-14T00:56:44Z",
+  "extra": {
+    "name": "sqlca"
+  },
+  "kind": "copybook",
+  "mtime_utc": "2026-01-14T00:56:44Z",
+  "name": "sqlca.cbl",
+  "path": "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/copy/sqlca.cbl",
+  "sha256": "13c9b62b49d856cd4a43a03fac9a4420519a6c38599f51219b13aeab470104e7",
+  "size": 692
+}

@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-01-14T01:03:41Z",
+  "extra": {
+    "layer": "business",
+    "program_id": "UTILISATEUR-BUSINESS"
+  },
+  "kind": "program_full_llm_strict",
+  "mtime_utc": "2026-01-14T01:03:41Z",
+  "name": "UTILISATEUR-BUSINESS.cbl",
+  "path": "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/business/UTILISATEUR-BUSINESS.cbl",
+  "sha256": "c720a4f906f3dde197d1c091f82b330c30c3ed7d040098c0051a81bf3e04bbd2",
+  "size": 1358
+}

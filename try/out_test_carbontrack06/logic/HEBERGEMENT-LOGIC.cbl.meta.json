@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-01-14T01:11:19Z",
+  "extra": {
+    "layer": "logic",
+    "program_id": "HEBERGEMENT-LOGIC"
+  },
+  "kind": "program_full_llm_strict",
+  "mtime_utc": "2026-01-14T01:11:19Z",
+  "name": "HEBERGEMENT-LOGIC.cbl",
+  "path": "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/logic/HEBERGEMENT-LOGIC.cbl",
+  "sha256": "eca4a4d7143936f59041c9c98642ca43dec94171a3d82907653bec9c9ab48022",
+  "size": 2873
+}

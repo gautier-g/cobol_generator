@@ -1,0 +1,887 @@
+{
+  "entities": [
+    {
+      "entity_name": "UTILISATEUR",
+      "inputs": [
+        {
+          "cobol_name": "USER-ID",
+          "cobol_type": "9(9)",
+          "default": null,
+          "direction": "in",
+          "name": "USER_ID",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "USER-NOM",
+          "cobol_type": "X(50)",
+          "default": null,
+          "direction": "inout",
+          "name": "USER_NOM",
+          "nullable": false,
+          "sql_type": "VARCHAR(50)",
+          "validation": {
+            "max_length": 50
+          }
+        },
+        {
+          "cobol_name": "USER-MAIL",
+          "cobol_type": "X(80)",
+          "default": null,
+          "direction": "inout",
+          "name": "USER_MAIL",
+          "nullable": false,
+          "sql_type": "VARCHAR(80)",
+          "validation": {
+            "max_length": 80
+          }
+        },
+        {
+          "cobol_name": "USER-PASS",
+          "cobol_type": "X(256)",
+          "default": null,
+          "direction": "inout",
+          "name": "USER_PASS",
+          "nullable": false,
+          "sql_type": "VARCHAR(256)",
+          "validation": {
+            "max_length": 256
+          }
+        },
+        {
+          "cobol_name": "USER-ROLE",
+          "cobol_type": "X(15)",
+          "default": null,
+          "direction": "inout",
+          "name": "USER_ROLE",
+          "nullable": false,
+          "sql_type": "VARCHAR(15)",
+          "validation": {
+            "max_length": 15
+          }
+        },
+        {
+          "cobol_name": "USER-ID-ANTENNE",
+          "cobol_type": "9(9)",
+          "default": null,
+          "direction": "in",
+          "name": "USER_ID_ANTENNE",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "USER-LAST-LOGIN",
+          "cobol_type": "S9(11)",
+          "default": null,
+          "direction": "inout",
+          "name": "USER_LAST_LOGIN",
+          "nullable": true,
+          "sql_type": "BIGINT"
+        }
+      ],
+      "name": "UTILISATEUR",
+      "outputs": [
+        {
+          "cobol_name": "USER-NOM",
+          "cobol_type": "X(50)",
+          "default": null,
+          "direction": "inout",
+          "name": "USER_NOM",
+          "nullable": false,
+          "sql_type": "VARCHAR(50)",
+          "validation": {
+            "max_length": 50
+          }
+        },
+        {
+          "cobol_name": "USER-MAIL",
+          "cobol_type": "X(80)",
+          "default": null,
+          "direction": "inout",
+          "name": "USER_MAIL",
+          "nullable": false,
+          "sql_type": "VARCHAR(80)",
+          "validation": {
+            "max_length": 80
+          }
+        },
+        {
+          "cobol_name": "USER-PASS",
+          "cobol_type": "X(256)",
+          "default": null,
+          "direction": "inout",
+          "name": "USER_PASS",
+          "nullable": false,
+          "sql_type": "VARCHAR(256)",
+          "validation": {
+            "max_length": 256
+          }
+        },
+        {
+          "cobol_name": "USER-ROLE",
+          "cobol_type": "X(15)",
+          "default": null,
+          "direction": "inout",
+          "name": "USER_ROLE",
+          "nullable": false,
+          "sql_type": "VARCHAR(15)",
+          "validation": {
+            "max_length": 15
+          }
+        },
+        {
+          "cobol_name": "USER-LAST-LOGIN",
+          "cobol_type": "S9(11)",
+          "default": null,
+          "direction": "inout",
+          "name": "USER_LAST_LOGIN",
+          "nullable": true,
+          "sql_type": "BIGINT"
+        }
+      ],
+      "procedures": [
+        {
+          "inputs": [
+            "UTILISATEUR-ID"
+          ],
+          "name": "READ-UTILISATEUR",
+          "outputs": [
+            "UTILISATEUR-RECORD"
+          ],
+          "type": "read"
+        },
+        {
+          "inputs": [
+            "UTILISATEUR-RECORD"
+          ],
+          "name": "WRITE-UTILISATEUR",
+          "outputs": [
+            "WS-RETURN-CODE"
+          ],
+          "type": "write"
+        },
+        {
+          "inputs": [
+            "UTILISATEUR-RECORD"
+          ],
+          "name": "UPDATE-UTILISATEUR",
+          "outputs": [
+            "WS-RETURN-CODE"
+          ],
+          "type": "update"
+        },
+        {
+          "inputs": [
+            "UTILISATEUR-ID"
+          ],
+          "name": "DELETE-UTILISATEUR",
+          "outputs": [
+            "WS-RETURN-CODE"
+          ],
+          "type": "delete"
+        }
+      ]
+    },
+    {
+      "entity_name": "ANTENNE",
+      "inputs": [
+        {
+          "cobol_name": "ANTENNE-ID",
+          "cobol_type": "9(9)",
+          "default": null,
+          "direction": "in",
+          "name": "ANTENNE_ID",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "ANTENNE-NOM",
+          "cobol_type": "X(50)",
+          "default": null,
+          "direction": "inout",
+          "name": "ANTENNE_NOM",
+          "nullable": false,
+          "sql_type": "VARCHAR(50)",
+          "validation": {
+            "max_length": 50
+          }
+        },
+        {
+          "cobol_name": "ANTENNE-REGION",
+          "cobol_type": "X(50)",
+          "default": null,
+          "direction": "inout",
+          "name": "ANTENNE_REGION",
+          "nullable": false,
+          "sql_type": "VARCHAR(50)",
+          "validation": {
+            "max_length": 50
+          }
+        }
+      ],
+      "name": "ANTENNE",
+      "outputs": [
+        {
+          "cobol_name": "ANTENNE-NOM",
+          "cobol_type": "X(50)",
+          "default": null,
+          "direction": "inout",
+          "name": "ANTENNE_NOM",
+          "nullable": false,
+          "sql_type": "VARCHAR(50)",
+          "validation": {
+            "max_length": 50
+          }
+        },
+        {
+          "cobol_name": "ANTENNE-REGION",
+          "cobol_type": "X(50)",
+          "default": null,
+          "direction": "inout",
+          "name": "ANTENNE_REGION",
+          "nullable": false,
+          "sql_type": "VARCHAR(50)",
+          "validation": {
+            "max_length": 50
+          }
+        }
+      ],
+      "procedures": [
+        {
+          "inputs": [
+            "ANTENNE-ID"
+          ],
+          "name": "READ-ANTENNE",
+          "outputs": [
+            "ANTENNE-RECORD"
+          ],
+          "type": "read"
+        },
+        {
+          "inputs": [
+            "ANTENNE-RECORD"
+          ],
+          "name": "WRITE-ANTENNE",
+          "outputs": [
+            "WS-RETURN-CODE"
+          ],
+          "type": "write"
+        },
+        {
+          "inputs": [
+            "ANTENNE-RECORD"
+          ],
+          "name": "UPDATE-ANTENNE",
+          "outputs": [
+            "WS-RETURN-CODE"
+          ],
+          "type": "update"
+        },
+        {
+          "inputs": [
+            "ANTENNE-ID"
+          ],
+          "name": "DELETE-ANTENNE",
+          "outputs": [
+            "WS-RETURN-CODE"
+          ],
+          "type": "delete"
+        }
+      ]
+    },
+    {
+      "entity_name": "ACTIVITE",
+      "inputs": [
+        {
+          "cobol_name": "ACTIVITE-ID",
+          "cobol_type": "9(9)",
+          "default": null,
+          "direction": "in",
+          "name": "ACTIVITE_ID",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "ACTIVITE-NOM",
+          "cobol_type": "X(50)",
+          "default": null,
+          "direction": "inout",
+          "name": "ACTIVITE_NOM",
+          "nullable": false,
+          "sql_type": "VARCHAR(50)",
+          "validation": {
+            "max_length": 50
+          }
+        },
+        {
+          "cobol_name": "ACTIVITE-TYPE",
+          "cobol_type": "X(20)",
+          "default": null,
+          "direction": "inout",
+          "name": "ACTIVITE_TYPE",
+          "nullable": false,
+          "sql_type": "VARCHAR(20)",
+          "validation": {
+            "max_length": 20
+          }
+        },
+        {
+          "cobol_name": "ACTIVITE-IDANTENNE",
+          "cobol_type": "9(9)",
+          "default": null,
+          "direction": "in",
+          "name": "ACTIVITE_IDANTENNE",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "ACTIVITE-ANIMATEUR",
+          "cobol_type": "9(9)",
+          "default": null,
+          "direction": "in",
+          "name": "ACTIVITE_ANIMATEUR",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "ACTIVITE-NBPARTICIPANTS",
+          "cobol_type": "9(9)",
+          "default": null,
+          "direction": "inout",
+          "name": "ACTIVITE_NBPARTICIPANTS",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "ACTIVITE-MODETRANSPORT",
+          "cobol_type": "9(2)",
+          "default": null,
+          "direction": "inout",
+          "name": "ACTIVITE_MODETRANSPORT",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "ACTIVITE-LIEU",
+          "cobol_type": "X(100)",
+          "default": null,
+          "direction": "inout",
+          "name": "ACTIVITE_LIEU",
+          "nullable": false,
+          "sql_type": "VARCHAR(100)",
+          "validation": {
+            "max_length": 100
+          }
+        },
+        {
+          "cobol_name": "ACTIVITE-DISTANCE",
+          "cobol_type": "9(10)",
+          "default": null,
+          "direction": "inout",
+          "name": "ACTIVITE_DISTANCE",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "ACTIVITE-HEBERGEMENT",
+          "cobol_type": "9(1)",
+          "default": null,
+          "direction": "inout",
+          "name": "ACTIVITE_HEBERGEMENT",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "ACTIVITE-REPASPREVU",
+          "cobol_type": "9(1)",
+          "default": null,
+          "direction": "inout",
+          "name": "ACTIVITE_REPASPREVU",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "ACTIVITE-EMPREINTETOTALE",
+          "cobol_type": "S9(9)V9(4)",
+          "default": null,
+          "direction": "inout",
+          "name": "ACTIVITE_EMPREINTETOTALE",
+          "nullable": true,
+          "sql_type": "DECIMAL(13,4)"
+        }
+      ],
+      "name": "ACTIVITE",
+      "outputs": [
+        {
+          "cobol_name": "ACTIVITE-NOM",
+          "cobol_type": "X(50)",
+          "default": null,
+          "direction": "inout",
+          "name": "ACTIVITE_NOM",
+          "nullable": false,
+          "sql_type": "VARCHAR(50)",
+          "validation": {
+            "max_length": 50
+          }
+        },
+        {
+          "cobol_name": "ACTIVITE-TYPE",
+          "cobol_type": "X(20)",
+          "default": null,
+          "direction": "inout",
+          "name": "ACTIVITE_TYPE",
+          "nullable": false,
+          "sql_type": "VARCHAR(20)",
+          "validation": {
+            "max_length": 20
+          }
+        },
+        {
+          "cobol_name": "ACTIVITE-NBPARTICIPANTS",
+          "cobol_type": "9(9)",
+          "default": null,
+          "direction": "inout",
+          "name": "ACTIVITE_NBPARTICIPANTS",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "ACTIVITE-MODETRANSPORT",
+          "cobol_type": "9(2)",
+          "default": null,
+          "direction": "inout",
+          "name": "ACTIVITE_MODETRANSPORT",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "ACTIVITE-LIEU",
+          "cobol_type": "X(100)",
+          "default": null,
+          "direction": "inout",
+          "name": "ACTIVITE_LIEU",
+          "nullable": false,
+          "sql_type": "VARCHAR(100)",
+          "validation": {
+            "max_length": 100
+          }
+        },
+        {
+          "cobol_name": "ACTIVITE-DISTANCE",
+          "cobol_type": "9(10)",
+          "default": null,
+          "direction": "inout",
+          "name": "ACTIVITE_DISTANCE",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "ACTIVITE-HEBERGEMENT",
+          "cobol_type": "9(1)",
+          "default": null,
+          "direction": "inout",
+          "name": "ACTIVITE_HEBERGEMENT",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "ACTIVITE-REPASPREVU",
+          "cobol_type": "9(1)",
+          "default": null,
+          "direction": "inout",
+          "name": "ACTIVITE_REPASPREVU",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "ACTIVITE-EMPREINTETOTALE",
+          "cobol_type": "S9(9)V9(4)",
+          "default": null,
+          "direction": "inout",
+          "name": "ACTIVITE_EMPREINTETOTALE",
+          "nullable": true,
+          "sql_type": "DECIMAL(13,4)"
+        }
+      ],
+      "procedures": [
+        {
+          "inputs": [
+            "ACTIVITE-ID"
+          ],
+          "name": "READ-ACTIVITE",
+          "outputs": [
+            "ACTIVITE-RECORD"
+          ],
+          "type": "read"
+        },
+        {
+          "inputs": [
+            "ACTIVITE-RECORD"
+          ],
+          "name": "WRITE-ACTIVITE",
+          "outputs": [
+            "WS-RETURN-CODE"
+          ],
+          "type": "write"
+        },
+        {
+          "inputs": [
+            "ACTIVITE-RECORD"
+          ],
+          "name": "UPDATE-ACTIVITE",
+          "outputs": [
+            "WS-RETURN-CODE"
+          ],
+          "type": "update"
+        },
+        {
+          "inputs": [
+            "ACTIVITE-ID"
+          ],
+          "name": "DELETE-ACTIVITE",
+          "outputs": [
+            "WS-RETURN-CODE"
+          ],
+          "type": "delete"
+        }
+      ]
+    },
+    {
+      "entity_name": "REPAS",
+      "inputs": [
+        {
+          "cobol_name": "REPAS-ID",
+          "cobol_type": "9(9)",
+          "default": null,
+          "direction": "in",
+          "name": "REPAS_ID",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "REPAS-ID-ACTIVITE",
+          "cobol_type": "9(9)",
+          "default": null,
+          "direction": "in",
+          "name": "REPAS_ID_ACTIVITE",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "REPAS-TYPE",
+          "cobol_type": "9(2)",
+          "default": null,
+          "direction": "inout",
+          "name": "REPAS_TYPE",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "REPAS-NBREPAS",
+          "cobol_type": "S9(5)",
+          "default": null,
+          "direction": "inout",
+          "name": "REPAS_NBREPAS",
+          "nullable": false,
+          "sql_type": "INT"
+        }
+      ],
+      "name": "REPAS",
+      "outputs": [
+        {
+          "cobol_name": "REPAS-TYPE",
+          "cobol_type": "9(2)",
+          "default": null,
+          "direction": "inout",
+          "name": "REPAS_TYPE",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "REPAS-NBREPAS",
+          "cobol_type": "S9(5)",
+          "default": null,
+          "direction": "inout",
+          "name": "REPAS_NBREPAS",
+          "nullable": false,
+          "sql_type": "INT"
+        }
+      ],
+      "procedures": [
+        {
+          "inputs": [
+            "REPAS-ID"
+          ],
+          "name": "READ-REPAS",
+          "outputs": [
+            "REPAS-RECORD"
+          ],
+          "type": "read"
+        },
+        {
+          "inputs": [
+            "REPAS-RECORD"
+          ],
+          "name": "WRITE-REPAS",
+          "outputs": [
+            "WS-RETURN-CODE"
+          ],
+          "type": "write"
+        },
+        {
+          "inputs": [
+            "REPAS-RECORD"
+          ],
+          "name": "UPDATE-REPAS",
+          "outputs": [
+            "WS-RETURN-CODE"
+          ],
+          "type": "update"
+        },
+        {
+          "inputs": [
+            "REPAS-ID"
+          ],
+          "name": "DELETE-REPAS",
+          "outputs": [
+            "WS-RETURN-CODE"
+          ],
+          "type": "delete"
+        }
+      ]
+    },
+    {
+      "entity_name": "HEBERGEMENT",
+      "inputs": [
+        {
+          "cobol_name": "HEBERGEMENT-ID",
+          "cobol_type": "9(9)",
+          "default": null,
+          "direction": "in",
+          "name": "HEBERGEMENT_ID",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "HEBERGEMENT-ID-ACTIVITE",
+          "cobol_type": "9(9)",
+          "default": null,
+          "direction": "in",
+          "name": "HEBERGEMENT_ID_ACTIVITE",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "HEBERGEMENT-TYPE",
+          "cobol_type": "9(2)",
+          "default": null,
+          "direction": "inout",
+          "name": "HEBERGEMENT_TYPE",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "HEBERGEMENT-NBNUIT",
+          "cobol_type": "S9(3)",
+          "default": null,
+          "direction": "inout",
+          "name": "HEBERGEMENT_NBNUIT",
+          "nullable": false,
+          "sql_type": "INT"
+        }
+      ],
+      "name": "HEBERGEMENT",
+      "outputs": [
+        {
+          "cobol_name": "HEBERGEMENT-TYPE",
+          "cobol_type": "9(2)",
+          "default": null,
+          "direction": "inout",
+          "name": "HEBERGEMENT_TYPE",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "HEBERGEMENT-NBNUIT",
+          "cobol_type": "S9(3)",
+          "default": null,
+          "direction": "inout",
+          "name": "HEBERGEMENT_NBNUIT",
+          "nullable": false,
+          "sql_type": "INT"
+        }
+      ],
+      "procedures": [
+        {
+          "inputs": [
+            "HEBERGEMENT-ID"
+          ],
+          "name": "READ-HEBERGEMENT",
+          "outputs": [
+            "HEBERGEMENT-RECORD"
+          ],
+          "type": "read"
+        },
+        {
+          "inputs": [
+            "HEBERGEMENT-RECORD"
+          ],
+          "name": "WRITE-HEBERGEMENT",
+          "outputs": [
+            "WS-RETURN-CODE"
+          ],
+          "type": "write"
+        },
+        {
+          "inputs": [
+            "HEBERGEMENT-RECORD"
+          ],
+          "name": "UPDATE-HEBERGEMENT",
+          "outputs": [
+            "WS-RETURN-CODE"
+          ],
+          "type": "update"
+        },
+        {
+          "inputs": [
+            "HEBERGEMENT-ID"
+          ],
+          "name": "DELETE-HEBERGEMENT",
+          "outputs": [
+            "WS-RETURN-CODE"
+          ],
+          "type": "delete"
+        }
+      ]
+    },
+    {
+      "entity_name": "PARTICIPATION",
+      "inputs": [
+        {
+          "cobol_name": "PARTICIPATION-ID-ACTIVITE",
+          "cobol_type": "9(9)",
+          "default": null,
+          "direction": "in",
+          "name": "PARTICIPATION_ID_ACTIVITE",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "PARTICIPATION-ID-USER",
+          "cobol_type": "9(9)",
+          "default": null,
+          "direction": "in",
+          "name": "PARTICIPATION_ID_USER",
+          "nullable": false,
+          "sql_type": "INT"
+        },
+        {
+          "cobol_name": "PARTICIPATION-MODE-TRANSPORT",
+          "cobol_type": "S9(2)",
+          "default": null,
+          "direction": "inout",
+          "name": "PARTICIPATION_MODE_TRANSPORT",
+          "nullable": false,
+          "sql_type": "INT"
+        }
+      ],
+      "name": "PARTICIPATION",
+      "outputs": [
+        {
+          "cobol_name": "PARTICIPATION-MODE-TRANSPORT",
+          "cobol_type": "S9(2)",
+          "default": null,
+          "direction": "inout",
+          "name": "PARTICIPATION_MODE_TRANSPORT",
+          "nullable": false,
+          "sql_type": "INT"
+        }
+      ],
+      "procedures": [
+        {
+          "inputs": [
+            "PARTICIPATION-ID"
+          ],
+          "name": "READ-PARTICIPATION",
+          "outputs": [
+            "PARTICIPATION-RECORD"
+          ],
+          "type": "read"
+        },
+        {
+          "inputs": [
+            "PARTICIPATION-RECORD"
+          ],
+          "name": "WRITE-PARTICIPATION",
+          "outputs": [
+            "WS-RETURN-CODE"
+          ],
+          "type": "write"
+        },
+        {
+          "inputs": [
+            "PARTICIPATION-RECORD"
+          ],
+          "name": "UPDATE-PARTICIPATION",
+          "outputs": [
+            "WS-RETURN-CODE"
+          ],
+          "type": "update"
+        },
+        {
+          "inputs": [
+            "PARTICIPATION-ID"
+          ],
+          "name": "DELETE-PARTICIPATION",
+          "outputs": [
+            "WS-RETURN-CODE"
+          ],
+          "type": "delete"
+        }
+      ]
+    }
+  ],
+  "global_copybooks": [
+    {
+      "fields": [
+        {
+          "cobol_type": "PIC S9(9) COMP-5",
+          "name": "SQLCODE"
+        },
+        {
+          "cobol_type": "PIC X(70)",
+          "name": "SQLERRM"
+        },
+        {
+          "cobol_type": "PIC X(5)",
+          "name": "SQLSTATE"
+        }
+      ],
+      "name": "SQLCA",
+      "purpose": "SQL Communication Area"
+    },
+    {
+      "fields": [
+        {
+          "cobol_type": "PIC S9(4) COMP",
+          "name": "WS-RETURN-CODE"
+        },
+        {
+          "cobol_type": "PIC X(255)",
+          "name": "WS-ERROR-MSG"
+        },
+        {
+          "cobol_type": "PIC X",
+          "name": "WS-STATUS"
+        }
+      ],
+      "name": "STATUS-CODES",
+      "purpose": "Standard status and error codes"
+    }
+  ],
+  "metadata": {
+    "dialect": "gnucobol",
+    "generated_at": "2026-01-14T00:56:43.995231Z",
+    "source_spec": "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/normalized_spec.json"
+  }
+}

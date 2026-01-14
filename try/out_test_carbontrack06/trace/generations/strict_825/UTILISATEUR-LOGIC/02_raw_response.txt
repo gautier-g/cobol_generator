@@ -1,0 +1,77 @@
+IDENTIFICATION DIVISION.
+       PROGRAM-ID. UTILISATEUR-LOGIC.
+      *****************************************************************
+      * Programme: UTILISATEUR-LOGIC                                  *
+      * Couche: LOGIC (Orchestration)                                 *
+      * Role: Traitement batch principal                              *
+      *       - Boucle sur les utilisateurs                           *
+      *       - Mise a jour dernier login                             *
+      *       - Sauvegarde en base                                    *
+      *       - Affichage des resultats                               *
+      *****************************************************************
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       REPOSITORY.
+           FUNCTION ALL INTRINSIC.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  END-OF-FILE            PIC X VALUE 'N'.
+           88  EOF-REACHED        VALUE 'Y'.
+           88  NOT-EOF            VALUE 'N'.
+       77  OPERATION              PIC X(4).
+       77  WS-COUNT-TOTAL         PIC 9(6) VALUE 0.
+       77  WS-COUNT-ERROR         PIC 9(6) VALUE 0.
+       01  UTILISATEUR.
+           05 USER-ID             PIC 9(9).
+           05 USER-NOM            PIC X(50).
+           05 USER-MAIL           PIC X(80).
+           05 USER-PASS           PIC X(256).
+           05 USER-ROLE           PIC X(15).
+           05 USER-ID-ANTENNE     PIC 9(9).
+           05 USER-LAST-LOGIN     PIC S9(11).
+       PROCEDURE DIVISION.
+       MAIN-PROCESS.
+           DISPLAY '=========================================='.
+           DISPLAY 'DEBUT TRAITEMENT BATCH UTILISATEURS'.
+           DISPLAY '=========================================='.
+           MOVE 'READ' TO OPERATION.
+           CALL 'UTILISATEUR-DAL-DB' USING
+                OPERATION
+                END-OF-FILE
+                UTILISATEUR.
+           PERFORM UNTIL EOF-REACHED
+               ADD 1 TO WS-COUNT-TOTAL
+               PERFORM CALCULATE-LOGIN
+               MOVE 'SAVE' TO OPERATION
+               CALL 'UTILISATEUR-DAL-DB' USING
+                    OPERATION
+                    END-OF-FILE
+                    UTILISATEUR
+               CALL 'UTILISATEUR-BUSINESS' USING UTILISATEUR
+               MOVE 'READ' TO OPERATION
+               CALL 'UTILISATEUR-DAL-DB' USING
+                    OPERATION
+                    END-OF-FILE
+                    UTILISATEUR
+           END-PERFORM.
+           MOVE 'END ' TO OPERATION.
+           CALL 'UTILISATEUR-DAL-DB' USING
+                OPERATION
+                END-OF-FILE
+                UTILISATEUR.
+           DISPLAY '=========================================='.
+           DISPLAY 'FIN TRAITEMENT BATCH UTILISATEURS'.
+           DISPLAY 'Nombre utilisateurs traites: ' WS-COUNT-TOTAL.
+           DISPLAY 'Utilisateurs en erreur: ' WS-COUNT-ERROR.
+           DISPLAY '=========================================='.
+           STOP RUN.
+
+       CALCULATE-LOGIN.
+      *****************************************************************
+      * Regle metier F1: controle dernier login                      *
+      *****************************************************************
+           IF USER-LAST-LOGIN OF UTILISATEUR < 0
+               MOVE 0 TO USER-LAST-LOGIN OF UTILISATEUR
+               ADD 1 TO WS-COUNT-ERROR
+               DISPLAY 'ANOMALIE: Dernier login invalide'
+           END-IF.

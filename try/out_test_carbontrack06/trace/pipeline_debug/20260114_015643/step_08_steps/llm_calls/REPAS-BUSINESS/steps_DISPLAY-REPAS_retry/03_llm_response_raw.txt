@@ -1,0 +1,11 @@
+```json
+[
+"DISPLAY '----------------------------------------'",
+"DISPLAY 'REPAS    : ' REPAS-ID OF LK-REPAS",
+"DISPLAY 'ACTIVITE : ' REPAS-ID-ACTIVITE OF LK-REPAS",
+"DISPLAY 'TYPE     : ' REPAS-TYPE OF LK-REPAS",
+"DISPLAY 'NBREPAS  : ' REPAS-NBREPAS OF LK-REPAS",
+"DISPLAY '----------------------------------------'",
+"GOBACK"
+]
+```

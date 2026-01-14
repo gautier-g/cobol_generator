@@ -1,0 +1,12 @@
+{
+  "created_utc": "2026-01-14T01:01:33Z",
+  "extra": {
+    "generated_functions": 28
+  },
+  "kind": "normalized_spec_steps",
+  "mtime_utc": "2026-01-14T01:01:33Z",
+  "name": "normalized_spec.json",
+  "path": "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/normalized_spec.json",
+  "sha256": "5f9b465d8dce7728605ad9c4780be221f3fdbecf7770e55691683a6a9c1a638f",
+  "size": 216945
+}

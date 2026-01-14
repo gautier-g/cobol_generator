@@ -1,0 +1,263 @@
+Reponds uniquement avec du code COBOL compilable, sans Markdown ni texte autour.
+La premiere ligne doit etre IDENTIFICATION DIVISION.
+Un seul PROGRAM-ID, pas de sous-programmes.
+Utilise strictement les identifiants, messages, SQL et sequences definis dans la spec.
+N'invente aucune variable, paragraphe, message ou SQL.
+Respecte exactement les listes de WORKING-STORAGE, LINKAGE et USING.
+Toujours utiliser les terminateurs explicites END-IF / END-EVALUATE / END-PERFORM / END-EXEC.
+Pas de GO TO, pas de logique DAL dans LOGIC, pas de SQL hors DAL.
+Toute variable utilisee doit etre declaree (WORKING-STORAGE ou LINKAGE).
+REGLE ABSOLUE PARAGRAPHES: Le nom ET le point sur la MEME ligne. Format: CALCULATE-FEES. JAMAIS de ligne avec juste un point apres.
+REGLE ABSOLUE EXEC SQL INCLUDE: EXEC SQL INCLUDE SQLCA END-EXEC. (avec point final). Autres instructions COBOL sans point final.
+REGLE ABSOLUE QUALIFICATION: Sous-champs avec OF obligatoire. Format: AMOUNT-BRUT OF OPERATION-REC.
+Dans DATA DIVISION (WORKING-STORAGE/LINKAGE), toute ligne 01/05/77/88 avec PIC ou VALUE doit se terminer par un point. Regle non applicable en PROCEDURE DIVISION.
+
+=== FONCTIONS INTRINSÈQUES GNUCOBOL (CRITIQUE) ===
+GnuCOBOL supporte un ensemble LIMITÉ de fonctions intrinsèques.
+
+FONCTIONS DISPONIBLES (utilise UNIQUEMENT ces fonctions):
+- FUNCTION INTEGER(x)      : Partie entière (tronque vers zéro)
+- FUNCTION ANINT(x)        : Arrondi au plus proche
+- FUNCTION MOD(x, y)       : Modulo
+- FUNCTION MAX(x, y, ...)  : Maximum
+- FUNCTION MIN(x, y, ...)  : Minimum
+- FUNCTION ABS(x)          : Valeur absolue
+- FUNCTION LENGTH(x)       : Longueur chaîne
+- FUNCTION UPPER-CASE(x)   : Majuscules
+- FUNCTION LOWER-CASE(x)   : Minuscules
+- FUNCTION TRIM(x)         : Supprimer espaces
+- FUNCTION CURRENT-DATE    : Date/heure système
+- FUNCTION WHEN-COMPILED   : Date compilation
+- FUNCTION NUMVAL(x)       : Convertir string en numérique
+
+FONCTIONS NON DISPONIBLES (N'EXISTENT PAS):
+❌ FUNCTION CEILING(x)  : N'existe pas! Utilise INTEGER(x + 0.999) à la place
+❌ FUNCTION CEIL(x)     : N'existe pas! Utilise INTEGER(x + 0.999) à la place
+❌ FUNCTION FLOOR(x)    : N'existe pas! Utilise INTEGER(x) à la place
+❌ FUNCTION ROUND(x, n) : N'existe pas! Utilise COMPUTE ... ROUNDED à la place
+❌ FUNCTION SQRT(x)     : N'existe pas!
+❌ FUNCTION POW(x, y)   : N'existe pas!
+❌ FUNCTION EXP(x)      : N'existe pas!
+❌ FUNCTION LOG(x)      : N'existe pas!
+❌ IF var NUMERIC = FALSE : N'existe pas! Utilise IF var IS NOT NUMERIC à la place
+
+ARRONDI SUPÉRIEUR (équivalent CEILING):
+Pour arrondir au supérieur, utilise cette technique:
+  COMPUTE result = FUNCTION INTEGER(value + 0.999)
+
+EXEMPLE CEILING:
+  value = 5.2  → FUNCTION INTEGER(5.2 + 0.999) = INTEGER(6.199) = 6  ✓
+  value = 5.0  → FUNCTION INTEGER(5.0 + 0.999) = INTEGER(5.999) = 5  ✓
+  value = -3.5 → FUNCTION INTEGER(-3.5 + 0.999) = INTEGER(-2.501) = -2  ✓
+
+ARRONDI STANDARD:
+Préfère toujours COMPUTE ... ROUNDED au lieu de FUNCTION:
+  ✅ CORRECT:   COMPUTE result ROUNDED = value1 * value2
+  ❌ INTERDIT:  COMPUTE result = FUNCTION ROUND(value1 * value2)
+
+VALIDATION NUMERIC:
+Utilise IS NUMERIC ou IS NOT NUMERIC pour tester si un champ alphanumérique contient des chiffres:
+  ✅ CORRECT:   IF var IS NUMERIC THEN ...
+  ✅ CORRECT:   IF var IS NOT NUMERIC THEN ...
+  ❌ INTERDIT:  IF var NUMERIC = FALSE ...
+
+IMPORTANT: Si tu dois arrondir, utilise COMPUTE ROUNDED, PAS FUNCTION ROUND.
+
+ERREUR DE COMPILATION SI TU UTILISES UNE FONCTION INEXISTANTE:
+Si tu génères FUNCTION CEILING, CEIL, FLOOR, ROUND, SQRT, POW, etc.,
+le compilateur GnuCOBOL retournera: "erreur : FUNCTION « XXX » inconnue"
+et la compilation ÉCHOUERA.
+
+
+=== STRATEGY ===
+1) Construis d'abord le squelette COBOL complet (DIVISION/SECTION) dans l'ordre.
+2) Insere les blocs WORKING-STORAGE/LINKAGE exacts fournis par la spec.
+3) Ecris la PROCEDURE DIVISION en suivant le flow et les fonctions.
+4) REGLE CRITIQUE FERMETURE: Pour toute fonction ouverte (OPEN cursor, EVALUATE, IF, PERFORM), tu DOIS la fermer (CLOSE, END-EVALUATE, END-IF, END-PERFORM).
+5) Verifie la coherence: aucune variable/paragraphes inventes.
+
+=== CONTEXT ===
+Programme: UTILISATEUR-LOGIC (couche logic)
+SGBD: postgres. Dialecte COBOL: gnucobol.
+Table UTILISATEUR: USER_ID INT PK, USER_NOM VARCHAR(50), USER_MAIL VARCHAR(80), USER_PASS VARCHAR(256), USER_ROLE VARCHAR(15), USER_ID_ANTENNE INT, USER_LAST_LOGIN BIGINT
+
+=== REQUIREMENTS ===
+Exigences (spec):
+[R1][regle_metier] Un utilisateur est identifie de maniere unique par son email. (notes: Aucun doublon d email n est autorise en base.)
+[R2][regle_metier] Une activite appartient a une seule antenne et possede un animateur.
+[R3][regle_metier] Une participation est definie par le couple (ID_ACTIVITE, ID_USER).
+[R4][technique] Toutes les operations BD sont realisees en COBOL embarque SQL PostgreSQL (OCESQL).
+[R5][validation] Toute erreur SQL doit etre remontee par un code retour negatif.
+
+=== STYLE ===
+Guidelines globales: Format FIXED: instructions commencent en colonne 8 (prefixe de 7 espaces).
+Commentaires: '*' en colonne 7 (6 espaces + '*'), pas de commentaires '*>'.
+Ne pas utiliser '>>SOURCE FORMAT FREE'.
+PARAGRAPHES: Nom + point sur meme ligne. Format: MAIN-PROCESS. JAMAIS de point seul sur ligne.
+En DATA DIVISION, chaque ligne 01/05/77/88 avec PIC ou VALUE se termine par un point.
+Aucune ligne ne doit depasser 72 colonnes (format FIXED).
+Si une instruction depasse 72 colonnes, la scinder sur plusieurs lignes.
+Pour EXEC SQL FETCH/SELECT/UPDATE: mettre chaque variable hote sur sa propre ligne.
+Ne pas mettre de point en fin de DISPLAY/GOBACK/STOP RUN/CALL/MOVE/IF (sauf EXEC SQL INCLUDE SQLCA END-EXEC.).
+Utiliser des guillemets simples pour les messages DISPLAY.
+Respecter l'ordre: IDENTIFICATION -> ENVIRONMENT -> DATA -> PROCEDURE.
+Dans DATA: WORKING-STORAGE puis LINKAGE (si present).
+Header commentaire (verbatim):
+      *****************************************************************
+      * Programme: UTILISATEUR-LOGIC                                  *
+      * Couche: LOGIC (Orchestration)                                 *
+      * Role: Traitement batch principal                              *
+      *       - Boucle sur les utilisateurs                           *
+      *       - Mise a jour dernier login                             *
+      *       - Sauvegarde en base                                    *
+      *       - Affichage des resultats                               *
+      *****************************************************************
+Style specifique: Utiliser commentaires de bloc pour les sections majeures.
+Afficher les bandeaux debut et fin.
+Bloc commentaire CALCULATE-LOGIN (verbatim):
+      *****************************************************************
+      * Regle metier F1: controle dernier login                      *
+      *****************************************************************
+
+=== FORMAT ===
+Format COBOL: line_format: fixed
+indent_spaces: 7
+max_line_length: 72
+comment: column=7, prefix=*
+literal_quotes: single
+paragraph_terminator: .
+allow_source_format_directive: False
+
+=== NAMING ===
+Conventions de nommage: variables_case=UPPER_SNAKE, programmes_case=UPPER-KEBAB
+prefixes: flags=WS-, linkage=LK-, working_storage=WS-
+paragraph_style: VERB-NOUN
+
+=== ENVIRONMENT ===
+ENVIRONMENT DIVISION.
+CONFIGURATION SECTION.
+REPOSITORY.
+    FUNCTION ALL INTRINSIC.
+
+=== INTERFACE ===
+Interface CALL/USING: LK-OPERATION: X(4) (direction: in); LK-END-OF-FILE: X (direction: inout); LK-ACTIVITE: groupe ACTIVITE (direction: inout)
+
+=== WORKING_STORAGE ===
+01  END-OF-FILE            PIC X VALUE 'N'.
+88  EOF-REACHED        VALUE 'Y'.
+88  NOT-EOF            VALUE 'N'.
+77  OPERATION              PIC X(4).
+77  WS-COUNT-TOTAL         PIC 9(6) VALUE 0.
+77  WS-COUNT-ERROR         PIC 9(6) VALUE 0.
+01  UTILISATEUR.
+    05 USER-ID             PIC 9(9).
+    05 USER-NOM            PIC X(50).
+    05 USER-MAIL           PIC X(80).
+    05 USER-PASS           PIC X(256).
+    05 USER-ROLE           PIC X(15).
+    05 USER-ID-ANTENNE     PIC 9(9).
+    05 USER-LAST-LOGIN     PIC S9(11).
+
+=== FLOW ===
+Afficher le bandeau de debut
+READ initial via DAL (OPERATION='READ')
+Boucle jusqu'a EOF: incrementer WS-COUNT-TOTAL, CALCULATE-LOGIN, SAVE, BUSINESS display, READ suivant
+Appeler DAL avec OPERATION='END '
+Afficher le bandeau de fin avec les compteurs
+STOP RUN
+
+=== LOGGING ===
+==========================================
+DEBUT TRAITEMENT BATCH UTILISATEURS
+==========================================
+==========================================
+FIN TRAITEMENT BATCH UTILISATEURS
+Nombre utilisateurs traites: 
+Utilisateurs en erreur: 
+==========================================
+ANOMALIE: Dernier login invalide
+
+=== CONSTRAINTS ===
+Interdictions: EXEC SQL, GO TO, *>
+Paragraphes publics attendus: MAIN-PROCESS, CALCULATE-LOGIN
+Paragraphes internes autorises: (none)
+Entry paragraph: MAIN-PROCESS
+
+=== SKELETON ===
+Squelette attendu (rappel structure):
+IDENTIFICATION DIVISION.
+PROGRAM-ID. UTILISATEUR-LOGIC.
+      *****************************************************************
+      * Programme: UTILISATEUR-LOGIC                                  *
+      * Couche: LOGIC (Orchestration)                                 *
+      * Role: Traitement batch principal                              *
+      *       - Boucle sur les utilisateurs                           *
+      *       - Mise a jour dernier login                             *
+      *       - Sauvegarde en base                                    *
+      *       - Affichage des resultats                               *
+      *****************************************************************
+ENVIRONMENT DIVISION.
+CONFIGURATION SECTION.
+REPOSITORY.
+    FUNCTION ALL INTRINSIC.
+DATA DIVISION.
+WORKING-STORAGE SECTION.
+01  END-OF-FILE            PIC X VALUE 'N'.
+88  EOF-REACHED        VALUE 'Y'.
+88  NOT-EOF            VALUE 'N'.
+77  OPERATION              PIC X(4).
+77  WS-COUNT-TOTAL         PIC 9(6) VALUE 0.
+77  WS-COUNT-ERROR         PIC 9(6) VALUE 0.
+01  UTILISATEUR.
+    05 USER-ID             PIC 9(9).
+    05 USER-NOM            PIC X(50).
+    05 USER-MAIL           PIC X(80).
+    05 USER-PASS           PIC X(256).
+    05 USER-ROLE           PIC X(15).
+    05 USER-ID-ANTENNE     PIC 9(9).
+    05 USER-LAST-LOGIN     PIC S9(11).
+PROCEDURE DIVISION.
+
+=== FONCTIONS ===
+- MAIN-PROCESS: Boucle principale du batch: lit les utilisateurs via la DAL, controle le dernier login, sauvegarde et affiche chaque utilisateur.
+  visibility: public, required: True
+  Steps:
+    - DISPLAY '=========================================='
+    - DISPLAY 'DEBUT TRAITEMENT BATCH UTILISATEURS'
+    - DISPLAY '=========================================='
+    - MOVE 'READ' TO OPERATION
+    - CALL 'UTILISATEUR-DAL-DB' USING OPERATION END-OF-FILE UTILISATEUR
+    - PERFORM UNTIL EOF-REACHED
+    - ADD 1 TO WS-COUNT-TOTAL
+    - PERFORM CALCULATE-LOGIN
+    - MOVE 'SAVE' TO OPERATION
+    - CALL 'UTILISATEUR-DAL-DB' USING OPERATION END-OF-FILE UTILISATEUR
+    - CALL 'UTILISATEUR-BUSINESS' USING UTILISATEUR
+    - MOVE 'READ' TO OPERATION
+    - CALL 'UTILISATEUR-DAL-DB' USING OPERATION END-OF-FILE UTILISATEUR
+    - END-PERFORM
+    - MOVE 'END ' TO OPERATION
+    - CALL 'UTILISATEUR-DAL-DB' USING OPERATION END-OF-FILE UTILISATEUR
+    - DISPLAY '=========================================='
+    - DISPLAY 'FIN TRAITEMENT BATCH UTILISATEURS'
+    - DISPLAY 'Nombre utilisateurs traites: ' WS-COUNT-TOTAL
+    - DISPLAY 'Utilisateurs en erreur: ' WS-COUNT-ERROR
+    - DISPLAY '=========================================='
+    - STOP RUN
+- CALCULATE-LOGIN: Controle simple: si USER_LAST_LOGIN est negatif, le remettre a zero et compter une anomalie.
+  visibility: public, required: True
+  Inputs: UTILISATEUR.USER_LAST_LOGIN
+  Outputs: UTILISATEUR.USER_LAST_LOGIN
+  Steps:
+    - IF USER-LAST-LOGIN OF UTILISATEUR < 0
+    - MOVE 0 TO USER-LAST-LOGIN OF UTILISATEUR
+    - ADD 1 TO WS-COUNT-ERROR
+    - {"DISPLAY 'ANOMALIE": "Dernier login invalide'"}
+    - END-IF
+
+Tache : genere le programme COBOL complet respectant ces contraintes (code seulement).
+
+Les erreurs suivantes ont été détectées, corrige-les strictement sans ajouter de texte explicatif:
+- Paragraphes en trop: UTILISATEUR, UTILISATEUR.
+- Instruction obligatoire manquante: CALL 'UTILISATEUR-DAL-DB' USING OPERATION, END-OF-FILE, UTILISATEUR
+- Point final interdit sur instruction (utiliser '.' uniquement sur ligne seule).

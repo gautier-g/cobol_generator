@@ -1,0 +1,26 @@
+```json
+[
+"DISPLAY '=========================================='",
+"DISPLAY 'DEBUT TRAITEMENT BATCH REPAS'",
+"DISPLAY '=========================================='",
+"MOVE 'READ' TO OPERATION",
+"CALL 'REPAS-DAL-DB' USING OPERATION END-OF-FILE REPAS",
+"PERFORM UNTIL EOF-REACHED",
+"    ADD 1 TO WS-COUNT-TOTAL",
+"    PERFORM CALCULATE-REPAS",
+"    MOVE 'SAVE' TO OPERATION",
+"    CALL 'REPAS-DAL-DB' USING OPERATION END-OF-FILE REPAS",
+"    CALL 'REPAS-BUSINESS' USING REPAS",
+"    MOVE 'READ' TO OPERATION",
+"    CALL 'REPAS-DAL-DB' USING OPERATION END-OF-FILE REPAS",
+"END-PERFORM",
+"MOVE 'END ' TO OPERATION",
+"CALL 'REPAS-DAL-DB' USING OPERATION END-OF-FILE REPAS",
+"DISPLAY '=========================================='",
+"DISPLAY 'FIN TRAITEMENT BATCH REPAS'",
+"DISPLAY 'Nombre repas traites: ' WS-COUNT-TOTAL",
+"DISPLAY 'Repas en erreur: ' WS-COUNT-ERROR",
+"DISPLAY '=========================================='",
+"STOP RUN"
+]
+```

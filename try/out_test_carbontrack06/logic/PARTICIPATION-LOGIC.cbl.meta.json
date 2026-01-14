@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-01-14T01:12:51Z",
+  "extra": {
+    "layer": "logic",
+    "program_id": "PARTICIPATION-LOGIC"
+  },
+  "kind": "program_full_llm_strict",
+  "mtime_utc": "2026-01-14T01:12:51Z",
+  "name": "PARTICIPATION-LOGIC.cbl",
+  "path": "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/logic/PARTICIPATION-LOGIC.cbl",
+  "sha256": "bdf82eb90b824a6d47862b9ec86fd51e38004d610a6ef28b081991dbe038b9ce",
+  "size": 3342
+}

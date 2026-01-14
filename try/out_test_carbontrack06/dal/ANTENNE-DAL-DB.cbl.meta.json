@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-01-14T01:04:41Z",
+  "extra": {
+    "layer": "dal",
+    "program_id": "ANTENNE-DAL-DB"
+  },
+  "kind": "program_full_llm_strict",
+  "mtime_utc": "2026-01-14T01:04:41Z",
+  "name": "ANTENNE-DAL-DB.cbl",
+  "path": "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/dal/ANTENNE-DAL-DB.cbl",
+  "sha256": "24a0d3dece20a68b83b06962615ac7c216a1b7e42404773e7c8844d1bda86b64",
+  "size": 6220
+}

@@ -1,0 +1,259 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. ACTIVITE-DAL-DB.
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       REPOSITORY.
+           FUNCTION ALL INTRINSIC.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       EXEC SQL INCLUDE SQLCA END-EXEC.
+       01  WS-CONNECTED-FLAG      PIC X VALUE 'N'.
+           88  WS-CONNECTED           VALUE 'Y'.
+       01  WS-CURSOR-OPEN-FLAG    PIC X VALUE 'N'.
+           88  WS-CURSOR-OPEN         VALUE 'Y'.
+       01  WS-ACTIVITE-ID         PIC 9(9).
+       01  WS-ACTIVITE-NOM        PIC X(50).
+       01  WS-ACTIVITE-TYPE       PIC X(20).
+       01  WS-ACTIVITE-IDANTENNE  PIC 9(9).
+       01  WS-ACTIVITE-ANIMATEUR  PIC 9(9).
+       01  WS-ACTIVITE-NBPART     PIC 9(9).
+       01  WS-ACTIVITE-TRANSPORT  PIC 9(2).
+       01  WS-ACTIVITE-LIEU       PIC X(100).
+       01  WS-ACTIVITE-DISTANCE   PIC 9(10).
+       01  WS-ACTIVITE-HEBERG     PIC 9(1).
+       01  WS-ACTIVITE-REPAS      PIC 9(1).
+       01  WS-ACTIVITE-EMPREINTE  PIC S9(9)V9(4).
+       01  WS-ANTENNE-NOM         PIC X(50).
+       01  WS-ANTENNE-REGION      PIC X(50).
+       01  WS-USER-NOM            PIC X(50).
+       01  WS-USER-MAIL           PIC X(80).
+       01  WS-DB-NAME.
+           05  WS-DB-NAME-TEXT     PIC X(13) VALUE 'carbontrackdb'.
+           05  WS-DB-NAME-TERM     PIC X VALUE X'00'.
+       01  WS-DB-USER.
+           05  WS-DB-USER-TEXT     PIC X(10) VALUE 'carbonuser'.
+           05  WS-DB-USER-TERM     PIC X VALUE X'00'.
+       01  WS-DB-PASSWORD.
+           05  WS-DB-PASSWORD-TEXT PIC X(9) VALUE 'CARBONPWD'.
+           05  WS-DB-PASSWORD-TERM PIC X VALUE X'00'.
+       01  WS-DB-NAME-LEN         PIC S9(4) COMP-5 VALUE 13.
+       01  WS-DB-USER-LEN         PIC S9(4) COMP-5 VALUE 10.
+       01  WS-DB-PASSWORD-LEN     PIC S9(4) COMP-5 VALUE 9.
+       01  WS-PGHOST-NAME         PIC X(6) VALUE 'PGHOST'.
+       01  WS-PGHOST-VALUE        PIC X(64) VALUE 'localhost'.
+       01  WS-PGPORT-NAME         PIC X(6) VALUE 'PGPORT'.
+       01  WS-PGPORT-VALUE        PIC X(5) VALUE '5432'.
+       01  WS-PGUSER-NAME         PIC X(6) VALUE 'PGUSER'.
+       01  WS-PGUSER-VALUE        PIC X(64) VALUE 'carbonuser'.
+       01  WS-PGPASSWORD-NAME     PIC X(10) VALUE 'PGPASSWORD'.
+       01  WS-PGPASSWORD-VALUE    PIC X(64) VALUE 'CARBONPWD'.
+       01  WS-PGDATABASE-NAME     PIC X(10) VALUE 'PGDATABASE'.
+       01  WS-PGDATABASE-VALUE    PIC X(64) VALUE 'carbontrackdb'.
+       LINKAGE SECTION.
+       01 LK-OPERATION           PIC X(4).
+       01 LK-END-OF-FILE         PIC X.
+       01 LK-ACTIVITE.
+           05 LK-ACTIVITE-ID         PIC 9(9).
+           05 LK-ACTIVITE-NOM        PIC X(50).
+           05 LK-ACTIVITE-TYPE       PIC X(20).
+           05 LK-ACTIVITE-IDANTENNE  PIC 9(9).
+           05 LK-ACTIVITE-ANIMATEUR  PIC 9(9).
+           05 LK-ACTIVITE-NBPART     PIC 9(9).
+           05 LK-ACTIVITE-TRANSPORT  PIC 9(2).
+           05 LK-ACTIVITE-LIEU       PIC X(100).
+           05 LK-ACTIVITE-DISTANCE   PIC 9(10).
+           05 LK-ACTIVITE-HEBERG     PIC 9(1).
+           05 LK-ACTIVITE-REPAS      PIC 9(1).
+           05 LK-ACTIVITE-EMPREINTE  PIC S9(9)V9(4).
+           05 LK-ANTENNE-NOM         PIC X(50).
+           05 LK-ANTENNE-REGION      PIC X(50).
+           05 LK-USER-NOM            PIC X(50).
+           05 LK-USER-MAIL           PIC X(80).
+       
+       PROCEDURE DIVISION USING LK-OPERATION LK-END-OF-FILE LK-ACTIVITE.
+       MAIN-ENTRY.
+           IF LK-OPERATION NOT = 'END '
+               PERFORM DAL-CONNECT
+               IF NOT WS-CONNECTED
+                   MOVE 'Y' TO LK-END-OF-FILE
+                   GOBACK
+               END-IF
+           END-IF
+           EVALUATE LK-OPERATION
+               WHEN 'READ'
+                   PERFORM DAL-READ
+               WHEN 'SAVE'
+                   PERFORM DAL-SAVE
+               WHEN 'END '
+                   PERFORM DAL-END
+               WHEN OTHER
+                   DISPLAY 'ERREUR: Operation inconnue: ' LK-OPERATION
+           END-EVALUATE
+           GOBACK.
+       
+       DAL-SET-ENV.
+           DISPLAY WS-PGHOST-NAME UPON ENVIRONMENT-NAME
+           DISPLAY WS-PGHOST-VALUE UPON ENVIRONMENT-VALUE
+           DISPLAY WS-PGPORT-NAME UPON ENVIRONMENT-NAME
+           DISPLAY WS-PGPORT-VALUE UPON ENVIRONMENT-VALUE
+           DISPLAY WS-PGUSER-NAME UPON ENVIRONMENT-NAME
+           DISPLAY WS-PGUSER-VALUE UPON ENVIRONMENT-VALUE
+           DISPLAY WS-PGPASSWORD-NAME UPON ENVIRONMENT-NAME
+           DISPLAY WS-PGPASSWORD-VALUE UPON ENVIRONMENT-VALUE
+           DISPLAY WS-PGDATABASE-NAME UPON ENVIRONMENT-NAME
+           DISPLAY WS-PGDATABASE-VALUE UPON ENVIRONMENT-VALUE
+           EXIT PARAGRAPH.
+       
+       DAL-CONNECT.
+           PERFORM DAL-SET-ENV
+           CALL "OCESQLStartSQL" END-CALL
+           CALL "OCESQLConnect" USING
+               BY REFERENCE SQLCA
+               BY REFERENCE WS-DB-USER-TEXT
+               BY VALUE WS-DB-USER-LEN
+               BY REFERENCE WS-DB-PASSWORD-TEXT
+               BY VALUE WS-DB-PASSWORD-LEN
+               BY REFERENCE WS-DB-NAME-TEXT
+               BY VALUE WS-DB-NAME-LEN
+           END-CALL
+           CALL "OCESQLEndSQL" END-CALL
+           IF SQLCODE = 0
+               MOVE 'Y' TO WS-CONNECTED-FLAG
+               DISPLAY 'carbontrackdb'
+           ELSE
+               DISPLAY 'ERREUR CONNECT: SQLCODE=' SQLCODE
+               DISPLAY 'SQLSTATE=' SQLSTATE
+               DISPLAY 'SQLERRMC=' SQLERRMC
+           END-IF
+           EXIT PARAGRAPH.
+       
+       DAL-READ.
+           IF NOT WS-CURSOR-OPEN
+               EXEC SQL DECLARE C_ACT CURSOR FOR
+                   SELECT a.ACTIVITE_ID, a.ACTIVITE_NOM, a.ACTIVITE_TYPE
+                   ,
+                          a.ACTIVITE_IDANTENNE, a.ACTIVITE_ANIMATEUR,
+                          a.ACTIVITE_NBPARTICIPANTS, 
+                          a.ACTIVITE_MODETRANSPORT,
+                          a.ACTIVITE_LIEU, a.ACTIVITE_DISTANCE,
+                          a.ACTIVITE_HEBERGEMENT,
+                          a.ACTIVITE_REPASPREVU, 
+                          a.ACTIVITE_EMPREINTETOTALE,
+                          an.ANTENNE_NOM, an.ANTENNE_REGION,
+                          u.USER_NOM, u.USER_MAIL
+                   FROM ACTIVITE a
+                   INNER JOIN ANTENNE an ON a.ACTIVITE_IDANTENNE =
+                   an.ANTENNE_ID
+                   INNER JOIN UTILISATEUR u ON a.ACTIVITE_ANIMATEUR = 
+                   u.USER_ID
+                   ORDER BY a.ACTIVITE_ID
+               END-EXEC
+               IF SQLCODE NOT EQUAL ZERO
+                   DISPLAY 'ERREUR DECLARE: SQLCODE=' SQLCODE
+                   MOVE 'Y' TO LK-END-OF-FILE
+                   EXIT PARAGRAPH
+               END-IF
+               EXEC SQL OPEN C_ACT END-EXEC
+               IF SQLCODE NOT EQUAL ZERO
+                   DISPLAY 'ERREUR OPEN: SQLCODE=' SQLCODE
+                   MOVE 'Y' TO LK-END-OF-FILE
+                   EXIT PARAGRAPH
+               END-IF
+               MOVE 'Y' TO WS-CURSOR-OPEN-FLAG
+               DISPLAY 'Curseur C_ACT ouvert'
+           END-IF
+           EXEC SQL FETCH C_ACT INTO
+               :WS-ACTIVITE-ID, :WS-ACTIVITE-NOM, :WS-ACTIVITE-TYPE,
+               :WS-ACTIVITE-IDANTENNE, :WS-ACTIVITE-ANIMATEUR,
+               :WS-ACTIVITE-NBPART,
+               :WS-ACTIVITE-TRANSPORT, :WS-ACTIVITE-LIEU,
+               :WS-ACTIVITE-DISTANCE,
+               :WS-ACTIVITE-HEBERG, :WS-ACTIVITE-REPAS, 
+               :WS-ACTIVITE-EMPREINTE,
+               :WS-ANTENNE-NOM, :WS-ANTENNE-REGION, 
+               :WS-USER-NOM, :WS-USER-MAIL
+           END-EXEC
+           IF SQLCODE EQUAL 100 OR SQLCODE NOT EQUAL ZERO
+               IF SQLCODE NOT EQUAL 100
+                   DISPLAY 'ERREUR FETCH: SQLCODE=' SQLCODE
+               END-IF
+               EXEC SQL CLOSE C_ACT END-EXEC
+               MOVE 'N' TO WS-CURSOR-OPEN-FLAG
+               MOVE 'Y' TO LK-END-OF-FILE
+               EXIT PARAGRAPH
+           END-IF
+           MOVE WS-ACTIVITE-ID TO LK-ACTIVITE-ID OF LK-ACTIVITE
+           MOVE WS-ACTIVITE-NOM TO LK-ACTIVITE-NOM OF LK-ACTIVITE
+           MOVE WS-ACTIVITE-TYPE TO LK-ACTIVITE-TYPE OF LK-ACTIVITE
+           MOVE WS-ACTIVITE-IDANTENNE TO LK-ACTIVITE-IDANTENNE OF 
+           LK-ACTIVITE
+           MOVE WS-ACTIVITE-ANIMATEUR TO LK-ACTIVITE-ANIMATEUR OF 
+           LK-ACTIVITE
+           MOVE WS-ACTIVITE-NBPART TO LK-ACTIVITE-NBPART OF LK-ACTIVITE
+           MOVE WS-ACTIVITE-TRANSPORT TO LK-ACTIVITE-TRANSPORT OF 
+           LK-ACTIVITE
+           MOVE WS-ACTIVITE-LIEU TO LK-ACTIVITE-LIEU OF LK-ACTIVITE
+           MOVE WS-ACTIVITE-DISTANCE TO LK-ACTIVITE-DISTANCE OF 
+           LK-ACTIVITE
+           MOVE WS-ACTIVITE-HEBERG TO LK-ACTIVITE-HEBERG OF LK-ACTIVITE
+           MOVE WS-ACTIVITE-REPAS TO LK-ACTIVITE-REPAS OF LK-ACTIVITE
+           MOVE WS-ACTIVITE-EMPREINTE TO LK-ACTIVITE-EMPREINTE OF 
+           LK-ACTIVITE
+           MOVE WS-ANTENNE-NOM TO LK-ANTENNE-NOM OF LK-ACTIVITE
+           MOVE WS-ANTENNE-REGION TO LK-ANTENNE-REGION OF LK-ACTIVITE
+           MOVE WS-USER-NOM TO LK-USER-NOM OF LK-ACTIVITE
+           MOVE WS-USER-MAIL TO LK-USER-MAIL OF LK-ACTIVITE
+           EXIT PARAGRAPH.
+       
+       DAL-SAVE.
+           MOVE LK-ACTIVITE-ID OF LK-ACTIVITE TO WS-ACTIVITE-ID
+           MOVE LK-ACTIVITE-EMPREINTE OF LK-ACTIVITE TO 
+           WS-ACTIVITE-EMPREINTE
+           IF WS-ACTIVITE-ID IS NOT NUMERIC OR WS-ACTIVITE-ID = ZERO
+               DISPLAY 'ERREUR: ACTIVITE-ID invalide'
+               MOVE 16 TO SQLCODE
+               EXIT PARAGRAPH
+           END-IF
+           IF WS-ACTIVITE-EMPREINTE IS NOT NUMERIC
+               DISPLAY 'ERREUR: ACTIVITE-EMPREINTETOTALE invalide'
+               MOVE 16 TO SQLCODE
+               EXIT PARAGRAPH
+           END-IF
+           EXEC SQL
+               UPDATE ACTIVITE
+               SET ACTIVITE_EMPREINTETOTALE = :WS-ACTIVITE-EMPREINTE
+               WHERE ACTIVITE_ID = :WS-ACTIVITE-ID
+           END-EXEC
+           EVALUATE SQLCODE
+               WHEN 0
+                   CONTINUE
+               WHEN OTHER
+                   DISPLAY 'ERREUR UPDATE: SQLCODE=' SQLCODE
+                   DISPLAY 'SQLSTATE=' SQLSTATE
+                   DISPLAY 'SQLERRMC=' SQLERRMC
+                   EXEC SQL ROLLBACK END-EXEC
+           END-EVALUATE
+           EXIT PARAGRAPH.
+       
+       DAL-END.
+           IF WS-CURSOR-OPEN
+               EXEC SQL CLOSE C_ACT END-EXEC
+               MOVE 'N' TO WS-CURSOR-OPEN-FLAG
+               IF SQLCODE NOT = 0
+                   DISPLAY 'ERREUR CLOSE: SQLCODE=' SQLCODE
+               END-IF
+           END-IF
+           EXEC SQL COMMIT END-EXEC
+           IF SQLCODE NOT = 0
+               DISPLAY 'ERREUR COMMIT: SQLCODE=' SQLCODE
+           END-IF
+           IF WS-CONNECTED
+               EXEC SQL DISCONNECT ALL END-EXEC
+               MOVE 'N' TO WS-CONNECTED-FLAG
+               IF SQLCODE NOT = 0
+                   DISPLAY 'ERREUR DISCONNECT: SQLCODE=' SQLCODE
+               END-IF
+               DISPLAY 'Fermeture connexion'
+           END-IF
+           EXIT PARAGRAPH.

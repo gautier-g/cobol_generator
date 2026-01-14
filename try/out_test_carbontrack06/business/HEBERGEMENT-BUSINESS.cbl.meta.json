@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-01-14T01:11:29Z",
+  "extra": {
+    "layer": "business",
+    "program_id": "HEBERGEMENT-BUSINESS"
+  },
+  "kind": "program_full_llm_strict",
+  "mtime_utc": "2026-01-14T01:11:29Z",
+  "name": "HEBERGEMENT-BUSINESS.cbl",
+  "path": "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/business/HEBERGEMENT-BUSINESS.cbl",
+  "sha256": "389277bb62f98acb12dc9e34a701ee74d25b00914cd19914270d3cdad78afb7e",
+  "size": 1142
+}

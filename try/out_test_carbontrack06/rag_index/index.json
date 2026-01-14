@@ -1,0 +1,6096 @@
+{
+  "avg_doc_length": 28.757575757575758,
+  "b": 0.75,
+  "doc_count": 66,
+  "doc_lengths": [
+    11,
+    14,
+    12,
+    10,
+    8,
+    10,
+    22,
+    14,
+    12,
+    15,
+    14,
+    22,
+    7,
+    6,
+    6,
+    6,
+    6,
+    9,
+    6,
+    12,
+    7,
+    6,
+    6,
+    33,
+    7,
+    6,
+    6,
+    9,
+    9,
+    5,
+    5,
+    6,
+    5,
+    5,
+    5,
+    8,
+    12,
+    7,
+    9,
+    5,
+    5,
+    12,
+    7,
+    9,
+    5,
+    5,
+    10,
+    11,
+    11,
+    5,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    140,
+    163,
+    862,
+    78,
+    117,
+    0,
+    6,
+    11,
+    9
+  ],
+  "document_frequencies": {
+    "0": 4,
+    "00": 1,
+    "01": 1,
+    "1": 12,
+    "10": 1,
+    "100": 2,
+    "13": 2,
+    "15": 2,
+    "2": 4,
+    "20": 2,
+    "256": 2,
+    "3": 3,
+    "30": 1,
+    "3000": 1,
+    "4": 5,
+    "4000": 1,
+    "4096": 1,
+    "5": 2,
+    "50": 7,
+    "6": 2,
+    "7": 2,
+    "8": 1,
+    "80": 2,
+    "9": 1,
+    "a": 4,
+    "above": 1,
+    "absolues": 2,
+    "absolute": 1,
+    "activite": 8,
+    "activite_animateur": 2,
+    "activite_distance": 2,
+    "activite_empreintetotale": 2,
+    "activite_hebergement": 2,
+    "activite_id": 2,
+    "activite_idantenne": 2,
+    "activite_lieu": 2,
+    "activite_modetransport": 2,
+    "activite_nbparticipants": 2,
+    "activite_nom": 2,
+    "activite_repasprevu": 2,
+    "activite_type": 2,
+    "activites": 3,
+    "adapt": 1,
+    "add": 1,
+    "adding": 1,
+    "adjust": 1,
+    "adjusting": 1,
+    "affecting": 1,
+    "after": 1,
+    "ajoute": 1,
+    "align": 1,
+    "all": 1,
+    "alone": 1,
+    "already": 1,
+    "also": 1,
+    "always": 1,
+    "an": 1,
+    "anchor": 1,
+    "anchored": 1,
+    "anchors": 1,
+    "and": 1,
+    "animateur": 1,
+    "antenne": 4,
+    "antenne_id": 2,
+    "antenne_nom": 2,
+    "antenne_region": 2,
+    "antennes": 1,
+    "any": 1,
+    "appartient": 1,
+    "appear": 1,
+    "application": 2,
+    "applicative": 1,
+    "apply": 1,
+    "are": 1,
+    "area": 1,
+    "array": 1,
+    "artifacts": 1,
+    "as": 1,
+    "associée": 1,
+    "assumptions": 1,
+    "at": 1,
+    "attribute": 33,
+    "attributes": 6,
+    "aucun": 1,
+    "aucune": 2,
+    "automatically": 1,
+    "autorise": 1,
+    "aux": 2,
+    "avec": 3,
+    "avoid": 1,
+    "b": 1,
+    "backticks": 1,
+    "base": 2,
+    "bash": 1,
+    "basiques": 1,
+    "basé": 1,
+    "basée": 1,
+    "bd": 2,
+    "be": 1,
+    "before": 1,
+    "begin": 1,
+    "below": 1,
+    "best": 1,
+    "between": 1,
+    "bigint": 2,
+    "bin": 1,
+    "block": 1,
+    "blocks": 1,
+    "bounds": 1,
+    "brief": 1,
+    "brut": 2,
+    "business": 1,
+    "but": 1,
+    "by": 1,
+    "cannot": 1,
+    "captured": 1,
+    "carbone": 2,
+    "carbontrack": 2,
+    "cause": 1,
+    "causes": 1,
+    "celles": 1,
+    "changes": 1,
+    "changing": 1,
+    "char": 1,
+    "check": 2,
+    "ci": 1,
+    "cible": 1,
+    "clearly": 1,
+    "close": 1,
+    "closed": 1,
+    "cobc": 3,
+    "cobol": 5,
+    "cobolsmartgen": 1,
+    "code": 4,
+    "codes": 1,
+    "coherent": 1,
+    "column": 1,
+    "comments": 1,
+    "common": 1,
+    "compatible": 2,
+    "compilable": 1,
+    "compilation": 2,
+    "compile": 2,
+    "compiler": 2,
+    "compiler_flags": 1,
+    "compiler_log_begin": 1,
+    "compiler_log_end": 1,
+    "compiler_name": 1,
+    "compiler_stderr": 1,
+    "compilerflags": 1,
+    "compiling": 1,
+    "complet": 1,
+    "complete": 1,
+    "complexes": 1,
+    "complexité": 1,
+    "compliquées": 1,
+    "conform": 1,
+    "constraints": 1,
+    "content": 1,
+    "context": 1,
+    "contexte": 1,
+    "contract_constraints": 1,
+    "contraintes": 3,
+    "conventions": 1,
+    "copy": 1,
+    "copy_dirs_json": 1,
+    "copybook": 1,
+    "copydirs": 1,
+    "correct": 1,
+    "couche": 1,
+    "couple": 1,
+    "cpy": 1,
+    "create": 2,
+    "creating": 1,
+    "creation": 1,
+    "création": 1,
+    "d": 3,
+    "dal": 1,
+    "dans": 2,
+    "data": 1,
+    "date": 1,
+    "db2": 1,
+    "de": 6,
+    "decimal": 4,
+    "declared": 1,
+    "defined": 1,
+    "definie": 1,
+    "dehors": 1,
+    "delete": 1,
+    "demandé": 1,
+    "des": 1,
+    "description": 1,
+    "dessus": 1,
+    "diagnosis": 1,
+    "diagnostic": 1,
+    "diagnostician": 1,
+    "dialect": 2,
+    "dialecte": 3,
+    "directory": 1,
+    "disponibles": 1,
+    "distinct": 1,
+    "division": 2,
+    "do": 1,
+    "document": 1,
+    "doit": 3,
+    "données": 3,
+    "doublon": 1,
+    "du": 2,
+    "due": 1,
+    "duplicate": 1,
+    "dupont": 1,
+    "déclarations": 1,
+    "décrite": 1,
+    "définies": 1,
+    "e": 2,
+    "each": 1,
+    "echo": 1,
+    "else": 2,
+    "email": 1,
+    "embarque": 1,
+    "emp_id": 1,
+    "emp_name": 1,
+    "employee": 1,
+    "empreinte": 1,
+    "en": 3,
+    "end": 1,
+    "ensure": 1,
+    "ensuring": 1,
+    "entities_json": 1,
+    "entity": 6,
+    "entités": 1,
+    "entrée": 2,
+    "environment": 1,
+    "eq": 1,
+    "erreur": 1,
+    "error": 2,
+    "errors": 1,
+    "es": 2,
+    "est": 4,
+    "et": 3,
+    "etc": 1,
+    "etre": 1,
+    "evaluate": 1,
+    "exact": 1,
+    "exactly": 1,
+    "exec": 1,
+    "executable": 1,
+    "exemple": 1,
+    "exigence": 1,
+    "exigences": 2,
+    "exigences_json": 2,
+    "exist": 1,
+    "existing": 1,
+    "exists": 1,
+    "exit": 1,
+    "expected": 1,
+    "expert": 3,
+    "explanation": 1,
+    "explications": 2,
+    "explicitement": 1,
+    "extra": 1,
+    "f": 1,
+    "f1": 1,
+    "f2": 1,
+    "f3": 1,
+    "f4": 1,
+    "f5": 1,
+    "failed": 1,
+    "failures": 1,
+    "fd": 1,
+    "fences": 1,
+    "fi": 1,
+    "fields": 1,
+    "file": 2,
+    "file_path": 1,
+    "filepath": 1,
+    "final": 1,
+    "find": 1,
+    "fix": 1,
+    "fixed": 1,
+    "fixes": 1,
+    "flags": 2,
+    "follow": 1,
+    "fonctionnalité": 1,
+    "fonctionnel": 1,
+    "fonctionnelles": 1,
+    "for": 2,
+    "foreign": 7,
+    "format": 3,
+    "found": 1,
+    "fournie": 1,
+    "fournies": 2,
+    "free": 3,
+    "from": 8,
+    "full": 1,
+    "g": 1,
+    "generate": 1,
+    "generated": 2,
+    "generating": 1,
+    "gerer": 4,
+    "gets": 1,
+    "gnucobol": 3,
+    "guidance": 1,
+    "génère": 3,
+    "headers": 1,
+    "hebergement": 3,
+    "hebergement_id": 2,
+    "hebergement_id_activite": 2,
+    "hebergement_nbnuit": 2,
+    "hebergement_type": 2,
+    "high": 1,
+    "hints": 1,
+    "human": 1,
+    "i": 1,
+    "ibm": 1,
+    "id": 1,
+    "id_activite": 1,
+    "id_user": 1,
+    "identification": 1,
+    "identifie": 1,
+    "identify": 1,
+    "if": 2,
+    "illegal": 1,
+    "immediately": 1,
+    "immédiatement": 2,
+    "impact": 1,
+    "implémente": 2,
+    "important": 1,
+    "in": 1,
+    "include": 1,
+    "infer": 1,
+    "inputs": 1,
+    "insert": 2,
+    "insert_after": 1,
+    "insert_before": 1,
+    "inserted": 1,
+    "inspect": 1,
+    "instructions": 2,
+    "int": 29,
+    "integer": 1,
+    "intended": 1,
+    "internally": 1,
+    "into": 1,
+    "intégrable": 1,
+    "inutile": 1,
+    "invalid": 1,
+    "invente": 1,
+    "io": 1,
+    "io_json": 2,
+    "io_summary": 1,
+    "is": 1,
+    "issue": 1,
+    "it": 1,
+    "jour": 1,
+    "json": 1,
+    "juste": 1,
+    "kebab": 1,
+    "keep": 1,
+    "key": 14,
+    "keys": 1,
+    "known": 1,
+    "l": 3,
+    "la": 2,
+    "label": 1,
+    "labels": 1,
+    "layer": 1,
+    "layer_instructions": 1,
+    "le": 4,
+    "lecture": 1,
+    "length": 1,
+    "les": 8,
+    "leur": 1,
+    "line": 2,
+    "line_format": 1,
+    "lineformat": 1,
+    "lines": 1,
+    "listées": 2,
+    "literal": 1,
+    "llm": 1,
+    "locate": 1,
+    "location": 1,
+    "log": 1,
+    "logic": 1,
+    "main": 1,
+    "maintenant": 2,
+    "makes": 1,
+    "maniere": 1,
+    "map": 1,
+    "mapping": 1,
+    "marche": 1,
+    "mark": 1,
+    "markdown": 3,
+    "marker": 1,
+    "markers": 1,
+    "martin": 1,
+    "match": 1,
+    "matching": 1,
+    "max": 1,
+    "mentionnée": 1,
+    "messages": 1,
+    "microfocus": 1,
+    "minimal": 2,
+    "minimally": 1,
+    "minimum": 1,
+    "mise": 1,
+    "missing": 1,
+    "mkdir": 1,
+    "mnemonic": 1,
+    "must": 1,
+    "mysql": 1,
+    "métier": 1,
+    "n": 10,
+    "name": 1,
+    "names": 1,
+    "naming": 1,
+    "ne": 1,
+    "near": 1,
+    "necessary": 1,
+    "needed": 1,
+    "negatif": 1,
+    "new": 1,
+    "newlines": 1,
+    "ni": 2,
+    "no": 1,
+    "nom": 2,
+    "nommage": 1,
+    "nommé": 1,
+    "non": 1,
+    "not": 2,
+    "notes": 6,
+    "nullable": 2,
+    "number": 1,
+    "o": 1,
+    "ocesql": 1,
+    "of": 34,
+    "ollama": 1,
+    "once": 1,
+    "one": 1,
+    "only": 1,
+    "op": 1,
+    "opened": 1,
+    "opening": 1,
+    "operations": 1,
+    "optional": 1,
+    "or": 1,
+    "oracle": 1,
+    "otherwise": 1,
+    "ou": 1,
+    "out": 1,
+    "output": 2,
+    "output_dir": 1,
+    "outputs": 1,
+    "overflow": 1,
+    "p": 2,
+    "par": 4,
+    "paragraph": 1,
+    "paragraphe": 1,
+    "parent": 1,
+    "parse": 1,
+    "parseable": 1,
+    "part": 1,
+    "participation": 4,
+    "participation_id_activite": 2,
+    "participation_id_user": 2,
+    "participation_mode_transport": 2,
+    "participations": 1,
+    "parts": 1,
+    "pas": 3,
+    "patch": 1,
+    "patch_plan": 1,
+    "patches": 1,
+    "path": 1,
+    "paths": 1,
+    "perform": 1,
+    "permettre": 1,
+    "pic": 1,
+    "picture": 1,
+    "plan": 1,
+    "possede": 1,
+    "possible": 1,
+    "post": 1,
+    "postgres": 2,
+    "postgresql": 1,
+    "pour": 2,
+    "precise": 1,
+    "precision": 1,
+    "prefer": 1,
+    "prefix": 1,
+    "present": 1,
+    "preserving": 1,
+    "primary": 8,
+    "procedure": 1,
+    "procedure_description": 1,
+    "procedure_name": 1,
+    "procedure_type": 1,
+    "procedures": 1,
+    "procname": 1,
+    "procs": 1,
+    "procédure": 1,
+    "produce": 1,
+    "program": 4,
+    "program_id": 4,
+    "program_name": 1,
+    "programid": 1,
+    "programme": 2,
+    "project": 1,
+    "properly": 1,
+    "propose": 1,
+    "prose": 1,
+    "provider": 1,
+    "quelques": 1,
+    "qui": 3,
+    "r1": 1,
+    "r2": 1,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "rag_chunks": 1,
+    "rag_rules": 1,
+    "rattachement": 1,
+    "read": 1,
+    "readable": 1,
+    "reading": 1,
+    "realisees": 1,
+    "reason": 1,
+    "recommend": 1,
+    "record": 1,
+    "refactors": 1,
+    "reference": 1,
+    "reformat": 1,
+    "regionales": 1,
+    "regle_metier": 3,
+    "relationship": 7,
+    "relative": 1,
+    "relevant": 1,
+    "remontee": 1,
+    "rename": 1,
+    "repas": 3,
+    "repas_id": 2,
+    "repas_id_activite": 2,
+    "repas_nbrepas": 2,
+    "repas_type": 2,
+    "replace": 1,
+    "replacement": 1,
+    "replacing": 1,
+    "reported": 1,
+    "required": 1,
+    "requirement": 1,
+    "respecte": 2,
+    "respected": 1,
+    "reste": 1,
+    "retour": 1,
+    "retrieved_rag_snippets": 1,
+    "return": 1,
+    "rien": 1,
+    "role": 1,
+    "root": 1,
+    "rules": 1,
+    "running": 1,
+    "règles": 1,
+    "s": 1,
+    "safe": 1,
+    "salary_brut": 1,
+    "salary_net": 1,
+    "sans": 2,
+    "schema": 1,
+    "script": 2,
+    "search": 1,
+    "second": 1,
+    "section": 2,
+    "senior": 1,
+    "sensitive": 1,
+    "set": 2,
+    "seule": 1,
+    "seulement": 1,
+    "sgbd": 2,
+    "short": 1,
+    "si": 1,
+    "similaire": 1,
+    "simple": 1,
+    "single": 1,
+    "smallest": 1,
+    "soit": 1,
+    "son": 1,
+    "sont": 1,
+    "sortie": 2,
+    "source": 1,
+    "source_begin": 1,
+    "source_cobol": 1,
+    "source_end": 1,
+    "specified": 1,
+    "spécifications": 2,
+    "spécifiques": 1,
+    "spécifiée": 1,
+    "spécifiées": 2,
+    "sql": 5,
+    "sql_cible": 1,
+    "sqlca": 1,
+    "sqlcode": 1,
+    "sqlite": 1,
+    "sqlserver": 1,
+    "stable": 1,
+    "statement": 1,
+    "status": 1,
+    "stderr": 1,
+    "stdout": 1,
+    "step": 1,
+    "steps": 1,
+    "still": 1,
+    "stockage": 1,
+    "stockées": 1,
+    "storage": 2,
+    "strict": 1,
+    "string": 1,
+    "strings": 1,
+    "structure": 1,
+    "stub": 1,
+    "successful": 1,
+    "suit": 1,
+    "suitable": 1,
+    "supply": 1,
+    "suppression": 1,
+    "sur": 2,
+    "surgical": 1,
+    "suspected": 1,
+    "switching": 1,
+    "syntax": 1,
+    "table": 1,
+    "target": 2,
+    "technique": 1,
+    "temperature": 1,
+    "templates": 1,
+    "test": 1,
+    "text": 1,
+    "that": 1,
+    "the": 1,
+    "them": 1,
+    "then": 1,
+    "these": 1,
+    "to": 15,
+    "tokens": 1,
+    "touching": 1,
+    "toute": 1,
+    "toutes": 2,
+    "transport": 1,
+    "triggers": 1,
+    "true": 7,
+    "tu": 2,
+    "type": 34,
+    "types": 2,
+    "tâche": 3,
+    "un": 6,
+    "undefined": 1,
+    "under": 1,
+    "une": 3,
+    "unique": 2,
+    "uniquement": 3,
+    "unknown": 1,
+    "unless": 1,
+    "unrelated": 1,
+    "unresolved": 1,
+    "update": 1,
+    "upper": 1,
+    "upper_snake": 1,
+    "ups": 1,
+    "usage": 1,
+    "use": 1,
+    "used": 1,
+    "user_id": 2,
+    "user_id_antenne": 2,
+    "user_last_login": 2,
+    "user_mail": 2,
+    "user_nom": 2,
+    "user_pass": 2,
+    "user_role": 2,
+    "utilisateur": 5,
+    "utilisateurs": 3,
+    "utilise": 2,
+    "v9": 1,
+    "valid": 1,
+    "validate": 1,
+    "validation": 1,
+    "value": 1,
+    "values": 1,
+    "varchar": 13,
+    "variable": 3,
+    "variables": 3,
+    "via": 1,
+    "viable": 1,
+    "vs": 1,
+    "wall": 1,
+    "what": 1,
+    "when": 1,
+    "wide": 1,
+    "with": 8,
+    "working": 2,
+    "wrap": 1,
+    "writable": 1,
+    "wrong": 1,
+    "ws": 2,
+    "x": 2,
+    "you": 1,
+    "être": 2
+  },
+  "documents": [
+    {
+      "id": "spec_overview",
+      "metadata": {
+        "layer": "all",
+        "source": "specification",
+        "type": "overview"
+      },
+      "text": "Project: APPLICATION-CARBONTRACK-BD-PART. COBOL Dialect: gnucobol. SQL Target: postgres",
+      "tokens": [
+        "project",
+        "application",
+        "carbontrack",
+        "bd",
+        "part",
+        "cobol",
+        "dialect",
+        "gnucobol",
+        "sql",
+        "target",
+        "postgres"
+      ]
+    },
+    {
+      "id": "func_F1",
+      "metadata": {
+        "layer": "business",
+        "source": "specification",
+        "type": "functionality"
+      },
+      "text": "F1: Gerer les utilisateurs de l application CarbonTrack (creation, lecture, mise a jour, suppression).",
+      "tokens": [
+        "f1",
+        "gerer",
+        "les",
+        "utilisateurs",
+        "de",
+        "l",
+        "application",
+        "carbontrack",
+        "creation",
+        "lecture",
+        "mise",
+        "a",
+        "jour",
+        "suppression"
+      ]
+    },
+    {
+      "id": "func_F2",
+      "metadata": {
+        "layer": "business",
+        "source": "specification",
+        "type": "functionality"
+      },
+      "text": "F2: Gerer les antennes regionales et leur rattachement aux utilisateurs et activites.",
+      "tokens": [
+        "f2",
+        "gerer",
+        "les",
+        "antennes",
+        "regionales",
+        "et",
+        "leur",
+        "rattachement",
+        "aux",
+        "utilisateurs",
+        "et",
+        "activites"
+      ]
+    },
+    {
+      "id": "func_F3",
+      "metadata": {
+        "layer": "business",
+        "source": "specification",
+        "type": "functionality"
+      },
+      "text": "F3: Gerer les activites a impact carbone (transport, hebergement, repas).",
+      "tokens": [
+        "f3",
+        "gerer",
+        "les",
+        "activites",
+        "a",
+        "impact",
+        "carbone",
+        "transport",
+        "hebergement",
+        "repas"
+      ]
+    },
+    {
+      "id": "func_F4",
+      "metadata": {
+        "layer": "business",
+        "source": "specification",
+        "type": "functionality"
+      },
+      "text": "F4: Gerer les participations des utilisateurs aux activites.",
+      "tokens": [
+        "f4",
+        "gerer",
+        "les",
+        "participations",
+        "des",
+        "utilisateurs",
+        "aux",
+        "activites"
+      ]
+    },
+    {
+      "id": "func_F5",
+      "metadata": {
+        "layer": "business",
+        "source": "specification",
+        "type": "functionality"
+      },
+      "text": "F5: Permettre le stockage de l empreinte carbone par activite.",
+      "tokens": [
+        "f5",
+        "permettre",
+        "le",
+        "stockage",
+        "de",
+        "l",
+        "empreinte",
+        "carbone",
+        "par",
+        "activite"
+      ]
+    },
+    {
+      "id": "req_R1",
+      "metadata": {
+        "layer": "logic",
+        "req_type": "regle_metier",
+        "source": "specification",
+        "type": "requirement"
+      },
+      "text": "R1 (regle_metier): Un utilisateur est identifie de maniere unique par son email.. Notes: Aucun doublon d email n est autorise en base.",
+      "tokens": [
+        "r1",
+        "regle_metier",
+        "un",
+        "utilisateur",
+        "est",
+        "identifie",
+        "de",
+        "maniere",
+        "unique",
+        "par",
+        "son",
+        "email",
+        "notes",
+        "aucun",
+        "doublon",
+        "d",
+        "email",
+        "n",
+        "est",
+        "autorise",
+        "en",
+        "base"
+      ]
+    },
+    {
+      "id": "req_R2",
+      "metadata": {
+        "layer": "logic",
+        "req_type": "regle_metier",
+        "source": "specification",
+        "type": "requirement"
+      },
+      "text": "R2 (regle_metier): Une activite appartient a une seule antenne et possede un animateur.. Notes: ",
+      "tokens": [
+        "r2",
+        "regle_metier",
+        "une",
+        "activite",
+        "appartient",
+        "a",
+        "une",
+        "seule",
+        "antenne",
+        "et",
+        "possede",
+        "un",
+        "animateur",
+        "notes"
+      ]
+    },
+    {
+      "id": "req_R3",
+      "metadata": {
+        "layer": "logic",
+        "req_type": "regle_metier",
+        "source": "specification",
+        "type": "requirement"
+      },
+      "text": "R3 (regle_metier): Une participation est definie par le couple (ID_ACTIVITE, ID_USER).. Notes: ",
+      "tokens": [
+        "r3",
+        "regle_metier",
+        "une",
+        "participation",
+        "est",
+        "definie",
+        "par",
+        "le",
+        "couple",
+        "id_activite",
+        "id_user",
+        "notes"
+      ]
+    },
+    {
+      "id": "req_R4",
+      "metadata": {
+        "layer": "logic",
+        "req_type": "technique",
+        "source": "specification",
+        "type": "requirement"
+      },
+      "text": "R4 (technique): Toutes les operations BD sont realisees en COBOL embarque SQL PostgreSQL (OCESQL).. Notes: ",
+      "tokens": [
+        "r4",
+        "technique",
+        "toutes",
+        "les",
+        "operations",
+        "bd",
+        "sont",
+        "realisees",
+        "en",
+        "cobol",
+        "embarque",
+        "sql",
+        "postgresql",
+        "ocesql",
+        "notes"
+      ]
+    },
+    {
+      "id": "req_R5",
+      "metadata": {
+        "layer": "logic",
+        "req_type": "validation",
+        "source": "specification",
+        "type": "requirement"
+      },
+      "text": "R5 (validation): Toute erreur SQL doit etre remontee par un code retour negatif.. Notes: ",
+      "tokens": [
+        "r5",
+        "validation",
+        "toute",
+        "erreur",
+        "sql",
+        "doit",
+        "etre",
+        "remontee",
+        "par",
+        "un",
+        "code",
+        "retour",
+        "negatif",
+        "notes"
+      ]
+    },
+    {
+      "id": "entity_UTILISATEUR",
+      "metadata": {
+        "entity": "UTILISATEUR",
+        "layer": "dal",
+        "source": "specification",
+        "type": "entity"
+      },
+      "text": "Entity UTILISATEUR with attributes: USER_ID (INT), USER_NOM (VARCHAR(50)), USER_MAIL (VARCHAR(80)), USER_PASS (VARCHAR(256)), USER_ROLE (VARCHAR(15)), USER_ID_ANTENNE (INT), USER_LAST_LOGIN (BIGINT)",
+      "tokens": [
+        "entity",
+        "utilisateur",
+        "with",
+        "attributes",
+        "user_id",
+        "int",
+        "user_nom",
+        "varchar",
+        "50",
+        "user_mail",
+        "varchar",
+        "80",
+        "user_pass",
+        "varchar",
+        "256",
+        "user_role",
+        "varchar",
+        "15",
+        "user_id_antenne",
+        "int",
+        "user_last_login",
+        "bigint"
+      ]
+    },
+    {
+      "id": "attr_UTILISATEUR_USER_ID",
+      "metadata": {
+        "attribute": "USER_ID",
+        "entity": "UTILISATEUR",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute USER_ID of type INT (Primary Key)",
+      "tokens": [
+        "attribute",
+        "user_id",
+        "of",
+        "type",
+        "int",
+        "primary",
+        "key"
+      ]
+    },
+    {
+      "id": "attr_UTILISATEUR_USER_NOM",
+      "metadata": {
+        "attribute": "USER_NOM",
+        "entity": "UTILISATEUR",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute USER_NOM of type VARCHAR(50)",
+      "tokens": [
+        "attribute",
+        "user_nom",
+        "of",
+        "type",
+        "varchar",
+        "50"
+      ]
+    },
+    {
+      "id": "attr_UTILISATEUR_USER_MAIL",
+      "metadata": {
+        "attribute": "USER_MAIL",
+        "entity": "UTILISATEUR",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute USER_MAIL of type VARCHAR(80)",
+      "tokens": [
+        "attribute",
+        "user_mail",
+        "of",
+        "type",
+        "varchar",
+        "80"
+      ]
+    },
+    {
+      "id": "attr_UTILISATEUR_USER_PASS",
+      "metadata": {
+        "attribute": "USER_PASS",
+        "entity": "UTILISATEUR",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute USER_PASS of type VARCHAR(256)",
+      "tokens": [
+        "attribute",
+        "user_pass",
+        "of",
+        "type",
+        "varchar",
+        "256"
+      ]
+    },
+    {
+      "id": "attr_UTILISATEUR_USER_ROLE",
+      "metadata": {
+        "attribute": "USER_ROLE",
+        "entity": "UTILISATEUR",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute USER_ROLE of type VARCHAR(15)",
+      "tokens": [
+        "attribute",
+        "user_role",
+        "of",
+        "type",
+        "varchar",
+        "15"
+      ]
+    },
+    {
+      "id": "attr_UTILISATEUR_USER_ID_ANTENNE",
+      "metadata": {
+        "attribute": "USER_ID_ANTENNE",
+        "entity": "UTILISATEUR",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute USER_ID_ANTENNE of type INT (Foreign Key to True)",
+      "tokens": [
+        "attribute",
+        "user_id_antenne",
+        "of",
+        "type",
+        "int",
+        "foreign",
+        "key",
+        "to",
+        "true"
+      ]
+    },
+    {
+      "id": "attr_UTILISATEUR_USER_LAST_LOGIN",
+      "metadata": {
+        "attribute": "USER_LAST_LOGIN",
+        "entity": "UTILISATEUR",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute USER_LAST_LOGIN of type BIGINT (Nullable)",
+      "tokens": [
+        "attribute",
+        "user_last_login",
+        "of",
+        "type",
+        "bigint",
+        "nullable"
+      ]
+    },
+    {
+      "id": "entity_ANTENNE",
+      "metadata": {
+        "entity": "ANTENNE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "entity"
+      },
+      "text": "Entity ANTENNE with attributes: ANTENNE_ID (INT), ANTENNE_NOM (VARCHAR(50)), ANTENNE_REGION (VARCHAR(50))",
+      "tokens": [
+        "entity",
+        "antenne",
+        "with",
+        "attributes",
+        "antenne_id",
+        "int",
+        "antenne_nom",
+        "varchar",
+        "50",
+        "antenne_region",
+        "varchar",
+        "50"
+      ]
+    },
+    {
+      "id": "attr_ANTENNE_ANTENNE_ID",
+      "metadata": {
+        "attribute": "ANTENNE_ID",
+        "entity": "ANTENNE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ANTENNE_ID of type INT (Primary Key)",
+      "tokens": [
+        "attribute",
+        "antenne_id",
+        "of",
+        "type",
+        "int",
+        "primary",
+        "key"
+      ]
+    },
+    {
+      "id": "attr_ANTENNE_ANTENNE_NOM",
+      "metadata": {
+        "attribute": "ANTENNE_NOM",
+        "entity": "ANTENNE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ANTENNE_NOM of type VARCHAR(50)",
+      "tokens": [
+        "attribute",
+        "antenne_nom",
+        "of",
+        "type",
+        "varchar",
+        "50"
+      ]
+    },
+    {
+      "id": "attr_ANTENNE_ANTENNE_REGION",
+      "metadata": {
+        "attribute": "ANTENNE_REGION",
+        "entity": "ANTENNE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ANTENNE_REGION of type VARCHAR(50)",
+      "tokens": [
+        "attribute",
+        "antenne_region",
+        "of",
+        "type",
+        "varchar",
+        "50"
+      ]
+    },
+    {
+      "id": "entity_ACTIVITE",
+      "metadata": {
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "entity"
+      },
+      "text": "Entity ACTIVITE with attributes: ACTIVITE_ID (INT), ACTIVITE_NOM (VARCHAR(50)), ACTIVITE_TYPE (VARCHAR(20)), ACTIVITE_IDANTENNE (INT), ACTIVITE_ANIMATEUR (INT), ACTIVITE_NBPARTICIPANTS (INT), ACTIVITE_MODETRANSPORT (INT), ACTIVITE_LIEU (VARCHAR(100)), ACTIVITE_DISTANCE (INT), ACTIVITE_HEBERGEMENT (INT), ACTIVITE_REPASPREVU (INT), ACTIVITE_EMPREINTETOTALE (DECIMAL(13,4))",
+      "tokens": [
+        "entity",
+        "activite",
+        "with",
+        "attributes",
+        "activite_id",
+        "int",
+        "activite_nom",
+        "varchar",
+        "50",
+        "activite_type",
+        "varchar",
+        "20",
+        "activite_idantenne",
+        "int",
+        "activite_animateur",
+        "int",
+        "activite_nbparticipants",
+        "int",
+        "activite_modetransport",
+        "int",
+        "activite_lieu",
+        "varchar",
+        "100",
+        "activite_distance",
+        "int",
+        "activite_hebergement",
+        "int",
+        "activite_repasprevu",
+        "int",
+        "activite_empreintetotale",
+        "decimal",
+        "13",
+        "4"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_ID",
+      "metadata": {
+        "attribute": "ACTIVITE_ID",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_ID of type INT (Primary Key)",
+      "tokens": [
+        "attribute",
+        "activite_id",
+        "of",
+        "type",
+        "int",
+        "primary",
+        "key"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_NOM",
+      "metadata": {
+        "attribute": "ACTIVITE_NOM",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_NOM of type VARCHAR(50)",
+      "tokens": [
+        "attribute",
+        "activite_nom",
+        "of",
+        "type",
+        "varchar",
+        "50"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_TYPE",
+      "metadata": {
+        "attribute": "ACTIVITE_TYPE",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_TYPE of type VARCHAR(20)",
+      "tokens": [
+        "attribute",
+        "activite_type",
+        "of",
+        "type",
+        "varchar",
+        "20"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_IDANTENNE",
+      "metadata": {
+        "attribute": "ACTIVITE_IDANTENNE",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_IDANTENNE of type INT (Foreign Key to True)",
+      "tokens": [
+        "attribute",
+        "activite_idantenne",
+        "of",
+        "type",
+        "int",
+        "foreign",
+        "key",
+        "to",
+        "true"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_ANIMATEUR",
+      "metadata": {
+        "attribute": "ACTIVITE_ANIMATEUR",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_ANIMATEUR of type INT (Foreign Key to True)",
+      "tokens": [
+        "attribute",
+        "activite_animateur",
+        "of",
+        "type",
+        "int",
+        "foreign",
+        "key",
+        "to",
+        "true"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_NBPARTICIPANTS",
+      "metadata": {
+        "attribute": "ACTIVITE_NBPARTICIPANTS",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_NBPARTICIPANTS of type INT",
+      "tokens": [
+        "attribute",
+        "activite_nbparticipants",
+        "of",
+        "type",
+        "int"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_MODETRANSPORT",
+      "metadata": {
+        "attribute": "ACTIVITE_MODETRANSPORT",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_MODETRANSPORT of type INT",
+      "tokens": [
+        "attribute",
+        "activite_modetransport",
+        "of",
+        "type",
+        "int"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_LIEU",
+      "metadata": {
+        "attribute": "ACTIVITE_LIEU",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_LIEU of type VARCHAR(100)",
+      "tokens": [
+        "attribute",
+        "activite_lieu",
+        "of",
+        "type",
+        "varchar",
+        "100"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_DISTANCE",
+      "metadata": {
+        "attribute": "ACTIVITE_DISTANCE",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_DISTANCE of type INT",
+      "tokens": [
+        "attribute",
+        "activite_distance",
+        "of",
+        "type",
+        "int"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_HEBERGEMENT",
+      "metadata": {
+        "attribute": "ACTIVITE_HEBERGEMENT",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_HEBERGEMENT of type INT",
+      "tokens": [
+        "attribute",
+        "activite_hebergement",
+        "of",
+        "type",
+        "int"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_REPASPREVU",
+      "metadata": {
+        "attribute": "ACTIVITE_REPASPREVU",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_REPASPREVU of type INT",
+      "tokens": [
+        "attribute",
+        "activite_repasprevu",
+        "of",
+        "type",
+        "int"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_EMPREINTETOTALE",
+      "metadata": {
+        "attribute": "ACTIVITE_EMPREINTETOTALE",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_EMPREINTETOTALE of type DECIMAL(13,4) (Nullable)",
+      "tokens": [
+        "attribute",
+        "activite_empreintetotale",
+        "of",
+        "type",
+        "decimal",
+        "13",
+        "4",
+        "nullable"
+      ]
+    },
+    {
+      "id": "entity_REPAS",
+      "metadata": {
+        "entity": "REPAS",
+        "layer": "dal",
+        "source": "specification",
+        "type": "entity"
+      },
+      "text": "Entity REPAS with attributes: REPAS_ID (INT), REPAS_ID_ACTIVITE (INT), REPAS_TYPE (INT), REPAS_NBREPAS (INT)",
+      "tokens": [
+        "entity",
+        "repas",
+        "with",
+        "attributes",
+        "repas_id",
+        "int",
+        "repas_id_activite",
+        "int",
+        "repas_type",
+        "int",
+        "repas_nbrepas",
+        "int"
+      ]
+    },
+    {
+      "id": "attr_REPAS_REPAS_ID",
+      "metadata": {
+        "attribute": "REPAS_ID",
+        "entity": "REPAS",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute REPAS_ID of type INT (Primary Key)",
+      "tokens": [
+        "attribute",
+        "repas_id",
+        "of",
+        "type",
+        "int",
+        "primary",
+        "key"
+      ]
+    },
+    {
+      "id": "attr_REPAS_REPAS_ID_ACTIVITE",
+      "metadata": {
+        "attribute": "REPAS_ID_ACTIVITE",
+        "entity": "REPAS",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute REPAS_ID_ACTIVITE of type INT (Foreign Key to True)",
+      "tokens": [
+        "attribute",
+        "repas_id_activite",
+        "of",
+        "type",
+        "int",
+        "foreign",
+        "key",
+        "to",
+        "true"
+      ]
+    },
+    {
+      "id": "attr_REPAS_REPAS_TYPE",
+      "metadata": {
+        "attribute": "REPAS_TYPE",
+        "entity": "REPAS",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute REPAS_TYPE of type INT",
+      "tokens": [
+        "attribute",
+        "repas_type",
+        "of",
+        "type",
+        "int"
+      ]
+    },
+    {
+      "id": "attr_REPAS_REPAS_NBREPAS",
+      "metadata": {
+        "attribute": "REPAS_NBREPAS",
+        "entity": "REPAS",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute REPAS_NBREPAS of type INT",
+      "tokens": [
+        "attribute",
+        "repas_nbrepas",
+        "of",
+        "type",
+        "int"
+      ]
+    },
+    {
+      "id": "entity_HEBERGEMENT",
+      "metadata": {
+        "entity": "HEBERGEMENT",
+        "layer": "dal",
+        "source": "specification",
+        "type": "entity"
+      },
+      "text": "Entity HEBERGEMENT with attributes: HEBERGEMENT_ID (INT), HEBERGEMENT_ID_ACTIVITE (INT), HEBERGEMENT_TYPE (INT), HEBERGEMENT_NBNUIT (INT)",
+      "tokens": [
+        "entity",
+        "hebergement",
+        "with",
+        "attributes",
+        "hebergement_id",
+        "int",
+        "hebergement_id_activite",
+        "int",
+        "hebergement_type",
+        "int",
+        "hebergement_nbnuit",
+        "int"
+      ]
+    },
+    {
+      "id": "attr_HEBERGEMENT_HEBERGEMENT_ID",
+      "metadata": {
+        "attribute": "HEBERGEMENT_ID",
+        "entity": "HEBERGEMENT",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute HEBERGEMENT_ID of type INT (Primary Key)",
+      "tokens": [
+        "attribute",
+        "hebergement_id",
+        "of",
+        "type",
+        "int",
+        "primary",
+        "key"
+      ]
+    },
+    {
+      "id": "attr_HEBERGEMENT_HEBERGEMENT_ID_ACTIVITE",
+      "metadata": {
+        "attribute": "HEBERGEMENT_ID_ACTIVITE",
+        "entity": "HEBERGEMENT",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute HEBERGEMENT_ID_ACTIVITE of type INT (Foreign Key to True)",
+      "tokens": [
+        "attribute",
+        "hebergement_id_activite",
+        "of",
+        "type",
+        "int",
+        "foreign",
+        "key",
+        "to",
+        "true"
+      ]
+    },
+    {
+      "id": "attr_HEBERGEMENT_HEBERGEMENT_TYPE",
+      "metadata": {
+        "attribute": "HEBERGEMENT_TYPE",
+        "entity": "HEBERGEMENT",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute HEBERGEMENT_TYPE of type INT",
+      "tokens": [
+        "attribute",
+        "hebergement_type",
+        "of",
+        "type",
+        "int"
+      ]
+    },
+    {
+      "id": "attr_HEBERGEMENT_HEBERGEMENT_NBNUIT",
+      "metadata": {
+        "attribute": "HEBERGEMENT_NBNUIT",
+        "entity": "HEBERGEMENT",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute HEBERGEMENT_NBNUIT of type INT",
+      "tokens": [
+        "attribute",
+        "hebergement_nbnuit",
+        "of",
+        "type",
+        "int"
+      ]
+    },
+    {
+      "id": "entity_PARTICIPATION",
+      "metadata": {
+        "entity": "PARTICIPATION",
+        "layer": "dal",
+        "source": "specification",
+        "type": "entity"
+      },
+      "text": "Entity PARTICIPATION with attributes: PARTICIPATION_ID_ACTIVITE (INT), PARTICIPATION_ID_USER (INT), PARTICIPATION_MODE_TRANSPORT (INT)",
+      "tokens": [
+        "entity",
+        "participation",
+        "with",
+        "attributes",
+        "participation_id_activite",
+        "int",
+        "participation_id_user",
+        "int",
+        "participation_mode_transport",
+        "int"
+      ]
+    },
+    {
+      "id": "attr_PARTICIPATION_PARTICIPATION_ID_ACTIVITE",
+      "metadata": {
+        "attribute": "PARTICIPATION_ID_ACTIVITE",
+        "entity": "PARTICIPATION",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute PARTICIPATION_ID_ACTIVITE of type INT (Primary Key) (Foreign Key to True)",
+      "tokens": [
+        "attribute",
+        "participation_id_activite",
+        "of",
+        "type",
+        "int",
+        "primary",
+        "key",
+        "foreign",
+        "key",
+        "to",
+        "true"
+      ]
+    },
+    {
+      "id": "attr_PARTICIPATION_PARTICIPATION_ID_USER",
+      "metadata": {
+        "attribute": "PARTICIPATION_ID_USER",
+        "entity": "PARTICIPATION",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute PARTICIPATION_ID_USER of type INT (Primary Key) (Foreign Key to True)",
+      "tokens": [
+        "attribute",
+        "participation_id_user",
+        "of",
+        "type",
+        "int",
+        "primary",
+        "key",
+        "foreign",
+        "key",
+        "to",
+        "true"
+      ]
+    },
+    {
+      "id": "attr_PARTICIPATION_PARTICIPATION_MODE_TRANSPORT",
+      "metadata": {
+        "attribute": "PARTICIPATION_MODE_TRANSPORT",
+        "entity": "PARTICIPATION",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute PARTICIPATION_MODE_TRANSPORT of type INT",
+      "tokens": [
+        "attribute",
+        "participation_mode_transport",
+        "of",
+        "type",
+        "int"
+      ]
+    },
+    {
+      "id": "rel_UTILISATEUR_ANTENNE",
+      "metadata": {
+        "layer": "dal",
+        "source": "specification",
+        "type": "relation"
+      },
+      "text": "Relationship from UTILISATEUR to ANTENNE (N:1): ",
+      "tokens": [
+        "relationship",
+        "from",
+        "utilisateur",
+        "to",
+        "antenne",
+        "n",
+        "1"
+      ]
+    },
+    {
+      "id": "rel_ACTIVITE_ANTENNE",
+      "metadata": {
+        "layer": "dal",
+        "source": "specification",
+        "type": "relation"
+      },
+      "text": "Relationship from ACTIVITE to ANTENNE (N:1): ",
+      "tokens": [
+        "relationship",
+        "from",
+        "activite",
+        "to",
+        "antenne",
+        "n",
+        "1"
+      ]
+    },
+    {
+      "id": "rel_ACTIVITE_UTILISATEUR",
+      "metadata": {
+        "layer": "dal",
+        "source": "specification",
+        "type": "relation"
+      },
+      "text": "Relationship from ACTIVITE to UTILISATEUR (N:1): ",
+      "tokens": [
+        "relationship",
+        "from",
+        "activite",
+        "to",
+        "utilisateur",
+        "n",
+        "1"
+      ]
+    },
+    {
+      "id": "rel_PARTICIPATION_UTILISATEUR",
+      "metadata": {
+        "layer": "dal",
+        "source": "specification",
+        "type": "relation"
+      },
+      "text": "Relationship from PARTICIPATION to UTILISATEUR (N:1): ",
+      "tokens": [
+        "relationship",
+        "from",
+        "participation",
+        "to",
+        "utilisateur",
+        "n",
+        "1"
+      ]
+    },
+    {
+      "id": "rel_PARTICIPATION_ACTIVITE",
+      "metadata": {
+        "layer": "dal",
+        "source": "specification",
+        "type": "relation"
+      },
+      "text": "Relationship from PARTICIPATION to ACTIVITE (N:1): ",
+      "tokens": [
+        "relationship",
+        "from",
+        "participation",
+        "to",
+        "activite",
+        "n",
+        "1"
+      ]
+    },
+    {
+      "id": "rel_REPAS_ACTIVITE",
+      "metadata": {
+        "layer": "dal",
+        "source": "specification",
+        "type": "relation"
+      },
+      "text": "Relationship from REPAS to ACTIVITE (N:1): ",
+      "tokens": [
+        "relationship",
+        "from",
+        "repas",
+        "to",
+        "activite",
+        "n",
+        "1"
+      ]
+    },
+    {
+      "id": "rel_HEBERGEMENT_ACTIVITE",
+      "metadata": {
+        "layer": "dal",
+        "source": "specification",
+        "type": "relation"
+      },
+      "text": "Relationship from HEBERGEMENT to ACTIVITE (N:1): ",
+      "tokens": [
+        "relationship",
+        "from",
+        "hebergement",
+        "to",
+        "activite",
+        "n",
+        "1"
+      ]
+    },
+    {
+      "id": "prompt_procedure_template",
+      "metadata": {
+        "filename": "procedure_template.txt",
+        "layer": "logic",
+        "source": "prompt",
+        "type": "template"
+      },
+      "text": "Tu es un expert COBOL. Génère une procédure (paragraphe) COBOL basée UNIQUEMENT sur les spécifications fournies.\n\nSPÉCIFICATIONS DE LA PROCÉDURE:\n- Programme parent: {program_id}\n- Nom de la procédure: {procedure_name}\n- Type de procédure: {procedure_type}\n- Description: {procedure_description}\n- Dialecte COBOL: {dialecte}\n\nDONNÉES DISPONIBLES:\n- Variables d'entrée: {inputs}\n- Variables de sortie: {outputs}\n\nEXIGENCE ASSOCIÉE:\n{requirement}\n\nTÂCHE:\nGénère UNIQUEMENT le paragraphe COBOL nommé \"{procedure_name}\" qui:\n1. Respecte la description fournie\n2. Utilise UNIQUEMENT les variables listées dans inputs/outputs\n3. Implémente l'exigence spécifiée (si fournie)\n4. Est compatible avec le dialecte {dialecte}\n\nCONTRAINTES ABSOLUES:\n- Génère SEULEMENT le paragraphe (pas de DIVISION, pas de PROGRAM-ID, pas de déclarations de données)\n- N'utilise AUCUNE variable en dehors de celles listées dans inputs/outputs\n- Code COBOL brut uniquement, sans markdown ni explications\n- Le paragraphe doit être immédiatement intégrable dans le programme parent\n\nGénère maintenant le paragraphe COBOL:\n",
+      "tokens": [
+        "tu",
+        "es",
+        "un",
+        "expert",
+        "cobol",
+        "génère",
+        "une",
+        "procédure",
+        "paragraphe",
+        "cobol",
+        "basée",
+        "uniquement",
+        "sur",
+        "les",
+        "spécifications",
+        "fournies",
+        "spécifications",
+        "de",
+        "la",
+        "procédure",
+        "programme",
+        "parent",
+        "program_id",
+        "nom",
+        "de",
+        "la",
+        "procédure",
+        "procedure_name",
+        "type",
+        "de",
+        "procédure",
+        "procedure_type",
+        "description",
+        "procedure_description",
+        "dialecte",
+        "cobol",
+        "dialecte",
+        "données",
+        "disponibles",
+        "variables",
+        "d",
+        "entrée",
+        "inputs",
+        "variables",
+        "de",
+        "sortie",
+        "outputs",
+        "exigence",
+        "associée",
+        "requirement",
+        "tâche",
+        "génère",
+        "uniquement",
+        "le",
+        "paragraphe",
+        "cobol",
+        "nommé",
+        "procedure_name",
+        "qui",
+        "1",
+        "respecte",
+        "la",
+        "description",
+        "fournie",
+        "2",
+        "utilise",
+        "uniquement",
+        "les",
+        "variables",
+        "listées",
+        "dans",
+        "inputs",
+        "outputs",
+        "3",
+        "implémente",
+        "l",
+        "exigence",
+        "spécifiée",
+        "si",
+        "fournie",
+        "4",
+        "est",
+        "compatible",
+        "avec",
+        "le",
+        "dialecte",
+        "dialecte",
+        "contraintes",
+        "absolues",
+        "génère",
+        "seulement",
+        "le",
+        "paragraphe",
+        "pas",
+        "de",
+        "division",
+        "pas",
+        "de",
+        "program",
+        "id",
+        "pas",
+        "de",
+        "déclarations",
+        "de",
+        "données",
+        "n",
+        "utilise",
+        "aucune",
+        "variable",
+        "en",
+        "dehors",
+        "de",
+        "celles",
+        "listées",
+        "dans",
+        "inputs",
+        "outputs",
+        "code",
+        "cobol",
+        "brut",
+        "uniquement",
+        "sans",
+        "markdown",
+        "ni",
+        "explications",
+        "le",
+        "paragraphe",
+        "doit",
+        "être",
+        "immédiatement",
+        "intégrable",
+        "dans",
+        "le",
+        "programme",
+        "parent",
+        "génère",
+        "maintenant",
+        "le",
+        "paragraphe",
+        "cobol"
+      ]
+    },
+    {
+      "id": "prompt_header_template",
+      "metadata": {
+        "filename": "header_template.txt",
+        "layer": "all",
+        "source": "prompt",
+        "type": "template"
+      },
+      "text": "Tu es un expert COBOL. Génère un programme COBOL complet basé UNIQUEMENT sur les spécifications fournies.\n\nSPÉCIFICATIONS DU PROGRAMME:\n- Nom du programme: {program_id}\n- Couche applicative: {couche}\n- Dialecte COBOL: {dialecte}\n- Format: {format}\n- Base de données cible: {sql_cible}\n\nDONNÉES D'ENTRÉE/SORTIE (io_json):\n{io_json}\n\nEXIGENCES FONCTIONNELLES (exigences_json):\n{exigences_json}\n\nRÈGLES MÉTIER:\n{rag_rules}\n\nCONVENTIONS DE NOMMAGE:\n{nommage}\n\nINSTRUCTIONS SPÉCIFIQUES POUR LA COUCHE {couche}:\n{layer_instructions}\n{contract_constraints}\n\nTÂCHE:\nGénère un programme COBOL complet pour {program_id} qui:\n1. Respecte toutes les exigences fonctionnelles listées ci-dessus\n2. Utilise UNIQUEMENT les variables définies dans io_json\n3. Implémente les règles métier spécifiées\n4. Suit les conventions de nommage\n5. Est compatible avec le dialecte {dialecte}\n6. Reste MINIMAL - n'ajoute rien qui ne soit pas explicitement demandé dans les spécifications\n\nCONTRAINTES ABSOLUES:\n- N'invente AUCUNE variable ou section non mentionnée dans io_json\n- N'ajoute AUCUNE fonctionnalité non décrite dans les exigences\n- Génère du code COBOL brut uniquement, sans markdown ni explications\n- Le code doit être immédiatement compilable\n\nGénère maintenant le programme COBOL:\n",
+      "tokens": [
+        "tu",
+        "es",
+        "un",
+        "expert",
+        "cobol",
+        "génère",
+        "un",
+        "programme",
+        "cobol",
+        "complet",
+        "basé",
+        "uniquement",
+        "sur",
+        "les",
+        "spécifications",
+        "fournies",
+        "spécifications",
+        "du",
+        "programme",
+        "nom",
+        "du",
+        "programme",
+        "program_id",
+        "couche",
+        "applicative",
+        "couche",
+        "dialecte",
+        "cobol",
+        "dialecte",
+        "format",
+        "format",
+        "base",
+        "de",
+        "données",
+        "cible",
+        "sql_cible",
+        "données",
+        "d",
+        "entrée",
+        "sortie",
+        "io_json",
+        "io_json",
+        "exigences",
+        "fonctionnelles",
+        "exigences_json",
+        "exigences_json",
+        "règles",
+        "métier",
+        "rag_rules",
+        "conventions",
+        "de",
+        "nommage",
+        "nommage",
+        "instructions",
+        "spécifiques",
+        "pour",
+        "la",
+        "couche",
+        "couche",
+        "layer_instructions",
+        "contract_constraints",
+        "tâche",
+        "génère",
+        "un",
+        "programme",
+        "cobol",
+        "complet",
+        "pour",
+        "program_id",
+        "qui",
+        "1",
+        "respecte",
+        "toutes",
+        "les",
+        "exigences",
+        "fonctionnelles",
+        "listées",
+        "ci",
+        "dessus",
+        "2",
+        "utilise",
+        "uniquement",
+        "les",
+        "variables",
+        "définies",
+        "dans",
+        "io_json",
+        "3",
+        "implémente",
+        "les",
+        "règles",
+        "métier",
+        "spécifiées",
+        "4",
+        "suit",
+        "les",
+        "conventions",
+        "de",
+        "nommage",
+        "5",
+        "est",
+        "compatible",
+        "avec",
+        "le",
+        "dialecte",
+        "dialecte",
+        "6",
+        "reste",
+        "minimal",
+        "n",
+        "ajoute",
+        "rien",
+        "qui",
+        "ne",
+        "soit",
+        "pas",
+        "explicitement",
+        "demandé",
+        "dans",
+        "les",
+        "spécifications",
+        "contraintes",
+        "absolues",
+        "n",
+        "invente",
+        "aucune",
+        "variable",
+        "ou",
+        "section",
+        "non",
+        "mentionnée",
+        "dans",
+        "io_json",
+        "n",
+        "ajoute",
+        "aucune",
+        "fonctionnalité",
+        "non",
+        "décrite",
+        "dans",
+        "les",
+        "exigences",
+        "génère",
+        "du",
+        "code",
+        "cobol",
+        "brut",
+        "uniquement",
+        "sans",
+        "markdown",
+        "ni",
+        "explications",
+        "le",
+        "code",
+        "doit",
+        "être",
+        "immédiatement",
+        "compilable",
+        "génère",
+        "maintenant",
+        "le",
+        "programme",
+        "cobol"
+      ]
+    },
+    {
+      "id": "prompt_diagnosis_template",
+      "metadata": {
+        "filename": "diagnosis_template.txt",
+        "layer": "autofix",
+        "source": "prompt",
+        "type": "template"
+      },
+      "text": "[ROLE]\nYou are a senior COBOL compiler expert and code diagnostician. You read compiler errors, inspect the COBOL source file, and produce a precise, minimal patch plan that fixes compilation failures. You ALWAYS output STRICT JSON (no prose, no code fences).\n\n[CONTEXT]\nDialect: {dialecte}              # e.g., gnucobol | ibm | microfocus\nCompiler: {compiler_name}        # e.g., cobc\nCompilerFlags: {compiler_flags}  # e.g., -x -free -Wall -I copy -I out/copy\nLineFormat: {line_format}        # \"free\" or \"fixed\"\nLayer: {layer}                   # business | logic | dal\nSGBD: {sgbd}                     # e.g., postgres | db2 | oracle | sqlserver | mysql | sqlite\nCopyDirs: {copy_dirs_json}       # JSON array of COPY search paths\nProgramID: {program_id}\nFilePath: {file_path}\nIO_Summary: {io_json}            # Brief JSON of fields/types (from IO map)\nExigences: {exigences_json}      # Key business rules affecting code (JSON)\nRetrieved_RAG_Snippets:\n{rag_chunks}                     # Optional; short relevant guidance/templates\n\n[ARTIFACTS]\n# COBOL source (full, exact). Do not reformat internally; use only for diagnosis.\n<<<SOURCE_BEGIN\n{source_cobol}\nSOURCE_END>>>\n\n# Compiler stderr/stdout (as captured). Use these to locate exact lines & messages.\n<<<COMPILER_LOG_BEGIN\n{compiler_stderr}\nCOMPILER_LOG_END>>>\n\n[WHAT TO DO]\n1) Parse the compiler log and identify each distinct error or unresolved reference. Map each error to a source location if possible (line number, section, or near an anchor).\n2) Infer root causes with high precision. Prefer smallest, surgical changes (e.g., add missing COPY, close an IF, correct PIC/USAGE, fix EXEC SQL include, adjust column rules for fixed format, add SECTION/PROCEDURE headers, add FD/01 record structure, etc.).\n3) Produce a patch plan with the MINIMUM number of steps that makes the program compile, preserving intended logic. Avoid wide refactors.\n4) All patches must be anchored. Use one of:\n   - anchor: a literal line to match (e.g., \"WORKING-STORAGE SECTION.\" or \"*> @ANCHOR:WS\" or \"*> @ANCHOR:PROCS\")\n   - before/after: short, unique context strings when anchor alone is not possible\n   - For replacing existing blocks (e.g., between markers), use op=\"replace\" with an anchor matching the opening marker (e.g., \"*> @BEGIN:PROCNAME\").\n5) If SQLCODE or EXEC SQL blocks are used but SQLCA is missing, include `EXEC SQL INCLUDE SQLCA END-EXEC.` in WORKING-STORAGE via an insert at a suitable anchor.\n6) For fixed line format, ensure column rules are respected; for free format, avoid column-sensitive syntax. If the error is due to wrong format, propose switching flags (document in \"notes\") OR adapt code minimally.\n7) If a COPYBOOK is missing or a search path issue is suspected, prefer adding/ensuring the INCLUDE or adjusting the copy path only if necessary; otherwise, propose generating a minimal stub COPY (e.g., STATUS-CODES.cpy).\n8) Validate that the post-patch file structure is coherent:\n   - IDENTIFICATION DIVISION.\n   - (Optional) ENVIRONMENT DIVISION.\n   - DATA DIVISION. with WORKING-STORAGE SECTION.\n   - PROCEDURE DIVISION.\n   - All opened IF/EVALUATE/PERFORM blocks are properly closed.\n9) If any errors cannot be fixed automatically, mark them clearly in \"notes\" and still return the best possible minimal patch plan.\n\n[OUTPUT JSON SCHEMA]  # Must conform exactly; key names as below.\n{\n  \"causes\": [\n    {\n      \"file\": \"string\",              # absolute or relative path; use {file_path}\n      \"line\": 0,                     # integer line number if known, else -1\n      \"section\": \"IDENTIFICATION|ENVIRONMENT|DATA|PROCEDURE|COPYBOOK|SQL|UNKNOWN\",\n      \"reason\": \"string\",            # short human-readable root cause\n      \"code\": \"string\"               # optional: compiler error code or mnemonic; \"\" if unknown\n    }\n  ],\n  \"patch_plan\": [\n    {\n      \"op\": \"insert_after|insert_before|replace|delete\",\n      \"file\": \"string\",             # target file; use {file_path} unless a COPYBOOK is generated\n      \"anchor\": \"string\",           # REQUIRED for insert/replace/delete; exact literal to find\n      \"before\": \"string\",           # OPTIONAL: extra context that must appear immediately before anchor\n      \"after\": \"string\",            # OPTIONAL: extra context that must appear immediately after anchor\n      \"text\": \"string\"              # REQUIRED for insert*/replace; the inserted/replacement text (no code fences)\n    }\n  ],\n  \"notes\": \"string\"                 # short explanation of assumptions, flags changes, or follow-ups\n}\n\n[CONSTRAINTS]\n- OUTPUT ONLY VALID JSON as defined above. No backticks, no extra keys, no comments.\n- Keep \"text\" fields as literal COBOL or COPYBOOK content with newlines; do NOT wrap in markdown.\n- Use the smallest viable patch set. Avoid touching unrelated parts.\n- Prefer anchors that are stable and already present (e.g., \"WORKING-STORAGE SECTION.\", \"PROCEDURE DIVISION.\", \"*> @ANCHOR:PROCS\", \"*> @ANCHOR:WS\").\n- If creating a new COPYBOOK, set \"file\" to a writable relative path under \"out/copy/<NAME>.cpy\" and ensure the main program also gets a patch to COPY it (second patch step).\n- If changing compiler flags (e.g., -free vs -fixed) is the only safe fix, document it in \"notes\" but still supply code patches if any are needed.\n\n[COMMON DIAGNOSTIC HINTS — APPLY WHEN MATCHING LOG LINES]\n- \"SQLCODE\" undefined → add `EXEC SQL INCLUDE SQLCA END-EXEC.` in WORKING-STORAGE.\n- Unresolved COPY name → check CopyDirs, add COPY statement, or generate minimal stub.\n- \"expected END-IF/END-EVALUATE/END-PERFORM\" → close the block near the reported line.\n- \"Illegal char at column\" under fixed format → align AREA A/B; or recommend -free in notes.\n- \"Invalid PICTURE\" or overflow → adjust PIC length to mapping (e.g., DECIMAL(p,s) → PIC 9(p-s)V9(s) with bounds).\n- \"Unknown paragraph/section\" → ensure SECTION labels exist and paragraph is declared once.\n- \"EXEC SQL\" syntax error → ensure EXEC SQL ... END-EXEC. blocks and include SQLCA when reading SQLCODE.\n- \"Duplicate label\" → rename the paragraph minimally; update a single PERFORM target if needed.\n\n[FINAL INSTRUCTIONS]\nReturn a SINGLE JSON value as specified. Do not include any explanation text or code fences. Ensure it is parseable and complete.\n",
+      "tokens": [
+        "role",
+        "you",
+        "are",
+        "a",
+        "senior",
+        "cobol",
+        "compiler",
+        "expert",
+        "and",
+        "code",
+        "diagnostician",
+        "you",
+        "read",
+        "compiler",
+        "errors",
+        "inspect",
+        "the",
+        "cobol",
+        "source",
+        "file",
+        "and",
+        "produce",
+        "a",
+        "precise",
+        "minimal",
+        "patch",
+        "plan",
+        "that",
+        "fixes",
+        "compilation",
+        "failures",
+        "you",
+        "always",
+        "output",
+        "strict",
+        "json",
+        "no",
+        "prose",
+        "no",
+        "code",
+        "fences",
+        "context",
+        "dialect",
+        "dialecte",
+        "e",
+        "g",
+        "gnucobol",
+        "ibm",
+        "microfocus",
+        "compiler",
+        "compiler_name",
+        "e",
+        "g",
+        "cobc",
+        "compilerflags",
+        "compiler_flags",
+        "e",
+        "g",
+        "x",
+        "free",
+        "wall",
+        "i",
+        "copy",
+        "i",
+        "out",
+        "copy",
+        "lineformat",
+        "line_format",
+        "free",
+        "or",
+        "fixed",
+        "layer",
+        "layer",
+        "business",
+        "logic",
+        "dal",
+        "sgbd",
+        "sgbd",
+        "e",
+        "g",
+        "postgres",
+        "db2",
+        "oracle",
+        "sqlserver",
+        "mysql",
+        "sqlite",
+        "copydirs",
+        "copy_dirs_json",
+        "json",
+        "array",
+        "of",
+        "copy",
+        "search",
+        "paths",
+        "programid",
+        "program_id",
+        "filepath",
+        "file_path",
+        "io_summary",
+        "io_json",
+        "brief",
+        "json",
+        "of",
+        "fields",
+        "types",
+        "from",
+        "io",
+        "map",
+        "exigences",
+        "exigences_json",
+        "key",
+        "business",
+        "rules",
+        "affecting",
+        "code",
+        "json",
+        "retrieved_rag_snippets",
+        "rag_chunks",
+        "optional",
+        "short",
+        "relevant",
+        "guidance",
+        "templates",
+        "artifacts",
+        "cobol",
+        "source",
+        "full",
+        "exact",
+        "do",
+        "not",
+        "reformat",
+        "internally",
+        "use",
+        "only",
+        "for",
+        "diagnosis",
+        "source_begin",
+        "source_cobol",
+        "source_end",
+        "compiler",
+        "stderr",
+        "stdout",
+        "as",
+        "captured",
+        "use",
+        "these",
+        "to",
+        "locate",
+        "exact",
+        "lines",
+        "messages",
+        "compiler_log_begin",
+        "compiler_stderr",
+        "compiler_log_end",
+        "what",
+        "to",
+        "do",
+        "1",
+        "parse",
+        "the",
+        "compiler",
+        "log",
+        "and",
+        "identify",
+        "each",
+        "distinct",
+        "error",
+        "or",
+        "unresolved",
+        "reference",
+        "map",
+        "each",
+        "error",
+        "to",
+        "a",
+        "source",
+        "location",
+        "if",
+        "possible",
+        "line",
+        "number",
+        "section",
+        "or",
+        "near",
+        "an",
+        "anchor",
+        "2",
+        "infer",
+        "root",
+        "causes",
+        "with",
+        "high",
+        "precision",
+        "prefer",
+        "smallest",
+        "surgical",
+        "changes",
+        "e",
+        "g",
+        "add",
+        "missing",
+        "copy",
+        "close",
+        "an",
+        "if",
+        "correct",
+        "pic",
+        "usage",
+        "fix",
+        "exec",
+        "sql",
+        "include",
+        "adjust",
+        "column",
+        "rules",
+        "for",
+        "fixed",
+        "format",
+        "add",
+        "section",
+        "procedure",
+        "headers",
+        "add",
+        "fd",
+        "01",
+        "record",
+        "structure",
+        "etc",
+        "3",
+        "produce",
+        "a",
+        "patch",
+        "plan",
+        "with",
+        "the",
+        "minimum",
+        "number",
+        "of",
+        "steps",
+        "that",
+        "makes",
+        "the",
+        "program",
+        "compile",
+        "preserving",
+        "intended",
+        "logic",
+        "avoid",
+        "wide",
+        "refactors",
+        "4",
+        "all",
+        "patches",
+        "must",
+        "be",
+        "anchored",
+        "use",
+        "one",
+        "of",
+        "anchor",
+        "a",
+        "literal",
+        "line",
+        "to",
+        "match",
+        "e",
+        "g",
+        "working",
+        "storage",
+        "section",
+        "or",
+        "anchor",
+        "ws",
+        "or",
+        "anchor",
+        "procs",
+        "before",
+        "after",
+        "short",
+        "unique",
+        "context",
+        "strings",
+        "when",
+        "anchor",
+        "alone",
+        "is",
+        "not",
+        "possible",
+        "for",
+        "replacing",
+        "existing",
+        "blocks",
+        "e",
+        "g",
+        "between",
+        "markers",
+        "use",
+        "op",
+        "replace",
+        "with",
+        "an",
+        "anchor",
+        "matching",
+        "the",
+        "opening",
+        "marker",
+        "e",
+        "g",
+        "begin",
+        "procname",
+        "5",
+        "if",
+        "sqlcode",
+        "or",
+        "exec",
+        "sql",
+        "blocks",
+        "are",
+        "used",
+        "but",
+        "sqlca",
+        "is",
+        "missing",
+        "include",
+        "exec",
+        "sql",
+        "include",
+        "sqlca",
+        "end",
+        "exec",
+        "in",
+        "working",
+        "storage",
+        "via",
+        "an",
+        "insert",
+        "at",
+        "a",
+        "suitable",
+        "anchor",
+        "6",
+        "for",
+        "fixed",
+        "line",
+        "format",
+        "ensure",
+        "column",
+        "rules",
+        "are",
+        "respected",
+        "for",
+        "free",
+        "format",
+        "avoid",
+        "column",
+        "sensitive",
+        "syntax",
+        "if",
+        "the",
+        "error",
+        "is",
+        "due",
+        "to",
+        "wrong",
+        "format",
+        "propose",
+        "switching",
+        "flags",
+        "document",
+        "in",
+        "notes",
+        "or",
+        "adapt",
+        "code",
+        "minimally",
+        "7",
+        "if",
+        "a",
+        "copybook",
+        "is",
+        "missing",
+        "or",
+        "a",
+        "search",
+        "path",
+        "issue",
+        "is",
+        "suspected",
+        "prefer",
+        "adding",
+        "ensuring",
+        "the",
+        "include",
+        "or",
+        "adjusting",
+        "the",
+        "copy",
+        "path",
+        "only",
+        "if",
+        "necessary",
+        "otherwise",
+        "propose",
+        "generating",
+        "a",
+        "minimal",
+        "stub",
+        "copy",
+        "e",
+        "g",
+        "status",
+        "codes",
+        "cpy",
+        "8",
+        "validate",
+        "that",
+        "the",
+        "post",
+        "patch",
+        "file",
+        "structure",
+        "is",
+        "coherent",
+        "identification",
+        "division",
+        "optional",
+        "environment",
+        "division",
+        "data",
+        "division",
+        "with",
+        "working",
+        "storage",
+        "section",
+        "procedure",
+        "division",
+        "all",
+        "opened",
+        "if",
+        "evaluate",
+        "perform",
+        "blocks",
+        "are",
+        "properly",
+        "closed",
+        "9",
+        "if",
+        "any",
+        "errors",
+        "cannot",
+        "be",
+        "fixed",
+        "automatically",
+        "mark",
+        "them",
+        "clearly",
+        "in",
+        "notes",
+        "and",
+        "still",
+        "return",
+        "the",
+        "best",
+        "possible",
+        "minimal",
+        "patch",
+        "plan",
+        "output",
+        "json",
+        "schema",
+        "must",
+        "conform",
+        "exactly",
+        "key",
+        "names",
+        "as",
+        "below",
+        "causes",
+        "file",
+        "string",
+        "absolute",
+        "or",
+        "relative",
+        "path",
+        "use",
+        "file_path",
+        "line",
+        "0",
+        "integer",
+        "line",
+        "number",
+        "if",
+        "known",
+        "else",
+        "1",
+        "section",
+        "identification",
+        "environment",
+        "data",
+        "procedure",
+        "copybook",
+        "sql",
+        "unknown",
+        "reason",
+        "string",
+        "short",
+        "human",
+        "readable",
+        "root",
+        "cause",
+        "code",
+        "string",
+        "optional",
+        "compiler",
+        "error",
+        "code",
+        "or",
+        "mnemonic",
+        "if",
+        "unknown",
+        "patch_plan",
+        "op",
+        "insert_after",
+        "insert_before",
+        "replace",
+        "delete",
+        "file",
+        "string",
+        "target",
+        "file",
+        "use",
+        "file_path",
+        "unless",
+        "a",
+        "copybook",
+        "is",
+        "generated",
+        "anchor",
+        "string",
+        "required",
+        "for",
+        "insert",
+        "replace",
+        "delete",
+        "exact",
+        "literal",
+        "to",
+        "find",
+        "before",
+        "string",
+        "optional",
+        "extra",
+        "context",
+        "that",
+        "must",
+        "appear",
+        "immediately",
+        "before",
+        "anchor",
+        "after",
+        "string",
+        "optional",
+        "extra",
+        "context",
+        "that",
+        "must",
+        "appear",
+        "immediately",
+        "after",
+        "anchor",
+        "text",
+        "string",
+        "required",
+        "for",
+        "insert",
+        "replace",
+        "the",
+        "inserted",
+        "replacement",
+        "text",
+        "no",
+        "code",
+        "fences",
+        "notes",
+        "string",
+        "short",
+        "explanation",
+        "of",
+        "assumptions",
+        "flags",
+        "changes",
+        "or",
+        "follow",
+        "ups",
+        "constraints",
+        "output",
+        "only",
+        "valid",
+        "json",
+        "as",
+        "defined",
+        "above",
+        "no",
+        "backticks",
+        "no",
+        "extra",
+        "keys",
+        "no",
+        "comments",
+        "keep",
+        "text",
+        "fields",
+        "as",
+        "literal",
+        "cobol",
+        "or",
+        "copybook",
+        "content",
+        "with",
+        "newlines",
+        "do",
+        "not",
+        "wrap",
+        "in",
+        "markdown",
+        "use",
+        "the",
+        "smallest",
+        "viable",
+        "patch",
+        "set",
+        "avoid",
+        "touching",
+        "unrelated",
+        "parts",
+        "prefer",
+        "anchors",
+        "that",
+        "are",
+        "stable",
+        "and",
+        "already",
+        "present",
+        "e",
+        "g",
+        "working",
+        "storage",
+        "section",
+        "procedure",
+        "division",
+        "anchor",
+        "procs",
+        "anchor",
+        "ws",
+        "if",
+        "creating",
+        "a",
+        "new",
+        "copybook",
+        "set",
+        "file",
+        "to",
+        "a",
+        "writable",
+        "relative",
+        "path",
+        "under",
+        "out",
+        "copy",
+        "name",
+        "cpy",
+        "and",
+        "ensure",
+        "the",
+        "main",
+        "program",
+        "also",
+        "gets",
+        "a",
+        "patch",
+        "to",
+        "copy",
+        "it",
+        "second",
+        "patch",
+        "step",
+        "if",
+        "changing",
+        "compiler",
+        "flags",
+        "e",
+        "g",
+        "free",
+        "vs",
+        "fixed",
+        "is",
+        "the",
+        "only",
+        "safe",
+        "fix",
+        "document",
+        "it",
+        "in",
+        "notes",
+        "but",
+        "still",
+        "supply",
+        "code",
+        "patches",
+        "if",
+        "any",
+        "are",
+        "needed",
+        "common",
+        "diagnostic",
+        "hints",
+        "apply",
+        "when",
+        "matching",
+        "log",
+        "lines",
+        "sqlcode",
+        "undefined",
+        "add",
+        "exec",
+        "sql",
+        "include",
+        "sqlca",
+        "end",
+        "exec",
+        "in",
+        "working",
+        "storage",
+        "unresolved",
+        "copy",
+        "name",
+        "check",
+        "copydirs",
+        "add",
+        "copy",
+        "statement",
+        "or",
+        "generate",
+        "minimal",
+        "stub",
+        "expected",
+        "end",
+        "if",
+        "end",
+        "evaluate",
+        "end",
+        "perform",
+        "close",
+        "the",
+        "block",
+        "near",
+        "the",
+        "reported",
+        "line",
+        "illegal",
+        "char",
+        "at",
+        "column",
+        "under",
+        "fixed",
+        "format",
+        "align",
+        "area",
+        "a",
+        "b",
+        "or",
+        "recommend",
+        "free",
+        "in",
+        "notes",
+        "invalid",
+        "picture",
+        "or",
+        "overflow",
+        "adjust",
+        "pic",
+        "length",
+        "to",
+        "mapping",
+        "e",
+        "g",
+        "decimal",
+        "p",
+        "s",
+        "pic",
+        "9",
+        "p",
+        "s",
+        "v9",
+        "s",
+        "with",
+        "bounds",
+        "unknown",
+        "paragraph",
+        "section",
+        "ensure",
+        "section",
+        "labels",
+        "exist",
+        "and",
+        "paragraph",
+        "is",
+        "declared",
+        "once",
+        "exec",
+        "sql",
+        "syntax",
+        "error",
+        "ensure",
+        "exec",
+        "sql",
+        "end",
+        "exec",
+        "blocks",
+        "and",
+        "include",
+        "sqlca",
+        "when",
+        "reading",
+        "sqlcode",
+        "duplicate",
+        "label",
+        "rename",
+        "the",
+        "paragraph",
+        "minimally",
+        "update",
+        "a",
+        "single",
+        "perform",
+        "target",
+        "if",
+        "needed",
+        "final",
+        "instructions",
+        "return",
+        "a",
+        "single",
+        "json",
+        "value",
+        "as",
+        "specified",
+        "do",
+        "not",
+        "include",
+        "any",
+        "explanation",
+        "text",
+        "or",
+        "code",
+        "fences",
+        "ensure",
+        "it",
+        "is",
+        "parseable",
+        "and",
+        "complete"
+      ]
+    },
+    {
+      "id": "prompt_compiler_test_template",
+      "metadata": {
+        "filename": "compiler_test_template.txt",
+        "layer": "all",
+        "source": "prompt",
+        "type": "template"
+      },
+      "text": "#!/bin/bash\n# Compilation script for {program_id}\n# Generated by CobolSmartGen\n\nset -e\n\nPROGRAM=\"{file}\"\nPROGRAM_NAME=\"{program_id}\"\nOUTPUT_DIR=\"../bin\"\n\necho \"=========================================\"\necho \"Compiling ${PROGRAM_NAME}...\"\necho \"=========================================\"\n\n# Check if file exists\nif [ ! -f \"${PROGRAM}\" ]; then\n    echo \"ERROR: File ${PROGRAM} not found!\"\n    exit 1\nfi\n\n# Create output directory\nmkdir -p \"${OUTPUT_DIR}\"\n\n# Compile with GnuCOBOL\necho \"Running cobc...\"\ncobc -x -free -o \"${OUTPUT_DIR}/${PROGRAM_NAME}\" \"${PROGRAM}\"\n\nif [ $? -eq 0 ]; then\n    echo \"✅ Compilation successful!\"\n    echo \"Executable: ${OUTPUT_DIR}/${PROGRAM_NAME}\"\n    exit 0\nelse\n    echo \"❌ Compilation failed!\"\n    exit 1\nfi",
+      "tokens": [
+        "bin",
+        "bash",
+        "compilation",
+        "script",
+        "for",
+        "program_id",
+        "generated",
+        "by",
+        "cobolsmartgen",
+        "set",
+        "e",
+        "program",
+        "file",
+        "program_name",
+        "program_id",
+        "output_dir",
+        "bin",
+        "echo",
+        "echo",
+        "compiling",
+        "program_name",
+        "echo",
+        "check",
+        "if",
+        "file",
+        "exists",
+        "if",
+        "f",
+        "program",
+        "then",
+        "echo",
+        "error",
+        "file",
+        "program",
+        "not",
+        "found",
+        "exit",
+        "1",
+        "fi",
+        "create",
+        "output",
+        "directory",
+        "mkdir",
+        "p",
+        "output_dir",
+        "compile",
+        "with",
+        "gnucobol",
+        "echo",
+        "running",
+        "cobc",
+        "cobc",
+        "x",
+        "free",
+        "o",
+        "output_dir",
+        "program_name",
+        "program",
+        "if",
+        "eq",
+        "0",
+        "then",
+        "echo",
+        "compilation",
+        "successful",
+        "echo",
+        "executable",
+        "output_dir",
+        "program_name",
+        "exit",
+        "0",
+        "else",
+        "echo",
+        "compilation",
+        "failed",
+        "exit",
+        "1",
+        "fi"
+      ]
+    },
+    {
+      "id": "prompt_sql_template",
+      "metadata": {
+        "filename": "sql_template.txt",
+        "layer": "dal",
+        "source": "prompt",
+        "type": "template"
+      },
+      "text": "[Contexte]\nGénère un script SQL SIMPLE et FONCTIONNEL pour {sgbd}.\nPas de complexité inutile, juste du SQL qui marche.\n\n[Variables]\n- SGBD: {sgbd}\n- Entités: {entities_json}\n\n[Tâche]\nGénère un script SQL simple avec:\n\nEXEMPLE:\n\n-- Création table\nCREATE TABLE EMPLOYEE (\n    EMP_ID INT PRIMARY KEY,\n    EMP_NAME VARCHAR(30),\n    SALARY_BRUT DECIMAL(10,2),\n    SALARY_NET DECIMAL(10,2)\n);\n\n-- Données de test\nINSERT INTO EMPLOYEE (EMP_ID, EMP_NAME, SALARY_BRUT, SALARY_NET)\nVALUES (1, 'Dupont', 3000.00, 0.00);\n\nINSERT INTO EMPLOYEE (EMP_ID, EMP_NAME, SALARY_BRUT, SALARY_NET)\nVALUES (2, 'Martin', 4000.00, 0.00);\n\nGÉNÈRE du SQL similaire pour les entités spécifiées.\n\nIMPORTANT:\n- SQL SIMPLE uniquement\n- Pas de triggers, procedures stockées complexes\n- Pas de contraintes compliquées\n- Types de données basiques (INT, VARCHAR, DECIMAL, DATE)\n- Quelques INSERT de test",
+      "tokens": [
+        "contexte",
+        "génère",
+        "un",
+        "script",
+        "sql",
+        "simple",
+        "et",
+        "fonctionnel",
+        "pour",
+        "sgbd",
+        "pas",
+        "de",
+        "complexité",
+        "inutile",
+        "juste",
+        "du",
+        "sql",
+        "qui",
+        "marche",
+        "variables",
+        "sgbd",
+        "sgbd",
+        "entités",
+        "entities_json",
+        "tâche",
+        "génère",
+        "un",
+        "script",
+        "sql",
+        "simple",
+        "avec",
+        "exemple",
+        "création",
+        "table",
+        "create",
+        "table",
+        "employee",
+        "emp_id",
+        "int",
+        "primary",
+        "key",
+        "emp_name",
+        "varchar",
+        "30",
+        "salary_brut",
+        "decimal",
+        "10",
+        "2",
+        "salary_net",
+        "decimal",
+        "10",
+        "2",
+        "données",
+        "de",
+        "test",
+        "insert",
+        "into",
+        "employee",
+        "emp_id",
+        "emp_name",
+        "salary_brut",
+        "salary_net",
+        "values",
+        "1",
+        "dupont",
+        "3000",
+        "00",
+        "0",
+        "00",
+        "insert",
+        "into",
+        "employee",
+        "emp_id",
+        "emp_name",
+        "salary_brut",
+        "salary_net",
+        "values",
+        "2",
+        "martin",
+        "4000",
+        "00",
+        "0",
+        "00",
+        "génère",
+        "du",
+        "sql",
+        "similaire",
+        "pour",
+        "les",
+        "entités",
+        "spécifiées",
+        "important",
+        "sql",
+        "simple",
+        "uniquement",
+        "pas",
+        "de",
+        "triggers",
+        "procedures",
+        "stockées",
+        "complexes",
+        "pas",
+        "de",
+        "contraintes",
+        "compliquées",
+        "types",
+        "de",
+        "données",
+        "basiques",
+        "int",
+        "varchar",
+        "decimal",
+        "date",
+        "quelques",
+        "insert",
+        "de",
+        "test"
+      ]
+    },
+    {
+      "id": "prompt_repair_template",
+      "metadata": {
+        "filename": "repair_template.txt",
+        "layer": "autofix",
+        "source": "prompt",
+        "type": "template"
+      },
+      "text": "",
+      "tokens": []
+    },
+    {
+      "id": "config_compiler",
+      "metadata": {
+        "layer": "all",
+        "source": "configuration",
+        "type": "compiler"
+      },
+      "text": "Compiler: cobc. Flags: . Line format: free",
+      "tokens": [
+        "compiler",
+        "cobc",
+        "flags",
+        "line",
+        "format",
+        "free"
+      ]
+    },
+    {
+      "id": "config_naming",
+      "metadata": {
+        "layer": "all",
+        "source": "configuration",
+        "type": "naming"
+      },
+      "text": "Program naming: UPPER-KEBAB. Variable naming: UPPER_SNAKE. Working storage prefix: WS-",
+      "tokens": [
+        "program",
+        "naming",
+        "upper",
+        "kebab",
+        "variable",
+        "naming",
+        "upper_snake",
+        "working",
+        "storage",
+        "prefix",
+        "ws"
+      ]
+    },
+    {
+      "id": "config_llm",
+      "metadata": {
+        "layer": "all",
+        "source": "configuration",
+        "type": "llm"
+      },
+      "text": "LLM provider: ollama. Temperature: 0.7. Max tokens: 4096",
+      "tokens": [
+        "llm",
+        "provider",
+        "ollama",
+        "temperature",
+        "0",
+        "7",
+        "max",
+        "tokens",
+        "4096"
+      ]
+    }
+  ],
+  "k1": 1.5,
+  "term_frequencies": {
+    "0": {
+      "59": 1,
+      "60": 2,
+      "61": 2,
+      "65": 1
+    },
+    "00": {
+      "61": 4
+    },
+    "01": {
+      "59": 1
+    },
+    "1": {
+      "50": 1,
+      "51": 1,
+      "52": 1,
+      "53": 1,
+      "54": 1,
+      "55": 1,
+      "56": 1,
+      "57": 1,
+      "58": 1,
+      "59": 2,
+      "60": 2,
+      "61": 1
+    },
+    "10": {
+      "61": 2
+    },
+    "100": {
+      "23": 1,
+      "31": 1
+    },
+    "13": {
+      "23": 1,
+      "35": 1
+    },
+    "15": {
+      "11": 1,
+      "16": 1
+    },
+    "2": {
+      "57": 1,
+      "58": 1,
+      "59": 1,
+      "61": 3
+    },
+    "20": {
+      "23": 1,
+      "26": 1
+    },
+    "256": {
+      "11": 1,
+      "15": 1
+    },
+    "3": {
+      "57": 1,
+      "58": 1,
+      "59": 1
+    },
+    "30": {
+      "61": 1
+    },
+    "3000": {
+      "61": 1
+    },
+    "4": {
+      "23": 1,
+      "35": 1,
+      "57": 1,
+      "58": 1,
+      "59": 1
+    },
+    "4000": {
+      "61": 1
+    },
+    "4096": {
+      "65": 1
+    },
+    "5": {
+      "58": 1,
+      "59": 1
+    },
+    "50": {
+      "11": 1,
+      "13": 1,
+      "19": 2,
+      "21": 1,
+      "22": 1,
+      "23": 1,
+      "25": 1
+    },
+    "6": {
+      "58": 1,
+      "59": 1
+    },
+    "7": {
+      "59": 1,
+      "65": 1
+    },
+    "8": {
+      "59": 1
+    },
+    "80": {
+      "11": 1,
+      "14": 1
+    },
+    "9": {
+      "59": 2
+    },
+    "a": {
+      "1": 1,
+      "3": 1,
+      "7": 1,
+      "59": 16
+    },
+    "above": {
+      "59": 1
+    },
+    "absolues": {
+      "57": 1,
+      "58": 1
+    },
+    "absolute": {
+      "59": 1
+    },
+    "activite": {
+      "5": 1,
+      "7": 1,
+      "23": 1,
+      "51": 1,
+      "52": 1,
+      "54": 1,
+      "55": 1,
+      "56": 1
+    },
+    "activite_animateur": {
+      "23": 1,
+      "28": 1
+    },
+    "activite_distance": {
+      "23": 1,
+      "32": 1
+    },
+    "activite_empreintetotale": {
+      "23": 1,
+      "35": 1
+    },
+    "activite_hebergement": {
+      "23": 1,
+      "33": 1
+    },
+    "activite_id": {
+      "23": 1,
+      "24": 1
+    },
+    "activite_idantenne": {
+      "23": 1,
+      "27": 1
+    },
+    "activite_lieu": {
+      "23": 1,
+      "31": 1
+    },
+    "activite_modetransport": {
+      "23": 1,
+      "30": 1
+    },
+    "activite_nbparticipants": {
+      "23": 1,
+      "29": 1
+    },
+    "activite_nom": {
+      "23": 1,
+      "25": 1
+    },
+    "activite_repasprevu": {
+      "23": 1,
+      "34": 1
+    },
+    "activite_type": {
+      "23": 1,
+      "26": 1
+    },
+    "activites": {
+      "2": 1,
+      "3": 1,
+      "4": 1
+    },
+    "adapt": {
+      "59": 1
+    },
+    "add": {
+      "59": 5
+    },
+    "adding": {
+      "59": 1
+    },
+    "adjust": {
+      "59": 2
+    },
+    "adjusting": {
+      "59": 1
+    },
+    "affecting": {
+      "59": 1
+    },
+    "after": {
+      "59": 3
+    },
+    "ajoute": {
+      "58": 2
+    },
+    "align": {
+      "59": 1
+    },
+    "all": {
+      "59": 2
+    },
+    "alone": {
+      "59": 1
+    },
+    "already": {
+      "59": 1
+    },
+    "also": {
+      "59": 1
+    },
+    "always": {
+      "59": 1
+    },
+    "an": {
+      "59": 4
+    },
+    "anchor": {
+      "59": 12
+    },
+    "anchored": {
+      "59": 1
+    },
+    "anchors": {
+      "59": 1
+    },
+    "and": {
+      "59": 9
+    },
+    "animateur": {
+      "7": 1
+    },
+    "antenne": {
+      "7": 1,
+      "19": 1,
+      "50": 1,
+      "51": 1
+    },
+    "antenne_id": {
+      "19": 1,
+      "20": 1
+    },
+    "antenne_nom": {
+      "19": 1,
+      "21": 1
+    },
+    "antenne_region": {
+      "19": 1,
+      "22": 1
+    },
+    "antennes": {
+      "2": 1
+    },
+    "any": {
+      "59": 3
+    },
+    "appartient": {
+      "7": 1
+    },
+    "appear": {
+      "59": 2
+    },
+    "application": {
+      "0": 1,
+      "1": 1
+    },
+    "applicative": {
+      "58": 1
+    },
+    "apply": {
+      "59": 1
+    },
+    "are": {
+      "59": 6
+    },
+    "area": {
+      "59": 1
+    },
+    "array": {
+      "59": 1
+    },
+    "artifacts": {
+      "59": 1
+    },
+    "as": {
+      "59": 5
+    },
+    "associée": {
+      "57": 1
+    },
+    "assumptions": {
+      "59": 1
+    },
+    "at": {
+      "59": 2
+    },
+    "attribute": {
+      "12": 1,
+      "13": 1,
+      "14": 1,
+      "15": 1,
+      "16": 1,
+      "17": 1,
+      "18": 1,
+      "20": 1,
+      "21": 1,
+      "22": 1,
+      "24": 1,
+      "25": 1,
+      "26": 1,
+      "27": 1,
+      "28": 1,
+      "29": 1,
+      "30": 1,
+      "31": 1,
+      "32": 1,
+      "33": 1,
+      "34": 1,
+      "35": 1,
+      "37": 1,
+      "38": 1,
+      "39": 1,
+      "40": 1,
+      "42": 1,
+      "43": 1,
+      "44": 1,
+      "45": 1,
+      "47": 1,
+      "48": 1,
+      "49": 1
+    },
+    "attributes": {
+      "11": 1,
+      "19": 1,
+      "23": 1,
+      "36": 1,
+      "41": 1,
+      "46": 1
+    },
+    "aucun": {
+      "6": 1
+    },
+    "aucune": {
+      "57": 1,
+      "58": 2
+    },
+    "automatically": {
+      "59": 1
+    },
+    "autorise": {
+      "6": 1
+    },
+    "aux": {
+      "2": 1,
+      "4": 1
+    },
+    "avec": {
+      "57": 1,
+      "58": 1,
+      "61": 1
+    },
+    "avoid": {
+      "59": 3
+    },
+    "b": {
+      "59": 1
+    },
+    "backticks": {
+      "59": 1
+    },
+    "base": {
+      "6": 1,
+      "58": 1
+    },
+    "bash": {
+      "60": 1
+    },
+    "basiques": {
+      "61": 1
+    },
+    "basé": {
+      "58": 1
+    },
+    "basée": {
+      "57": 1
+    },
+    "bd": {
+      "0": 1,
+      "9": 1
+    },
+    "be": {
+      "59": 2
+    },
+    "before": {
+      "59": 3
+    },
+    "begin": {
+      "59": 1
+    },
+    "below": {
+      "59": 1
+    },
+    "best": {
+      "59": 1
+    },
+    "between": {
+      "59": 1
+    },
+    "bigint": {
+      "11": 1,
+      "18": 1
+    },
+    "bin": {
+      "60": 2
+    },
+    "block": {
+      "59": 1
+    },
+    "blocks": {
+      "59": 4
+    },
+    "bounds": {
+      "59": 1
+    },
+    "brief": {
+      "59": 1
+    },
+    "brut": {
+      "57": 1,
+      "58": 1
+    },
+    "business": {
+      "59": 2
+    },
+    "but": {
+      "59": 2
+    },
+    "by": {
+      "60": 1
+    },
+    "cannot": {
+      "59": 1
+    },
+    "captured": {
+      "59": 1
+    },
+    "carbone": {
+      "3": 1,
+      "5": 1
+    },
+    "carbontrack": {
+      "0": 1,
+      "1": 1
+    },
+    "cause": {
+      "59": 1
+    },
+    "causes": {
+      "59": 2
+    },
+    "celles": {
+      "57": 1
+    },
+    "changes": {
+      "59": 2
+    },
+    "changing": {
+      "59": 1
+    },
+    "char": {
+      "59": 1
+    },
+    "check": {
+      "59": 1,
+      "60": 1
+    },
+    "ci": {
+      "58": 1
+    },
+    "cible": {
+      "58": 1
+    },
+    "clearly": {
+      "59": 1
+    },
+    "close": {
+      "59": 2
+    },
+    "closed": {
+      "59": 1
+    },
+    "cobc": {
+      "59": 1,
+      "60": 2,
+      "63": 1
+    },
+    "cobol": {
+      "0": 1,
+      "9": 1,
+      "57": 6,
+      "58": 6,
+      "59": 4
+    },
+    "cobolsmartgen": {
+      "60": 1
+    },
+    "code": {
+      "10": 1,
+      "57": 1,
+      "58": 2,
+      "59": 9
+    },
+    "codes": {
+      "59": 1
+    },
+    "coherent": {
+      "59": 1
+    },
+    "column": {
+      "59": 4
+    },
+    "comments": {
+      "59": 1
+    },
+    "common": {
+      "59": 1
+    },
+    "compatible": {
+      "57": 1,
+      "58": 1
+    },
+    "compilable": {
+      "58": 1
+    },
+    "compilation": {
+      "59": 1,
+      "60": 3
+    },
+    "compile": {
+      "59": 1,
+      "60": 1
+    },
+    "compiler": {
+      "59": 7,
+      "63": 1
+    },
+    "compiler_flags": {
+      "59": 1
+    },
+    "compiler_log_begin": {
+      "59": 1
+    },
+    "compiler_log_end": {
+      "59": 1
+    },
+    "compiler_name": {
+      "59": 1
+    },
+    "compiler_stderr": {
+      "59": 1
+    },
+    "compilerflags": {
+      "59": 1
+    },
+    "compiling": {
+      "60": 1
+    },
+    "complet": {
+      "58": 2
+    },
+    "complete": {
+      "59": 1
+    },
+    "complexes": {
+      "61": 1
+    },
+    "complexité": {
+      "61": 1
+    },
+    "compliquées": {
+      "61": 1
+    },
+    "conform": {
+      "59": 1
+    },
+    "constraints": {
+      "59": 1
+    },
+    "content": {
+      "59": 1
+    },
+    "context": {
+      "59": 4
+    },
+    "contexte": {
+      "61": 1
+    },
+    "contract_constraints": {
+      "58": 1
+    },
+    "contraintes": {
+      "57": 1,
+      "58": 1,
+      "61": 1
+    },
+    "conventions": {
+      "58": 2
+    },
+    "copy": {
+      "59": 10
+    },
+    "copy_dirs_json": {
+      "59": 1
+    },
+    "copybook": {
+      "59": 5
+    },
+    "copydirs": {
+      "59": 2
+    },
+    "correct": {
+      "59": 1
+    },
+    "couche": {
+      "58": 4
+    },
+    "couple": {
+      "8": 1
+    },
+    "cpy": {
+      "59": 2
+    },
+    "create": {
+      "60": 1,
+      "61": 1
+    },
+    "creating": {
+      "59": 1
+    },
+    "creation": {
+      "1": 1
+    },
+    "création": {
+      "61": 1
+    },
+    "d": {
+      "6": 1,
+      "57": 1,
+      "58": 1
+    },
+    "dal": {
+      "59": 1
+    },
+    "dans": {
+      "57": 3,
+      "58": 4
+    },
+    "data": {
+      "59": 2
+    },
+    "date": {
+      "61": 1
+    },
+    "db2": {
+      "59": 1
+    },
+    "de": {
+      "1": 1,
+      "5": 1,
+      "6": 1,
+      "57": 9,
+      "58": 3,
+      "61": 6
+    },
+    "decimal": {
+      "23": 1,
+      "35": 1,
+      "59": 1,
+      "61": 3
+    },
+    "declared": {
+      "59": 1
+    },
+    "defined": {
+      "59": 1
+    },
+    "definie": {
+      "8": 1
+    },
+    "dehors": {
+      "57": 1
+    },
+    "delete": {
+      "59": 2
+    },
+    "demandé": {
+      "58": 1
+    },
+    "des": {
+      "4": 1
+    },
+    "description": {
+      "57": 2
+    },
+    "dessus": {
+      "58": 1
+    },
+    "diagnosis": {
+      "59": 1
+    },
+    "diagnostic": {
+      "59": 1
+    },
+    "diagnostician": {
+      "59": 1
+    },
+    "dialect": {
+      "0": 1,
+      "59": 1
+    },
+    "dialecte": {
+      "57": 4,
+      "58": 4,
+      "59": 1
+    },
+    "directory": {
+      "60": 1
+    },
+    "disponibles": {
+      "57": 1
+    },
+    "distinct": {
+      "59": 1
+    },
+    "division": {
+      "57": 1,
+      "59": 5
+    },
+    "do": {
+      "59": 4
+    },
+    "document": {
+      "59": 2
+    },
+    "doit": {
+      "10": 1,
+      "57": 1,
+      "58": 1
+    },
+    "données": {
+      "57": 2,
+      "58": 2,
+      "61": 2
+    },
+    "doublon": {
+      "6": 1
+    },
+    "du": {
+      "58": 3,
+      "61": 2
+    },
+    "due": {
+      "59": 1
+    },
+    "duplicate": {
+      "59": 1
+    },
+    "dupont": {
+      "61": 1
+    },
+    "déclarations": {
+      "57": 1
+    },
+    "décrite": {
+      "58": 1
+    },
+    "définies": {
+      "58": 1
+    },
+    "e": {
+      "59": 12,
+      "60": 1
+    },
+    "each": {
+      "59": 2
+    },
+    "echo": {
+      "60": 8
+    },
+    "else": {
+      "59": 1,
+      "60": 1
+    },
+    "email": {
+      "6": 2
+    },
+    "embarque": {
+      "9": 1
+    },
+    "emp_id": {
+      "61": 3
+    },
+    "emp_name": {
+      "61": 3
+    },
+    "employee": {
+      "61": 3
+    },
+    "empreinte": {
+      "5": 1
+    },
+    "en": {
+      "6": 1,
+      "9": 1,
+      "57": 1
+    },
+    "end": {
+      "59": 6
+    },
+    "ensure": {
+      "59": 5
+    },
+    "ensuring": {
+      "59": 1
+    },
+    "entities_json": {
+      "61": 1
+    },
+    "entity": {
+      "11": 1,
+      "19": 1,
+      "23": 1,
+      "36": 1,
+      "41": 1,
+      "46": 1
+    },
+    "entités": {
+      "61": 2
+    },
+    "entrée": {
+      "57": 1,
+      "58": 1
+    },
+    "environment": {
+      "59": 2
+    },
+    "eq": {
+      "60": 1
+    },
+    "erreur": {
+      "10": 1
+    },
+    "error": {
+      "59": 5,
+      "60": 1
+    },
+    "errors": {
+      "59": 2
+    },
+    "es": {
+      "57": 1,
+      "58": 1
+    },
+    "est": {
+      "6": 2,
+      "8": 1,
+      "57": 1,
+      "58": 1
+    },
+    "et": {
+      "2": 2,
+      "7": 1,
+      "61": 1
+    },
+    "etc": {
+      "59": 1
+    },
+    "etre": {
+      "10": 1
+    },
+    "evaluate": {
+      "59": 2
+    },
+    "exact": {
+      "59": 3
+    },
+    "exactly": {
+      "59": 1
+    },
+    "exec": {
+      "59": 9
+    },
+    "executable": {
+      "60": 1
+    },
+    "exemple": {
+      "61": 1
+    },
+    "exigence": {
+      "57": 2
+    },
+    "exigences": {
+      "58": 3,
+      "59": 1
+    },
+    "exigences_json": {
+      "58": 2,
+      "59": 1
+    },
+    "exist": {
+      "59": 1
+    },
+    "existing": {
+      "59": 1
+    },
+    "exists": {
+      "60": 1
+    },
+    "exit": {
+      "60": 3
+    },
+    "expected": {
+      "59": 1
+    },
+    "expert": {
+      "57": 1,
+      "58": 1,
+      "59": 1
+    },
+    "explanation": {
+      "59": 2
+    },
+    "explications": {
+      "57": 1,
+      "58": 1
+    },
+    "explicitement": {
+      "58": 1
+    },
+    "extra": {
+      "59": 3
+    },
+    "f": {
+      "60": 1
+    },
+    "f1": {
+      "1": 1
+    },
+    "f2": {
+      "2": 1
+    },
+    "f3": {
+      "3": 1
+    },
+    "f4": {
+      "4": 1
+    },
+    "f5": {
+      "5": 1
+    },
+    "failed": {
+      "60": 1
+    },
+    "failures": {
+      "59": 1
+    },
+    "fd": {
+      "59": 1
+    },
+    "fences": {
+      "59": 3
+    },
+    "fi": {
+      "60": 2
+    },
+    "fields": {
+      "59": 2
+    },
+    "file": {
+      "59": 6,
+      "60": 3
+    },
+    "file_path": {
+      "59": 3
+    },
+    "filepath": {
+      "59": 1
+    },
+    "final": {
+      "59": 1
+    },
+    "find": {
+      "59": 1
+    },
+    "fix": {
+      "59": 2
+    },
+    "fixed": {
+      "59": 6
+    },
+    "fixes": {
+      "59": 1
+    },
+    "flags": {
+      "59": 3,
+      "63": 1
+    },
+    "follow": {
+      "59": 1
+    },
+    "fonctionnalité": {
+      "58": 1
+    },
+    "fonctionnel": {
+      "61": 1
+    },
+    "fonctionnelles": {
+      "58": 2
+    },
+    "for": {
+      "59": 7,
+      "60": 1
+    },
+    "foreign": {
+      "17": 1,
+      "27": 1,
+      "28": 1,
+      "38": 1,
+      "43": 1,
+      "47": 1,
+      "48": 1
+    },
+    "format": {
+      "58": 2,
+      "59": 5,
+      "63": 1
+    },
+    "found": {
+      "60": 1
+    },
+    "fournie": {
+      "57": 2
+    },
+    "fournies": {
+      "57": 1,
+      "58": 1
+    },
+    "free": {
+      "59": 5,
+      "60": 1,
+      "63": 1
+    },
+    "from": {
+      "50": 1,
+      "51": 1,
+      "52": 1,
+      "53": 1,
+      "54": 1,
+      "55": 1,
+      "56": 1,
+      "59": 1
+    },
+    "full": {
+      "59": 1
+    },
+    "g": {
+      "59": 12
+    },
+    "generate": {
+      "59": 1
+    },
+    "generated": {
+      "59": 1,
+      "60": 1
+    },
+    "generating": {
+      "59": 1
+    },
+    "gerer": {
+      "1": 1,
+      "2": 1,
+      "3": 1,
+      "4": 1
+    },
+    "gets": {
+      "59": 1
+    },
+    "gnucobol": {
+      "0": 1,
+      "59": 1,
+      "60": 1
+    },
+    "guidance": {
+      "59": 1
+    },
+    "génère": {
+      "57": 4,
+      "58": 4,
+      "61": 3
+    },
+    "headers": {
+      "59": 1
+    },
+    "hebergement": {
+      "3": 1,
+      "41": 1,
+      "56": 1
+    },
+    "hebergement_id": {
+      "41": 1,
+      "42": 1
+    },
+    "hebergement_id_activite": {
+      "41": 1,
+      "43": 1
+    },
+    "hebergement_nbnuit": {
+      "41": 1,
+      "45": 1
+    },
+    "hebergement_type": {
+      "41": 1,
+      "44": 1
+    },
+    "high": {
+      "59": 1
+    },
+    "hints": {
+      "59": 1
+    },
+    "human": {
+      "59": 1
+    },
+    "i": {
+      "59": 2
+    },
+    "ibm": {
+      "59": 1
+    },
+    "id": {
+      "57": 1
+    },
+    "id_activite": {
+      "8": 1
+    },
+    "id_user": {
+      "8": 1
+    },
+    "identification": {
+      "59": 2
+    },
+    "identifie": {
+      "6": 1
+    },
+    "identify": {
+      "59": 1
+    },
+    "if": {
+      "59": 15,
+      "60": 3
+    },
+    "illegal": {
+      "59": 1
+    },
+    "immediately": {
+      "59": 2
+    },
+    "immédiatement": {
+      "57": 1,
+      "58": 1
+    },
+    "impact": {
+      "3": 1
+    },
+    "implémente": {
+      "57": 1,
+      "58": 1
+    },
+    "important": {
+      "61": 1
+    },
+    "in": {
+      "59": 7
+    },
+    "include": {
+      "59": 7
+    },
+    "infer": {
+      "59": 1
+    },
+    "inputs": {
+      "57": 3
+    },
+    "insert": {
+      "59": 3,
+      "61": 3
+    },
+    "insert_after": {
+      "59": 1
+    },
+    "insert_before": {
+      "59": 1
+    },
+    "inserted": {
+      "59": 1
+    },
+    "inspect": {
+      "59": 1
+    },
+    "instructions": {
+      "58": 1,
+      "59": 1
+    },
+    "int": {
+      "11": 2,
+      "12": 1,
+      "17": 1,
+      "19": 1,
+      "20": 1,
+      "23": 8,
+      "24": 1,
+      "27": 1,
+      "28": 1,
+      "29": 1,
+      "30": 1,
+      "32": 1,
+      "33": 1,
+      "34": 1,
+      "36": 4,
+      "37": 1,
+      "38": 1,
+      "39": 1,
+      "40": 1,
+      "41": 4,
+      "42": 1,
+      "43": 1,
+      "44": 1,
+      "45": 1,
+      "46": 3,
+      "47": 1,
+      "48": 1,
+      "49": 1,
+      "61": 2
+    },
+    "integer": {
+      "59": 1
+    },
+    "intended": {
+      "59": 1
+    },
+    "internally": {
+      "59": 1
+    },
+    "into": {
+      "61": 2
+    },
+    "intégrable": {
+      "57": 1
+    },
+    "inutile": {
+      "61": 1
+    },
+    "invalid": {
+      "59": 1
+    },
+    "invente": {
+      "58": 1
+    },
+    "io": {
+      "59": 1
+    },
+    "io_json": {
+      "58": 4,
+      "59": 1
+    },
+    "io_summary": {
+      "59": 1
+    },
+    "is": {
+      "59": 10
+    },
+    "issue": {
+      "59": 1
+    },
+    "it": {
+      "59": 3
+    },
+    "jour": {
+      "1": 1
+    },
+    "json": {
+      "59": 7
+    },
+    "juste": {
+      "61": 1
+    },
+    "kebab": {
+      "64": 1
+    },
+    "keep": {
+      "59": 1
+    },
+    "key": {
+      "12": 1,
+      "17": 1,
+      "20": 1,
+      "24": 1,
+      "27": 1,
+      "28": 1,
+      "37": 1,
+      "38": 1,
+      "42": 1,
+      "43": 1,
+      "47": 2,
+      "48": 2,
+      "59": 2,
+      "61": 1
+    },
+    "keys": {
+      "59": 1
+    },
+    "known": {
+      "59": 1
+    },
+    "l": {
+      "1": 1,
+      "5": 1,
+      "57": 1
+    },
+    "la": {
+      "57": 3,
+      "58": 1
+    },
+    "label": {
+      "59": 1
+    },
+    "labels": {
+      "59": 1
+    },
+    "layer": {
+      "59": 2
+    },
+    "layer_instructions": {
+      "58": 1
+    },
+    "le": {
+      "5": 1,
+      "8": 1,
+      "57": 6,
+      "58": 3
+    },
+    "lecture": {
+      "1": 1
+    },
+    "length": {
+      "59": 1
+    },
+    "les": {
+      "1": 1,
+      "2": 1,
+      "3": 1,
+      "4": 1,
+      "9": 1,
+      "57": 2,
+      "58": 7,
+      "61": 1
+    },
+    "leur": {
+      "2": 1
+    },
+    "line": {
+      "59": 6,
+      "63": 1
+    },
+    "line_format": {
+      "59": 1
+    },
+    "lineformat": {
+      "59": 1
+    },
+    "lines": {
+      "59": 2
+    },
+    "listées": {
+      "57": 2,
+      "58": 1
+    },
+    "literal": {
+      "59": 3
+    },
+    "llm": {
+      "65": 1
+    },
+    "locate": {
+      "59": 1
+    },
+    "location": {
+      "59": 1
+    },
+    "log": {
+      "59": 2
+    },
+    "logic": {
+      "59": 2
+    },
+    "main": {
+      "59": 1
+    },
+    "maintenant": {
+      "57": 1,
+      "58": 1
+    },
+    "makes": {
+      "59": 1
+    },
+    "maniere": {
+      "6": 1
+    },
+    "map": {
+      "59": 2
+    },
+    "mapping": {
+      "59": 1
+    },
+    "marche": {
+      "61": 1
+    },
+    "mark": {
+      "59": 1
+    },
+    "markdown": {
+      "57": 1,
+      "58": 1,
+      "59": 1
+    },
+    "marker": {
+      "59": 1
+    },
+    "markers": {
+      "59": 1
+    },
+    "martin": {
+      "61": 1
+    },
+    "match": {
+      "59": 1
+    },
+    "matching": {
+      "59": 2
+    },
+    "max": {
+      "65": 1
+    },
+    "mentionnée": {
+      "58": 1
+    },
+    "messages": {
+      "59": 1
+    },
+    "microfocus": {
+      "59": 1
+    },
+    "minimal": {
+      "58": 1,
+      "59": 4
+    },
+    "minimally": {
+      "59": 2
+    },
+    "minimum": {
+      "59": 1
+    },
+    "mise": {
+      "1": 1
+    },
+    "missing": {
+      "59": 3
+    },
+    "mkdir": {
+      "60": 1
+    },
+    "mnemonic": {
+      "59": 1
+    },
+    "must": {
+      "59": 4
+    },
+    "mysql": {
+      "59": 1
+    },
+    "métier": {
+      "58": 2
+    },
+    "n": {
+      "6": 1,
+      "50": 1,
+      "51": 1,
+      "52": 1,
+      "53": 1,
+      "54": 1,
+      "55": 1,
+      "56": 1,
+      "57": 1,
+      "58": 3
+    },
+    "name": {
+      "59": 2
+    },
+    "names": {
+      "59": 1
+    },
+    "naming": {
+      "64": 2
+    },
+    "ne": {
+      "58": 1
+    },
+    "near": {
+      "59": 2
+    },
+    "necessary": {
+      "59": 1
+    },
+    "needed": {
+      "59": 2
+    },
+    "negatif": {
+      "10": 1
+    },
+    "new": {
+      "59": 1
+    },
+    "newlines": {
+      "59": 1
+    },
+    "ni": {
+      "57": 1,
+      "58": 1
+    },
+    "no": {
+      "59": 6
+    },
+    "nom": {
+      "57": 1,
+      "58": 1
+    },
+    "nommage": {
+      "58": 3
+    },
+    "nommé": {
+      "57": 1
+    },
+    "non": {
+      "58": 2
+    },
+    "not": {
+      "59": 4,
+      "60": 1
+    },
+    "notes": {
+      "6": 1,
+      "7": 1,
+      "8": 1,
+      "9": 1,
+      "10": 1,
+      "59": 5
+    },
+    "nullable": {
+      "18": 1,
+      "35": 1
+    },
+    "number": {
+      "59": 3
+    },
+    "o": {
+      "60": 1
+    },
+    "ocesql": {
+      "9": 1
+    },
+    "of": {
+      "12": 1,
+      "13": 1,
+      "14": 1,
+      "15": 1,
+      "16": 1,
+      "17": 1,
+      "18": 1,
+      "20": 1,
+      "21": 1,
+      "22": 1,
+      "24": 1,
+      "25": 1,
+      "26": 1,
+      "27": 1,
+      "28": 1,
+      "29": 1,
+      "30": 1,
+      "31": 1,
+      "32": 1,
+      "33": 1,
+      "34": 1,
+      "35": 1,
+      "37": 1,
+      "38": 1,
+      "39": 1,
+      "40": 1,
+      "42": 1,
+      "43": 1,
+      "44": 1,
+      "45": 1,
+      "47": 1,
+      "48": 1,
+      "49": 1,
+      "59": 5
+    },
+    "ollama": {
+      "65": 1
+    },
+    "once": {
+      "59": 1
+    },
+    "one": {
+      "59": 1
+    },
+    "only": {
+      "59": 4
+    },
+    "op": {
+      "59": 2
+    },
+    "opened": {
+      "59": 1
+    },
+    "opening": {
+      "59": 1
+    },
+    "operations": {
+      "9": 1
+    },
+    "optional": {
+      "59": 5
+    },
+    "or": {
+      "59": 17
+    },
+    "oracle": {
+      "59": 1
+    },
+    "otherwise": {
+      "59": 1
+    },
+    "ou": {
+      "58": 1
+    },
+    "out": {
+      "59": 2
+    },
+    "output": {
+      "59": 3,
+      "60": 1
+    },
+    "output_dir": {
+      "60": 4
+    },
+    "outputs": {
+      "57": 3
+    },
+    "overflow": {
+      "59": 1
+    },
+    "p": {
+      "59": 2,
+      "60": 1
+    },
+    "par": {
+      "5": 1,
+      "6": 1,
+      "8": 1,
+      "10": 1
+    },
+    "paragraph": {
+      "59": 3
+    },
+    "paragraphe": {
+      "57": 5
+    },
+    "parent": {
+      "57": 2
+    },
+    "parse": {
+      "59": 1
+    },
+    "parseable": {
+      "59": 1
+    },
+    "part": {
+      "0": 1
+    },
+    "participation": {
+      "8": 1,
+      "46": 1,
+      "53": 1,
+      "54": 1
+    },
+    "participation_id_activite": {
+      "46": 1,
+      "47": 1
+    },
+    "participation_id_user": {
+      "46": 1,
+      "48": 1
+    },
+    "participation_mode_transport": {
+      "46": 1,
+      "49": 1
+    },
+    "participations": {
+      "4": 1
+    },
+    "parts": {
+      "59": 1
+    },
+    "pas": {
+      "57": 3,
+      "58": 1,
+      "61": 3
+    },
+    "patch": {
+      "59": 7
+    },
+    "patch_plan": {
+      "59": 1
+    },
+    "patches": {
+      "59": 2
+    },
+    "path": {
+      "59": 4
+    },
+    "paths": {
+      "59": 1
+    },
+    "perform": {
+      "59": 3
+    },
+    "permettre": {
+      "5": 1
+    },
+    "pic": {
+      "59": 3
+    },
+    "picture": {
+      "59": 1
+    },
+    "plan": {
+      "59": 3
+    },
+    "possede": {
+      "7": 1
+    },
+    "possible": {
+      "59": 3
+    },
+    "post": {
+      "59": 1
+    },
+    "postgres": {
+      "0": 1,
+      "59": 1
+    },
+    "postgresql": {
+      "9": 1
+    },
+    "pour": {
+      "58": 2,
+      "61": 2
+    },
+    "precise": {
+      "59": 1
+    },
+    "precision": {
+      "59": 1
+    },
+    "prefer": {
+      "59": 3
+    },
+    "prefix": {
+      "64": 1
+    },
+    "present": {
+      "59": 1
+    },
+    "preserving": {
+      "59": 1
+    },
+    "primary": {
+      "12": 1,
+      "20": 1,
+      "24": 1,
+      "37": 1,
+      "42": 1,
+      "47": 1,
+      "48": 1,
+      "61": 1
+    },
+    "procedure": {
+      "59": 4
+    },
+    "procedure_description": {
+      "57": 1
+    },
+    "procedure_name": {
+      "57": 2
+    },
+    "procedure_type": {
+      "57": 1
+    },
+    "procedures": {
+      "61": 1
+    },
+    "procname": {
+      "59": 1
+    },
+    "procs": {
+      "59": 2
+    },
+    "procédure": {
+      "57": 4
+    },
+    "produce": {
+      "59": 2
+    },
+    "program": {
+      "57": 1,
+      "59": 2,
+      "60": 4,
+      "64": 1
+    },
+    "program_id": {
+      "57": 1,
+      "58": 2,
+      "59": 1,
+      "60": 2
+    },
+    "program_name": {
+      "60": 4
+    },
+    "programid": {
+      "59": 1
+    },
+    "programme": {
+      "57": 2,
+      "58": 5
+    },
+    "project": {
+      "0": 1
+    },
+    "properly": {
+      "59": 1
+    },
+    "propose": {
+      "59": 2
+    },
+    "prose": {
+      "59": 1
+    },
+    "provider": {
+      "65": 1
+    },
+    "quelques": {
+      "61": 1
+    },
+    "qui": {
+      "57": 1,
+      "58": 2,
+      "61": 1
+    },
+    "r1": {
+      "6": 1
+    },
+    "r2": {
+      "7": 1
+    },
+    "r3": {
+      "8": 1
+    },
+    "r4": {
+      "9": 1
+    },
+    "r5": {
+      "10": 1
+    },
+    "rag_chunks": {
+      "59": 1
+    },
+    "rag_rules": {
+      "58": 1
+    },
+    "rattachement": {
+      "2": 1
+    },
+    "read": {
+      "59": 1
+    },
+    "readable": {
+      "59": 1
+    },
+    "reading": {
+      "59": 1
+    },
+    "realisees": {
+      "9": 1
+    },
+    "reason": {
+      "59": 1
+    },
+    "recommend": {
+      "59": 1
+    },
+    "record": {
+      "59": 1
+    },
+    "refactors": {
+      "59": 1
+    },
+    "reference": {
+      "59": 1
+    },
+    "reformat": {
+      "59": 1
+    },
+    "regionales": {
+      "2": 1
+    },
+    "regle_metier": {
+      "6": 1,
+      "7": 1,
+      "8": 1
+    },
+    "relationship": {
+      "50": 1,
+      "51": 1,
+      "52": 1,
+      "53": 1,
+      "54": 1,
+      "55": 1,
+      "56": 1
+    },
+    "relative": {
+      "59": 2
+    },
+    "relevant": {
+      "59": 1
+    },
+    "remontee": {
+      "10": 1
+    },
+    "rename": {
+      "59": 1
+    },
+    "repas": {
+      "3": 1,
+      "36": 1,
+      "55": 1
+    },
+    "repas_id": {
+      "36": 1,
+      "37": 1
+    },
+    "repas_id_activite": {
+      "36": 1,
+      "38": 1
+    },
+    "repas_nbrepas": {
+      "36": 1,
+      "40": 1
+    },
+    "repas_type": {
+      "36": 1,
+      "39": 1
+    },
+    "replace": {
+      "59": 4
+    },
+    "replacement": {
+      "59": 1
+    },
+    "replacing": {
+      "59": 1
+    },
+    "reported": {
+      "59": 1
+    },
+    "required": {
+      "59": 2
+    },
+    "requirement": {
+      "57": 1
+    },
+    "respecte": {
+      "57": 1,
+      "58": 1
+    },
+    "respected": {
+      "59": 1
+    },
+    "reste": {
+      "58": 1
+    },
+    "retour": {
+      "10": 1
+    },
+    "retrieved_rag_snippets": {
+      "59": 1
+    },
+    "return": {
+      "59": 2
+    },
+    "rien": {
+      "58": 1
+    },
+    "role": {
+      "59": 1
+    },
+    "root": {
+      "59": 2
+    },
+    "rules": {
+      "59": 3
+    },
+    "running": {
+      "60": 1
+    },
+    "règles": {
+      "58": 2
+    },
+    "s": {
+      "59": 3
+    },
+    "safe": {
+      "59": 1
+    },
+    "salary_brut": {
+      "61": 3
+    },
+    "salary_net": {
+      "61": 3
+    },
+    "sans": {
+      "57": 1,
+      "58": 1
+    },
+    "schema": {
+      "59": 1
+    },
+    "script": {
+      "60": 1,
+      "61": 2
+    },
+    "search": {
+      "59": 2
+    },
+    "second": {
+      "59": 1
+    },
+    "section": {
+      "58": 1,
+      "59": 8
+    },
+    "senior": {
+      "59": 1
+    },
+    "sensitive": {
+      "59": 1
+    },
+    "set": {
+      "59": 2,
+      "60": 1
+    },
+    "seule": {
+      "7": 1
+    },
+    "seulement": {
+      "57": 1
+    },
+    "sgbd": {
+      "59": 2,
+      "61": 3
+    },
+    "short": {
+      "59": 4
+    },
+    "si": {
+      "57": 1
+    },
+    "similaire": {
+      "61": 1
+    },
+    "simple": {
+      "61": 3
+    },
+    "single": {
+      "59": 2
+    },
+    "smallest": {
+      "59": 2
+    },
+    "soit": {
+      "58": 1
+    },
+    "son": {
+      "6": 1
+    },
+    "sont": {
+      "9": 1
+    },
+    "sortie": {
+      "57": 1,
+      "58": 1
+    },
+    "source": {
+      "59": 3
+    },
+    "source_begin": {
+      "59": 1
+    },
+    "source_cobol": {
+      "59": 1
+    },
+    "source_end": {
+      "59": 1
+    },
+    "specified": {
+      "59": 1
+    },
+    "spécifications": {
+      "57": 2,
+      "58": 3
+    },
+    "spécifiques": {
+      "58": 1
+    },
+    "spécifiée": {
+      "57": 1
+    },
+    "spécifiées": {
+      "58": 1,
+      "61": 1
+    },
+    "sql": {
+      "0": 1,
+      "9": 1,
+      "10": 1,
+      "59": 7,
+      "61": 5
+    },
+    "sql_cible": {
+      "58": 1
+    },
+    "sqlca": {
+      "59": 4
+    },
+    "sqlcode": {
+      "59": 3
+    },
+    "sqlite": {
+      "59": 1
+    },
+    "sqlserver": {
+      "59": 1
+    },
+    "stable": {
+      "59": 1
+    },
+    "statement": {
+      "59": 1
+    },
+    "status": {
+      "59": 1
+    },
+    "stderr": {
+      "59": 1
+    },
+    "stdout": {
+      "59": 1
+    },
+    "step": {
+      "59": 1
+    },
+    "steps": {
+      "59": 1
+    },
+    "still": {
+      "59": 2
+    },
+    "stockage": {
+      "5": 1
+    },
+    "stockées": {
+      "61": 1
+    },
+    "storage": {
+      "59": 5,
+      "64": 1
+    },
+    "strict": {
+      "59": 1
+    },
+    "string": {
+      "59": 9
+    },
+    "strings": {
+      "59": 1
+    },
+    "structure": {
+      "59": 2
+    },
+    "stub": {
+      "59": 2
+    },
+    "successful": {
+      "60": 1
+    },
+    "suit": {
+      "58": 1
+    },
+    "suitable": {
+      "59": 1
+    },
+    "supply": {
+      "59": 1
+    },
+    "suppression": {
+      "1": 1
+    },
+    "sur": {
+      "57": 1,
+      "58": 1
+    },
+    "surgical": {
+      "59": 1
+    },
+    "suspected": {
+      "59": 1
+    },
+    "switching": {
+      "59": 1
+    },
+    "syntax": {
+      "59": 2
+    },
+    "table": {
+      "61": 2
+    },
+    "target": {
+      "0": 1,
+      "59": 2
+    },
+    "technique": {
+      "9": 1
+    },
+    "temperature": {
+      "65": 1
+    },
+    "templates": {
+      "59": 1
+    },
+    "test": {
+      "61": 2
+    },
+    "text": {
+      "59": 4
+    },
+    "that": {
+      "59": 6
+    },
+    "the": {
+      "59": 17
+    },
+    "them": {
+      "59": 1
+    },
+    "then": {
+      "60": 2
+    },
+    "these": {
+      "59": 1
+    },
+    "to": {
+      "17": 1,
+      "27": 1,
+      "28": 1,
+      "38": 1,
+      "43": 1,
+      "47": 1,
+      "48": 1,
+      "50": 1,
+      "51": 1,
+      "52": 1,
+      "53": 1,
+      "54": 1,
+      "55": 1,
+      "56": 1,
+      "59": 9
+    },
+    "tokens": {
+      "65": 1
+    },
+    "touching": {
+      "59": 1
+    },
+    "toute": {
+      "10": 1
+    },
+    "toutes": {
+      "9": 1,
+      "58": 1
+    },
+    "transport": {
+      "3": 1
+    },
+    "triggers": {
+      "61": 1
+    },
+    "true": {
+      "17": 1,
+      "27": 1,
+      "28": 1,
+      "38": 1,
+      "43": 1,
+      "47": 1,
+      "48": 1
+    },
+    "tu": {
+      "57": 1,
+      "58": 1
+    },
+    "type": {
+      "12": 1,
+      "13": 1,
+      "14": 1,
+      "15": 1,
+      "16": 1,
+      "17": 1,
+      "18": 1,
+      "20": 1,
+      "21": 1,
+      "22": 1,
+      "24": 1,
+      "25": 1,
+      "26": 1,
+      "27": 1,
+      "28": 1,
+      "29": 1,
+      "30": 1,
+      "31": 1,
+      "32": 1,
+      "33": 1,
+      "34": 1,
+      "35": 1,
+      "37": 1,
+      "38": 1,
+      "39": 1,
+      "40": 1,
+      "42": 1,
+      "43": 1,
+      "44": 1,
+      "45": 1,
+      "47": 1,
+      "48": 1,
+      "49": 1,
+      "57": 1
+    },
+    "types": {
+      "59": 1,
+      "61": 1
+    },
+    "tâche": {
+      "57": 1,
+      "58": 1,
+      "61": 1
+    },
+    "un": {
+      "6": 1,
+      "7": 1,
+      "10": 1,
+      "57": 1,
+      "58": 3,
+      "61": 2
+    },
+    "undefined": {
+      "59": 1
+    },
+    "under": {
+      "59": 2
+    },
+    "une": {
+      "7": 2,
+      "8": 1,
+      "57": 1
+    },
+    "unique": {
+      "6": 1,
+      "59": 1
+    },
+    "uniquement": {
+      "57": 4,
+      "58": 3,
+      "61": 1
+    },
+    "unknown": {
+      "59": 3
+    },
+    "unless": {
+      "59": 1
+    },
+    "unrelated": {
+      "59": 1
+    },
+    "unresolved": {
+      "59": 2
+    },
+    "update": {
+      "59": 1
+    },
+    "upper": {
+      "64": 1
+    },
+    "upper_snake": {
+      "64": 1
+    },
+    "ups": {
+      "59": 1
+    },
+    "usage": {
+      "59": 1
+    },
+    "use": {
+      "59": 7
+    },
+    "used": {
+      "59": 1
+    },
+    "user_id": {
+      "11": 1,
+      "12": 1
+    },
+    "user_id_antenne": {
+      "11": 1,
+      "17": 1
+    },
+    "user_last_login": {
+      "11": 1,
+      "18": 1
+    },
+    "user_mail": {
+      "11": 1,
+      "14": 1
+    },
+    "user_nom": {
+      "11": 1,
+      "13": 1
+    },
+    "user_pass": {
+      "11": 1,
+      "15": 1
+    },
+    "user_role": {
+      "11": 1,
+      "16": 1
+    },
+    "utilisateur": {
+      "6": 1,
+      "11": 1,
+      "50": 1,
+      "52": 1,
+      "53": 1
+    },
+    "utilisateurs": {
+      "1": 1,
+      "2": 1,
+      "4": 1
+    },
+    "utilise": {
+      "57": 2,
+      "58": 1
+    },
+    "v9": {
+      "59": 1
+    },
+    "valid": {
+      "59": 1
+    },
+    "validate": {
+      "59": 1
+    },
+    "validation": {
+      "10": 1
+    },
+    "value": {
+      "59": 1
+    },
+    "values": {
+      "61": 2
+    },
+    "varchar": {
+      "11": 4,
+      "13": 1,
+      "14": 1,
+      "15": 1,
+      "16": 1,
+      "19": 2,
+      "21": 1,
+      "22": 1,
+      "23": 3,
+      "25": 1,
+      "26": 1,
+      "31": 1,
+      "61": 2
+    },
+    "variable": {
+      "57": 1,
+      "58": 1,
+      "64": 1
+    },
+    "variables": {
+      "57": 3,
+      "58": 1,
+      "61": 1
+    },
+    "via": {
+      "59": 1
+    },
+    "viable": {
+      "59": 1
+    },
+    "vs": {
+      "59": 1
+    },
+    "wall": {
+      "59": 1
+    },
+    "what": {
+      "59": 1
+    },
+    "when": {
+      "59": 3
+    },
+    "wide": {
+      "59": 1
+    },
+    "with": {
+      "11": 1,
+      "19": 1,
+      "23": 1,
+      "36": 1,
+      "41": 1,
+      "46": 1,
+      "59": 6,
+      "60": 1
+    },
+    "working": {
+      "59": 5,
+      "64": 1
+    },
+    "wrap": {
+      "59": 1
+    },
+    "writable": {
+      "59": 1
+    },
+    "wrong": {
+      "59": 1
+    },
+    "ws": {
+      "59": 2,
+      "64": 1
+    },
+    "x": {
+      "59": 1,
+      "60": 1
+    },
+    "you": {
+      "59": 3
+    },
+    "être": {
+      "57": 1,
+      "58": 1
+    }
+  }
+}

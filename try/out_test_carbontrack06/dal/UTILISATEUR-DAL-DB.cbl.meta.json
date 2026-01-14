@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-01-14T01:03:01Z",
+  "extra": {
+    "layer": "dal",
+    "program_id": "UTILISATEUR-DAL-DB"
+  },
+  "kind": "program_full_llm_strict",
+  "mtime_utc": "2026-01-14T01:03:01Z",
+  "name": "UTILISATEUR-DAL-DB.cbl",
+  "path": "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/dal/UTILISATEUR-DAL-DB.cbl",
+  "sha256": "be3502803e96fe60ab76beb5423257da74c50953dd08b530d166cbaaf6e845c8",
+  "size": 6980
+}

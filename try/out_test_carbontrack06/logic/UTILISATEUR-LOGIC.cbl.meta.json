@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-01-14T01:03:27Z",
+  "extra": {
+    "layer": "logic",
+    "program_id": "UTILISATEUR-LOGIC"
+  },
+  "kind": "program_full_llm_strict",
+  "mtime_utc": "2026-01-14T01:03:27Z",
+  "name": "UTILISATEUR-LOGIC.cbl",
+  "path": "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/logic/UTILISATEUR-LOGIC.cbl",
+  "sha256": "f4248242f0cf809daf1503a1a12146ffa92829159772492cd8497f66f82dc89f",
+  "size": 3426
+}

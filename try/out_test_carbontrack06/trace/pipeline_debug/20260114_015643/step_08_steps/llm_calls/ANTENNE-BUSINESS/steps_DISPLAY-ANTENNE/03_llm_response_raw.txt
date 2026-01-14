@@ -1,0 +1,8 @@
+```json
+["DISPLAY '----------------------------------------'",
+"DISPLAY 'ANTENNE   : ' LK-ANTENNE-NOM",
+"DISPLAY 'ID        : ' LK-ANTENNE-ID",
+"DISPLAY 'REGION    : ' LK-ANTENNE-REGION",
+"DISPLAY '----------------------------------------'",
+"GOBACK"]
+```

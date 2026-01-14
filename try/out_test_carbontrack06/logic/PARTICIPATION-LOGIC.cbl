@@ -1,0 +1,65 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PARTICIPATION-LOGIC.
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       REPOSITORY.
+           FUNCTION ALL INTRINSIC.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  END-OF-FILE            PIC X VALUE 'N'.
+           88  EOF-REACHED        VALUE 'Y'.
+           88  NOT-EOF            VALUE 'N'.
+       77  OPERATION              PIC X(4).
+       77  WS-COUNT-TOTAL         PIC 9(6) VALUE 0.
+       77  WS-COUNT-ERROR         PIC 9(6) VALUE 0.
+       01  PARTICIPATION.
+           05 PARTICIPATION-ID-ACTIVITE     PIC 9(9).
+           05 PARTICIPATION-ID-USER         PIC 9(9).
+           05 PARTICIPATION-MODE-TRANSPORT  PIC S9(2).
+
+       PROCEDURE DIVISION.
+       MAIN-PROCESS.
+           DISPLAY '=========================================='
+           DISPLAY 'DEBUT TRAITEMENT BATCH PARTICIPATIONS'
+           DISPLAY '=========================================='
+           MOVE 'READ' TO OPERATION
+           CALL 'PARTICIPATION-DAL-DB' USING
+                OPERATION
+                END-OF-FILE
+                PARTICIPATION
+           PERFORM UNTIL EOF-REACHED
+               ADD 1 TO WS-COUNT-TOTAL
+               PERFORM CALCULATE-TRANSPORT
+               MOVE 'SAVE' TO OPERATION
+               CALL 'PARTICIPATION-DAL-DB' USING
+                    OPERATION
+                    END-OF-FILE
+                    PARTICIPATION
+               CALL 'PARTICIPATION-BUSINESS' USING PARTICIPATION
+               MOVE 'READ' TO OPERATION
+               CALL 'PARTICIPATION-DAL-DB' USING
+                    OPERATION
+                    END-OF-FILE
+                    PARTICIPATION
+           END-PERFORM
+           MOVE 'END ' TO OPERATION
+           CALL 'PARTICIPATION-DAL-DB' USING
+                OPERATION
+                END-OF-FILE
+                PARTICIPATION
+           DISPLAY '=========================================='
+           DISPLAY 'FIN TRAITEMENT BATCH PARTICIPATIONS'
+           DISPLAY 'Nombre participations traitees: ' WS-COUNT-TOTAL
+           DISPLAY 'Participations en erreur: ' WS-COUNT-ERROR
+           DISPLAY '=========================================='
+           STOP RUN.
+
+       CALCULATE-TRANSPORT.
+
+           IF PARTICIPATION-MODE-TRANSPORT OF PARTICIPATION < 0
+               MOVE 0 TO PARTICIPATION-MODE-TRANSPORT OF PARTICIPATION
+               ADD 1 TO WS-COUNT-ERROR
+               CALL 'PARTICIPATION-BUSINESS' USING PARTICIPATION
+           END-IF.

@@ -1,0 +1,33 @@
+IDENTIFICATION DIVISION.
+PROGRAM-ID. UTILISATEUR-BUSINESS.
+      *****************************************************************
+      * Programme: UTILISATEUR-BUSINESS                               *
+      * Couche: BUSINESS (Presentation)                               *
+      * Role: Affichage simple des informations utilisateur           *
+      *       - Nom, email, role, antenne, dernier login              *
+      *****************************************************************
+ENVIRONMENT DIVISION.
+DATA DIVISION.
+WORKING-STORAGE SECTION.
+LINKAGE SECTION.
+01 LK-UTILISATEUR.
+    05 LK-USER-ID PIC 9(9).
+    05 LK-USER-NOM PIC X(50).
+    05 LK-USER-MAIL PIC X(80).
+    05 LK-USER-PASS PIC X(256).
+    05 LK-USER-ROLE PIC X(15).
+    05 LK-USER-ID-ANTENNE PIC 9(9).
+    05 LK-USER-LAST-LOGIN PIC S9(11).
+
+PROCEDURE DIVISION USING LK-UTILISATEUR.
+DISPLAY-UTILISATEUR.
+    DISPLAY '----------------------------------------'
+    DISPLAY 'UTILISATEUR: ' LK-USER-NOM OF LK-UTILISATEUR
+    DISPLAY 'ID        : ' LK-USER-ID OF LK-UTILISATEUR
+    DISPLAY 'EMAIL     : ' LK-USER-MAIL OF LK-UTILISATEUR
+    DISPLAY 'ROLE      : ' LK-USER-ROLE OF LK-UTILISATEUR
+    DISPLAY 'ANTENNE   : ' LK-USER-ID-ANTENNE OF LK-UTILISATEUR
+    DISPLAY 'LASTLOGIN : ' LK-USER-LAST-LOGIN OF LK-UTILISATEUR
+    DISPLAY '----------------------------------------'
+    GOBACK
+.

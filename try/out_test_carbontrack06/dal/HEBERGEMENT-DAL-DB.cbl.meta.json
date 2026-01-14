@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-01-14T01:10:56Z",
+  "extra": {
+    "layer": "dal",
+    "program_id": "HEBERGEMENT-DAL-DB"
+  },
+  "kind": "program_full_llm_strict",
+  "mtime_utc": "2026-01-14T01:10:56Z",
+  "name": "HEBERGEMENT-DAL-DB.cbl",
+  "path": "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/dal/HEBERGEMENT-DAL-DB.cbl",
+  "sha256": "463a6f3f473ef27322eec91909fd22cee513982df48fdc34884d05e814524fee",
+  "size": 6603
+}

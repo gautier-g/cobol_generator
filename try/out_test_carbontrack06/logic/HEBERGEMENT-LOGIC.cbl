@@ -1,0 +1,64 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. HEBERGEMENT-LOGIC.
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       REPOSITORY.
+           FUNCTION ALL INTRINSIC.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  END-OF-FILE            PIC X VALUE 'N'.
+           88  EOF-REACHED        VALUE 'Y'.
+           88  NOT-EOF            VALUE 'N'.
+       77  OPERATION              PIC X(4).
+       77  WS-COUNT-TOTAL         PIC 9(6) VALUE 0.
+       77  WS-COUNT-ERROR         PIC 9(6) VALUE 0.
+       01  HEBERGEMENT.
+           05 HEBERGEMENT-ID      PIC 9(9).
+           05 HEBERG-ID-ACTIVITE  PIC 9(9).
+           05 HEBERGEMENT-TYPE    PIC 9(2).
+           05 HEBERGEMENT-NBNUIT  PIC S9(3).
+       PROCEDURE DIVISION.
+       MAIN-PROCESS.
+           DISPLAY '=========================================='
+           DISPLAY 'DEBUT TRAITEMENT BATCH HEBERGEMENTS'
+           DISPLAY '=========================================='
+           MOVE 'READ' TO OPERATION
+           CALL 'HEBERGEMENT-DAL-DB' USING
+                OPERATION
+                END-OF-FILE
+                HEBERGEMENT
+           PERFORM UNTIL EOF-REACHED
+               ADD 1 TO WS-COUNT-TOTAL
+               PERFORM CALCULATE-HEBERGEMENT
+               MOVE 'SAVE' TO OPERATION
+               CALL 'HEBERGEMENT-DAL-DB' USING
+                    OPERATION
+                    END-OF-FILE
+                    HEBERGEMENT
+               CALL 'HEBERGEMENT-BUSINESS' USING HEBERGEMENT
+               MOVE 'READ' TO OPERATION
+               CALL 'HEBERGEMENT-DAL-DB' USING
+                    OPERATION
+                    END-OF-FILE
+                    HEBERGEMENT
+           END-PERFORM
+           MOVE 'END ' TO OPERATION
+           CALL 'HEBERGEMENT-DAL-DB' USING
+                OPERATION
+                END-OF-FILE
+                HEBERGEMENT
+           DISPLAY '=========================================='
+           DISPLAY 'FIN TRAITEMENT BATCH HEBERGEMENTS'
+           DISPLAY 'Nombre hebergements traites: ' WS-COUNT-TOTAL
+           DISPLAY 'Hebergements en erreur: ' WS-COUNT-ERROR
+           DISPLAY '=========================================='
+           STOP RUN.
+       
+       CALCULATE-HEBERGEMENT.
+
+           IF HEBERGEMENT-NBNUIT OF HEBERGEMENT < 0
+               MOVE 0 TO HEBERGEMENT-NBNUIT OF HEBERGEMENT
+               ADD 1 TO WS-COUNT-ERROR
+               DISPLAY 'ANOMALIE: Nombre nuits invalide'
+           END-IF.

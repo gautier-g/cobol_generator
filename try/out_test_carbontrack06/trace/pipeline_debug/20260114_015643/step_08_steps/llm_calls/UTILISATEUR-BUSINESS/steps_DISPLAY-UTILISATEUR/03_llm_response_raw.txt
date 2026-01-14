@@ -1,0 +1,11 @@
+```json
+["DISPLAY '----------------------------------------'",
+"DISPLAY 'UTILISATEUR: ' LK-USER-NOM",
+"DISPLAY 'ID        : ' LK-USER-ID",
+"DISPLAY 'EMAIL     : ' LK-USER-MAIL",
+"DISPLAY 'ROLE      : ' LK-USER-ROLE",
+"DISPLAY 'ANTENNE   : ' LK-USER-ID-ANTENNE",
+"DISPLAY 'LASTLOGIN : ' LK-USER-LAST-LOGIN",
+"DISPLAY '----------------------------------------'",
+"GOBACK"]
+```

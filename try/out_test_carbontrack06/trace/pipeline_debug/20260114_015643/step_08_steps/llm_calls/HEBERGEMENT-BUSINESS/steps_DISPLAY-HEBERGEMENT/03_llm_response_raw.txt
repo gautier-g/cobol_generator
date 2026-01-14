@@ -1,0 +1,9 @@
+```json
+["DISPLAY '----------------------------------------'",
+"DISPLAY 'HEBERG. : ' LK-HEBERGEMENT-ID",
+"DISPLAY 'ACTIVITE: ' LK-HEBERG-ID-ACTIVITE",
+"DISPLAY 'TYPE    : ' LK-HEBERGEMENT-TYPE",
+"DISPLAY 'NBNUIT  : ' LK-HEBERGEMENT-NBNUIT",
+"DISPLAY '----------------------------------------'",
+"GOBACK"]
+```

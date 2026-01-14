@@ -1,0 +1,8 @@
+```json
+[
+"IF REPAS-NBREPAS OF REPAS < 0",
+"    MOVE 0 TO REPAS-NBREPAS OF REPAS",
+"    ADD 1 TO WS-COUNT-ERROR",
+"END-IF"
+]
+```

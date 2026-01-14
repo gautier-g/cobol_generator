@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-01-14T01:09:03Z",
+  "extra": {
+    "layer": "dal",
+    "program_id": "REPAS-DAL-DB"
+  },
+  "kind": "program_full_llm_strict",
+  "mtime_utc": "2026-01-14T01:09:03Z",
+  "name": "REPAS-DAL-DB.cbl",
+  "path": "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/dal/REPAS-DAL-DB.cbl",
+  "sha256": "ab3758746ed206c0150785e111f9838698b09edec7b4ece8920d869a04eafd90",
+  "size": 6479
+}

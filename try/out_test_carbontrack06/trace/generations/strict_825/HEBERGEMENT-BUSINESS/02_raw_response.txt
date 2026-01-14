@@ -1,0 +1,29 @@
+IDENTIFICATION DIVISION.
+PROGRAM-ID. HEBERGEMENT-BUSINESS.
+      *****************************************************************
+      * Programme: HEBERGEMENT-BUSINESS                               *
+      * Couche: BUSINESS (Presentation)                               *
+      * Role: Affichage simple des informations hebergement           *
+      *       - Type, nombre de nuits                                 *
+      *****************************************************************
+ENVIRONMENT DIVISION.
+DATA DIVISION.
+WORKING-STORAGE SECTION.
+LINKAGE SECTION.
+01 LK-HEBERGEMENT.
+    05 LK-HEBERGEMENT-ID PIC 9(9).
+    05 LK-HEBERGEMENT-ID-ACTIVITE PIC 9(9).
+    05 LK-HEBERGEMENT-TYPE PIC 9(2).
+    05 LK-HEBERGEMENT-NBNUIT PIC S9(3).
+
+PROCEDURE DIVISION USING LK-HEBERGEMENT.
+DISPLAY-HEBERGEMENT.
+    DISPLAY '----------------------------------------'
+    DISPLAY 'HEBERG. : '
+    DISPLAY 'ID      : ' LK-HEBERGEMENT-ID
+    DISPLAY 'ACTIVITE: ' LK-HEBERGEMENT-ID-ACTIVITE
+    DISPLAY 'TYPE    : ' LK-HEBERGEMENT-TYPE
+    DISPLAY 'NBNUIT  : ' LK-HEBERGEMENT-NBNUIT
+    DISPLAY '----------------------------------------'
+    GOBACK
+.

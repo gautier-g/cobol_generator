@@ -1,0 +1,35 @@
+{
+  "created_dirs": [
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/business",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/logic",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/dal",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/copy",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/sql/ddl",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/sql/dml",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/tests",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/reports",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/trace",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/bin"
+  ],
+  "tests": [
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/tests/compile_UTILISATEUR-DAL-DB.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/tests/compile_UTILISATEUR-LOGIC.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/tests/compile_UTILISATEUR-BUSINESS.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/tests/compile_ANTENNE-DAL-DB.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/tests/compile_ANTENNE-LOGIC.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/tests/compile_ANTENNE-BUSINESS.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/tests/compile_ACTIVITE-DAL-DB.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/tests/compile_ACTIVITE-LOGIC.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/tests/compile_ACTIVITE-BUSINESS.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/tests/compile_REPAS-DAL-DB.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/tests/compile_REPAS-LOGIC.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/tests/compile_REPAS-BUSINESS.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/tests/compile_HEBERGEMENT-DAL-DB.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/tests/compile_HEBERGEMENT-LOGIC.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/tests/compile_HEBERGEMENT-BUSINESS.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/tests/compile_PARTICIPATION-DAL-DB.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/tests/compile_PARTICIPATION-LOGIC.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/tests/compile_PARTICIPATION-BUSINESS.sh",
+    "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/tests/compile_UTILISATEUR.sh"
+  ]
+}

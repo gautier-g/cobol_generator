@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-01-14T01:12:28Z",
+  "extra": {
+    "layer": "dal",
+    "program_id": "PARTICIPATION-DAL-DB"
+  },
+  "kind": "program_full_llm_strict",
+  "mtime_utc": "2026-01-14T01:12:28Z",
+  "name": "PARTICIPATION-DAL-DB.cbl",
+  "path": "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/dal/PARTICIPATION-DAL-DB.cbl",
+  "sha256": "64fb2b1b1c5d81b14deae0b17eaae5e3378291037594821e164fec8d125aa871",
+  "size": 6206
+}

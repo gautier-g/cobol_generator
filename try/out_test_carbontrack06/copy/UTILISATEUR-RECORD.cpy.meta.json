@@ -1,0 +1,12 @@
+{
+  "created_utc": "2026-01-14T00:56:44Z",
+  "extra": {
+    "entity": "UTILISATEUR"
+  },
+  "kind": "copybook",
+  "mtime_utc": "2026-01-14T00:56:44Z",
+  "name": "UTILISATEUR-RECORD.cpy",
+  "path": "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/copy/UTILISATEUR-RECORD.cpy",
+  "sha256": "5dd2a7f349059ab2ddee180665a95c3a3eb09c72055a471d518ba755d621ba3b",
+  "size": 386
+}

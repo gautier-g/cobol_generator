@@ -1,0 +1,12 @@
+{
+  "created_utc": "2026-01-14T00:56:44Z",
+  "extra": {
+    "entity": "HEBERGEMENT"
+  },
+  "kind": "copybook",
+  "mtime_utc": "2026-01-14T00:56:44Z",
+  "name": "HEBERGEMENT-RECORD.cpy",
+  "path": "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/copy/HEBERGEMENT-RECORD.cpy",
+  "sha256": "3e73d7d2141a57d31a1a1f34c9ab80a158fc29e648221d6eba0e5fc7bce7e00f",
+  "size": 248
+}

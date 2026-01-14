@@ -1,0 +1,30 @@
+```json
+[
+"IF NOT WS-CONNECTED",
+"    PERFORM DAL-SET-ENV",
+"    CALL \"OCESQLStartSQL\" END-CALL",
+"    IF SQLCODE = ZERO",
+"        CALL \"OCESQLConnect\" USING BY REFERENCE SQLCA",
+"            BY REFERENCE WS-DB-USER-TEXT OF WS-DB-USER",
+"            BY VALUE WS-DB-USER-LEN",
+"            BY REFERENCE WS-DB-PASSWORD-TEXT OF WS-DB-PASSWORD",
+"            BY VALUE WS-DB-PASSWORD-LEN",
+"            BY REFERENCE WS-DB-NAME-TEXT OF WS-DB-NAME",
+"            BY VALUE WS-DB-NAME-LEN END-CALL",
+"        IF SQLCODE = ZERO",
+"            SET WS-CONNECTED TO TRUE",
+"            DISPLAY 'Connexion DB reussie: carbontrackdb'",
+"        ELSE",
+"            DISPLAY 'ERREUR CONNECT: SQLCODE=' SQLCODE",
+"            DISPLAY 'SQLSTATE=' SQLSTATE",
+"            DISPLAY 'SQLERRMC=' SQLERRMC",
+"            MOVE 'Y' TO LK-END-OF-FILE",
+"        END-IF",
+"    ELSE",
+"        DISPLAY 'ERREUR OCESQLStartSQL: SQLCODE=' SQLCODE",
+"        MOVE 'Y' TO LK-END-OF-FILE",
+"    END-IF",
+"    CALL \"OCESQLEndSQL\" END-CALL",
+"END-IF"
+]
+```

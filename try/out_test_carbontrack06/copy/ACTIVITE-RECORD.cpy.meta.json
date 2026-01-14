@@ -1,0 +1,12 @@
+{
+  "created_utc": "2026-01-14T00:56:44Z",
+  "extra": {
+    "entity": "ACTIVITE"
+  },
+  "kind": "copybook",
+  "mtime_utc": "2026-01-14T00:56:44Z",
+  "name": "ACTIVITE-RECORD.cpy",
+  "path": "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/copy/ACTIVITE-RECORD.cpy",
+  "sha256": "df9cf332c73d1b06c96a16c4e8086fddb5aee54bb5450cf75039780904a1e5c1",
+  "size": 618
+}

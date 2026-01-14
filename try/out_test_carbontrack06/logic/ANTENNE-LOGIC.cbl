@@ -1,0 +1,51 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. ANTENNE-LOGIC.
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       REPOSITORY.
+           FUNCTION ALL INTRINSIC.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  END-OF-FILE            PIC X VALUE 'N'.
+           88  EOF-REACHED        VALUE 'Y'.
+           88  NOT-EOF            VALUE 'N'.
+       77  OPERATION              PIC X(4).
+       77  WS-COUNT-TOTAL         PIC 9(6) VALUE 0.
+       77  WS-COUNT-ERROR         PIC 9(6) VALUE 0.
+       01  ANTENNE.
+           05 ANTENNE-ID          PIC 9(9).
+           05 ANTENNE-NOM         PIC X(50).
+           05 ANTENNE-REGION      PIC X(50).
+       PROCEDURE DIVISION.
+       MAIN-PROCESS.
+           DISPLAY '=========================================='
+           DISPLAY 'DEBUT TRAITEMENT BATCH ANTENNES'
+           DISPLAY '=========================================='
+           MOVE 'READ' TO OPERATION
+           CALL 'ANTENNE-DAL-DB' USING OPERATION END-OF-FILE ANTENNE
+           PERFORM UNTIL EOF-REACHED
+               ADD 1 TO WS-COUNT-TOTAL
+               PERFORM NORMALIZE-REGION
+               MOVE 'SAVE' TO OPERATION
+               CALL 'ANTENNE-DAL-DB' USING OPERATION END-OF-FILE ANTENNE
+               CALL 'ANTENNE-BUSINESS' USING ANTENNE
+               MOVE 'READ' TO OPERATION
+               CALL 'ANTENNE-DAL-DB' USING OPERATION END-OF-FILE ANTENNE
+           END-PERFORM
+           MOVE 'END ' TO OPERATION
+           CALL 'ANTENNE-DAL-DB' USING OPERATION END-OF-FILE ANTENNE
+           DISPLAY '=========================================='
+           DISPLAY 'FIN TRAITEMENT BATCH ANTENNES'
+           DISPLAY 'Nombre antennes traitees: ' WS-COUNT-TOTAL
+           DISPLAY 'Antennes en erreur: ' WS-COUNT-ERROR
+           DISPLAY '=========================================='
+           STOP RUN.
+       
+       NORMALIZE-REGION.
+
+           IF ANTENNE-REGION OF ANTENNE = SPACES
+               MOVE 'INCONNUE' TO ANTENNE-REGION OF ANTENNE
+               ADD 1 TO WS-COUNT-ERROR
+               DISPLAY 'ANOMALIE: Region antenne invalide'
+           END-IF.

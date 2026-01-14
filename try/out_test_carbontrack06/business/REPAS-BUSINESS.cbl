@@ -1,0 +1,22 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. REPAS-BUSINESS.
+
+       ENVIRONMENT DIVISION.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       LINKAGE SECTION.
+       01 LK-REPAS.
+           05 LK-REPAS-ID PIC 9(9).
+           05 LK-REPAS-ID-ACTIVITE PIC 9(9).
+           05 LK-REPAS-TYPE PIC 9(2).
+           05 LK-REPAS-NBREPAS PIC S9(5).
+       
+       PROCEDURE DIVISION USING LK-REPAS.
+       DISPLAY-REPAS.
+           DISPLAY '----------------------------------------'
+           DISPLAY 'REPAS    : ' LK-REPAS-ID
+           DISPLAY 'ACTIVITE : ' LK-REPAS-ID-ACTIVITE
+           DISPLAY 'TYPE     : ' LK-REPAS-TYPE
+           DISPLAY 'NBREPAS  : ' LK-REPAS-NBREPAS
+           DISPLAY '----------------------------------------'
+           GOBACK.

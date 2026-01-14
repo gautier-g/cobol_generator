@@ -1,0 +1,54 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. REPAS-LOGIC.
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       REPOSITORY.
+           FUNCTION ALL INTRINSIC.
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01  END-OF-FILE            PIC X VALUE 'N'.
+           88  EOF-REACHED        VALUE 'Y'.
+           88  NOT-EOF            VALUE 'N'.
+       77  OPERATION              PIC X(4).
+       77  WS-COUNT-TOTAL         PIC 9(6) VALUE 0.
+       77  WS-COUNT-ERROR         PIC 9(6) VALUE 0.
+       01  REPAS.
+           05 REPAS-ID            PIC 9(9).
+           05 REPAS-ID-ACTIVITE   PIC 9(9).
+           05 REPAS-TYPE          PIC 9(2).
+           05 REPAS-NBREPAS       PIC S9(5).
+
+       PROCEDURE DIVISION.
+       MAIN-PROCESS.
+           DISPLAY '=========================================='
+           DISPLAY 'DEBUT TRAITEMENT BATCH REPAS'
+           DISPLAY '=========================================='
+           MOVE 'READ' TO OPERATION
+           CALL 'REPAS-DAL-DB' USING OPERATION END-OF-FILE REPAS
+           PERFORM UNTIL EOF-REACHED
+               ADD 1 TO WS-COUNT-TOTAL
+               PERFORM CALCULATE-REPAS
+               MOVE 'SAVE' TO OPERATION
+               CALL 'REPAS-DAL-DB' USING OPERATION END-OF-FILE REPAS
+               CALL 'REPAS-BUSINESS' USING REPAS
+               MOVE 'READ' TO OPERATION
+               CALL 'REPAS-DAL-DB' USING OPERATION END-OF-FILE REPAS
+           END-PERFORM
+           MOVE 'END ' TO OPERATION
+           CALL 'REPAS-DAL-DB' USING OPERATION END-OF-FILE REPAS
+           DISPLAY '=========================================='
+           DISPLAY 'FIN TRAITEMENT BATCH REPAS'
+           DISPLAY 'Nombre repas traites: ' WS-COUNT-TOTAL
+           DISPLAY 'Repas en erreur: ' WS-COUNT-ERROR
+           DISPLAY '=========================================='
+           STOP RUN.
+
+       CALCULATE-REPAS.
+
+           IF REPAS-NBREPAS OF REPAS < 0
+               MOVE 0 TO REPAS-NBREPAS OF REPAS
+               ADD 1 TO WS-COUNT-ERROR
+               DISPLAY 'ANOMALIE: Nombre repas invalide'
+           END-IF.

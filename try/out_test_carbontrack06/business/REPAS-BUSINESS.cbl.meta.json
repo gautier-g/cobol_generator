@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-01-14T01:09:35Z",
+  "extra": {
+    "layer": "business",
+    "program_id": "REPAS-BUSINESS"
+  },
+  "kind": "program_full_llm_strict",
+  "mtime_utc": "2026-01-14T01:09:35Z",
+  "name": "REPAS-BUSINESS.cbl",
+  "path": "/home/mfabre/pi/cobol_generator/try/out_test_carbontrack06/business/REPAS-BUSINESS.cbl",
+  "sha256": "dac7ff064ca36fb79cd970a4493cc73019e3074f1099899651e09670974e68fa",
+  "size": 1050
+}
