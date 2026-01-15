@@ -1,0 +1,38 @@
+[
+  {
+    "user_id": 1,
+    "user_nom": "Dupont",
+    "user_mail": "jean.dupont@example.com",
+    "user_pass": "$argon2id$v=19$m=65536,t=3,p=4$hash1",
+    "user_role": "ADMIN",
+    "user_id_antenne": 10,
+    "user_last_login": 1704451200
+  },
+  {
+    "user_id": 2,
+    "user_nom": "Martin",
+    "user_mail": "claire.martin@example.com",
+    "user_pass": "$argon2id$v=19$m=65536,t=3,p=4$hash2",
+    "user_role": "GESTIONNAIRE",
+    "user_id_antenne": 12,
+    "user_last_login": 1704537600
+  },
+  {
+    "user_id": 3,
+    "user_nom": "Bernard",
+    "user_mail": "luc.bernard@example.com",
+    "user_pass": "$argon2id$v=19$m=65536,t=3,p=4$hash3",
+    "user_role": "UTILISATEUR",
+    "user_id_antenne": 10,
+    "user_last_login": null
+  },
+  {
+    "user_id": 4,
+    "user_nom": "Petit",
+    "user_mail": "sophie.petit@example.com",
+    "user_pass": "$argon2id$v=19$m=65536,t=3,p=4$hash4",
+    "user_role": "UTILISATEUR",
+    "user_id_antenne": 15,
+    "user_last_login": 1704624000
+  }
+]

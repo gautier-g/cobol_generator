@@ -9,5 +9,5 @@ physical_layer
 
 display_operations
 Ne dépasse jamais la colonne 72!
-Ce programme ne doit pas utiliser la couche physique.
+Ce programme ne doit pas utiliser la couche physique!
 Ce programme est destiné à être appelé par un fichier parent.

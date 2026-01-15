@@ -276,4 +276,5 @@ Voici des exemples de code fonctionnel pour que tu comprennes la syntaxe d'OCESQ
 Ne dépasse jamais la colonne 72!
 Ne mets pas de tiret dans le nom du curseur OCESQL.
 Connecte toi toujours à la base de données avant d'utiliser un curseur!
+Ne fais pas de procédure qui permet uniquement la connexion à la base de données!
 Ce programme est destiné à être appelé par un fichier parent.

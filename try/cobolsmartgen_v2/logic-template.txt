@@ -17,4 +17,4 @@ Ce programme ne doit pas avoir de LINKAGE SECTION ni de variables liées à LINK
 Ce programme ne doit pas faire directement du SQL!
 
 
-Ce programme doit utiliser les deux autres programmes donnés.
+Ce programme doit utiliser les deux autres programmes donnés!

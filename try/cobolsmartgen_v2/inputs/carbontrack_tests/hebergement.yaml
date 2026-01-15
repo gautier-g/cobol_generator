@@ -1,0 +1,43 @@
+generation_name: hebergement
+
+puml_diagram: |
+  @startuml
+  class Hebergement {
+    HEBERGEMENT_ID : integer (needed)
+    HEBERGEMENT_ID_ACTIVITE : integer (needed)
+    HEBERGEMENT_TYPE : integer (needed)
+    HEBERGEMENT_NBNUIT : integer (needed)
+  }
+
+  class Activite {
+    ACTIVITE_ID : integer (needed)
+    ACTIVITE_NOM : varchar(50) (needed)
+    ACTIVITE_TYPE : varchar(20) (needed)
+    ACTIVITE_IDANTENNE : integer (needed)
+    ACTIVITE_ANIMATEUR : integer (needed)
+    ACTIVITE_NBPARTICIPANTS : integer (needed)
+    ACTIVITE_MODETRANSPORT : integer (needed)
+    ACTIVITE_LIEU : varchar(100) (needed)
+    ACTIVITE_DISTANCE : integer (needed)
+    ACTIVITE_HEBERGEMENT : integer (needed)
+    ACTIVITE_REPASPREVU : integer (needed)
+    ACTIVITE_EMPREINTETOTALE : numeric(13,4) (optional)
+  }
+
+  Herbergement "1" -- "1" Activite
+  @enduml
+
+database_operations_string: |
+  Donne moi un programme COBOL DB2 permettant :
+  - d'ajouter un hébergement à une activité,
+  - de lire un hébergement par identifiant,
+  - de lister les hébergements d'une activité,
+  - de mettre à jour le type et le nombre de nuits,
+  - de supprimer un hébergement.
+
+layer_operations_string: |
+  Donne moi un programme COBOL qui affiche
+  les informations d'un hébergement.
+
+basic_functionality_string: |
+  Donne moi un programme COBOL qui teste chaque fonction de la couche physique.
