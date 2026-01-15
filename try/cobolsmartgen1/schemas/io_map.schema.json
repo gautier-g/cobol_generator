@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CobolSmartGen IO map",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["entities"],
+  "properties": {
+    "entities": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["fields"],
+        "properties": {
+          "fields": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "required": ["sql_type", "cobol_pic"],
+              "properties": {
+                "sql_type": { "type": "string" },
+                "cobol_pic": { "type": "string" },
+                "direction": {
+                  "type": "string",
+                  "enum": ["in", "out", "inout"],
+                  "default": "inout"
+                },
+                "nullable": { "type": "boolean" },
+                "default": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

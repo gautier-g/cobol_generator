@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-01-15T11:06:33Z",
+  "extra": {
+    "layer": "business",
+    "program_id": "ANTENNE-BUSINESS"
+  },
+  "kind": "program_full_llm_strict",
+  "mtime_utc": "2026-01-15T11:06:33Z",
+  "name": "ANTENNE-BUSINESS.cbl",
+  "path": "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/business/ANTENNE-BUSINESS.cbl",
+  "sha256": "6b75e3d82a9113b109570f9a64a6ec1ce20de08a75675c7b7be8ae6b01c6853b",
+  "size": 622
+}

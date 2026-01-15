@@ -1,0 +1,2405 @@
+{
+  "avg_doc_length": 9.0,
+  "b": 0.75,
+  "doc_count": 60,
+  "doc_lengths": [
+    11,
+    14,
+    12,
+    10,
+    8,
+    10,
+    22,
+    14,
+    12,
+    17,
+    14,
+    22,
+    7,
+    6,
+    6,
+    6,
+    6,
+    9,
+    6,
+    12,
+    7,
+    6,
+    6,
+    33,
+    7,
+    6,
+    6,
+    9,
+    9,
+    5,
+    5,
+    6,
+    5,
+    5,
+    5,
+    8,
+    12,
+    7,
+    9,
+    5,
+    5,
+    12,
+    7,
+    9,
+    5,
+    5,
+    10,
+    11,
+    11,
+    5,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    6,
+    11,
+    9
+  ],
+  "document_frequencies": {
+    "0": 1,
+    "1": 7,
+    "100": 2,
+    "13": 2,
+    "15": 2,
+    "20": 2,
+    "256": 2,
+    "4": 2,
+    "4096": 1,
+    "50": 7,
+    "7": 1,
+    "80": 2,
+    "a": 3,
+    "activite": 8,
+    "activite_animateur": 2,
+    "activite_distance": 2,
+    "activite_empreintetotale": 2,
+    "activite_hebergement": 2,
+    "activite_id": 2,
+    "activite_idantenne": 2,
+    "activite_lieu": 2,
+    "activite_modetransport": 2,
+    "activite_nbparticipants": 2,
+    "activite_nom": 2,
+    "activite_repasprevu": 2,
+    "activite_type": 2,
+    "activites": 3,
+    "animateur": 1,
+    "antenne": 4,
+    "antenne_id": 2,
+    "antenne_nom": 2,
+    "antenne_region": 2,
+    "antennes": 1,
+    "appartient": 1,
+    "application": 2,
+    "attribute": 33,
+    "attributes": 6,
+    "aucun": 1,
+    "autorise": 1,
+    "aux": 2,
+    "base": 1,
+    "bd": 2,
+    "bigint": 2,
+    "carbone": 2,
+    "carbontrack": 2,
+    "cobc": 1,
+    "cobol": 2,
+    "code": 1,
+    "compiler": 1,
+    "couple": 1,
+    "creation": 1,
+    "d": 1,
+    "de": 3,
+    "decimal": 2,
+    "definie": 1,
+    "des": 1,
+    "dialect": 1,
+    "doit": 1,
+    "doublon": 1,
+    "email": 1,
+    "embarque": 1,
+    "empreinte": 1,
+    "en": 2,
+    "entity": 6,
+    "erreur": 1,
+    "est": 2,
+    "et": 2,
+    "etre": 1,
+    "f1": 1,
+    "f2": 1,
+    "f3": 1,
+    "f4": 1,
+    "f5": 1,
+    "flags": 1,
+    "foreign": 7,
+    "format": 1,
+    "free": 1,
+    "from": 7,
+    "gerer": 4,
+    "gnucobol": 1,
+    "hebergement": 3,
+    "hebergement_id": 2,
+    "hebergement_id_activite": 2,
+    "hebergement_nbnuit": 2,
+    "hebergement_type": 2,
+    "id_activite": 1,
+    "id_user": 1,
+    "identifie": 1,
+    "impact": 1,
+    "int": 28,
+    "jour": 1,
+    "kebab": 1,
+    "key": 12,
+    "l": 2,
+    "le": 2,
+    "lecture": 1,
+    "les": 5,
+    "leur": 1,
+    "line": 1,
+    "llm": 1,
+    "maniere": 1,
+    "max": 1,
+    "mise": 1,
+    "n": 8,
+    "naming": 1,
+    "negatif": 1,
+    "notes": 5,
+    "nullable": 2,
+    "of": 33,
+    "ollama": 1,
+    "operations": 1,
+    "par": 4,
+    "part": 1,
+    "participation": 4,
+    "participation_id_activite": 2,
+    "participation_id_user": 2,
+    "participation_mode_transport": 2,
+    "participations": 1,
+    "permettre": 1,
+    "possede": 1,
+    "postgres": 1,
+    "postgresql": 1,
+    "precompile": 1,
+    "prefix": 1,
+    "primary": 7,
+    "program": 1,
+    "project": 1,
+    "provider": 1,
+    "r1": 1,
+    "r2": 1,
+    "r3": 1,
+    "r4": 1,
+    "r5": 1,
+    "rattachement": 1,
+    "realisees": 1,
+    "regionales": 1,
+    "regle_metier": 3,
+    "relationship": 7,
+    "remontee": 1,
+    "repas": 3,
+    "repas_id": 2,
+    "repas_id_activite": 2,
+    "repas_nbrepas": 2,
+    "repas_type": 2,
+    "retour": 1,
+    "seule": 1,
+    "son": 1,
+    "sont": 1,
+    "sql": 3,
+    "stockage": 1,
+    "storage": 1,
+    "suppression": 1,
+    "target": 1,
+    "technique": 1,
+    "temperature": 1,
+    "to": 14,
+    "tokens": 1,
+    "toute": 1,
+    "toutes": 1,
+    "transport": 1,
+    "true": 7,
+    "type": 33,
+    "un": 3,
+    "une": 2,
+    "unique": 1,
+    "upper": 1,
+    "upper_snake": 1,
+    "user_id": 2,
+    "user_id_antenne": 2,
+    "user_last_login": 2,
+    "user_mail": 2,
+    "user_nom": 2,
+    "user_pass": 2,
+    "user_role": 2,
+    "utilisateur": 5,
+    "utilisateurs": 3,
+    "validation": 1,
+    "varchar": 12,
+    "variable": 1,
+    "with": 6,
+    "working": 1,
+    "ws": 1
+  },
+  "documents": [
+    {
+      "id": "spec_overview",
+      "metadata": {
+        "layer": "all",
+        "source": "specification",
+        "type": "overview"
+      },
+      "text": "Project: APPLICATION-CARBONTRACK-BD-PART. COBOL Dialect: gnucobol. SQL Target: postgres",
+      "tokens": [
+        "project",
+        "application",
+        "carbontrack",
+        "bd",
+        "part",
+        "cobol",
+        "dialect",
+        "gnucobol",
+        "sql",
+        "target",
+        "postgres"
+      ]
+    },
+    {
+      "id": "func_F1",
+      "metadata": {
+        "layer": "business",
+        "source": "specification",
+        "type": "functionality"
+      },
+      "text": "F1: Gerer les utilisateurs de l application CarbonTrack (creation, lecture, mise a jour, suppression).",
+      "tokens": [
+        "f1",
+        "gerer",
+        "les",
+        "utilisateurs",
+        "de",
+        "l",
+        "application",
+        "carbontrack",
+        "creation",
+        "lecture",
+        "mise",
+        "a",
+        "jour",
+        "suppression"
+      ]
+    },
+    {
+      "id": "func_F2",
+      "metadata": {
+        "layer": "business",
+        "source": "specification",
+        "type": "functionality"
+      },
+      "text": "F2: Gerer les antennes regionales et leur rattachement aux utilisateurs et activites.",
+      "tokens": [
+        "f2",
+        "gerer",
+        "les",
+        "antennes",
+        "regionales",
+        "et",
+        "leur",
+        "rattachement",
+        "aux",
+        "utilisateurs",
+        "et",
+        "activites"
+      ]
+    },
+    {
+      "id": "func_F3",
+      "metadata": {
+        "layer": "business",
+        "source": "specification",
+        "type": "functionality"
+      },
+      "text": "F3: Gerer les activites a impact carbone (transport, hebergement, repas).",
+      "tokens": [
+        "f3",
+        "gerer",
+        "les",
+        "activites",
+        "a",
+        "impact",
+        "carbone",
+        "transport",
+        "hebergement",
+        "repas"
+      ]
+    },
+    {
+      "id": "func_F4",
+      "metadata": {
+        "layer": "business",
+        "source": "specification",
+        "type": "functionality"
+      },
+      "text": "F4: Gerer les participations des utilisateurs aux activites.",
+      "tokens": [
+        "f4",
+        "gerer",
+        "les",
+        "participations",
+        "des",
+        "utilisateurs",
+        "aux",
+        "activites"
+      ]
+    },
+    {
+      "id": "func_F5",
+      "metadata": {
+        "layer": "business",
+        "source": "specification",
+        "type": "functionality"
+      },
+      "text": "F5: Permettre le stockage de l empreinte carbone par activite.",
+      "tokens": [
+        "f5",
+        "permettre",
+        "le",
+        "stockage",
+        "de",
+        "l",
+        "empreinte",
+        "carbone",
+        "par",
+        "activite"
+      ]
+    },
+    {
+      "id": "req_R1",
+      "metadata": {
+        "layer": "logic",
+        "req_type": "regle_metier",
+        "source": "specification",
+        "type": "requirement"
+      },
+      "text": "R1 (regle_metier): Un utilisateur est identifie de maniere unique par son email.. Notes: Aucun doublon d email n est autorise en base.",
+      "tokens": [
+        "r1",
+        "regle_metier",
+        "un",
+        "utilisateur",
+        "est",
+        "identifie",
+        "de",
+        "maniere",
+        "unique",
+        "par",
+        "son",
+        "email",
+        "notes",
+        "aucun",
+        "doublon",
+        "d",
+        "email",
+        "n",
+        "est",
+        "autorise",
+        "en",
+        "base"
+      ]
+    },
+    {
+      "id": "req_R2",
+      "metadata": {
+        "layer": "logic",
+        "req_type": "regle_metier",
+        "source": "specification",
+        "type": "requirement"
+      },
+      "text": "R2 (regle_metier): Une activite appartient a une seule antenne et possede un animateur.. Notes: ",
+      "tokens": [
+        "r2",
+        "regle_metier",
+        "une",
+        "activite",
+        "appartient",
+        "a",
+        "une",
+        "seule",
+        "antenne",
+        "et",
+        "possede",
+        "un",
+        "animateur",
+        "notes"
+      ]
+    },
+    {
+      "id": "req_R3",
+      "metadata": {
+        "layer": "logic",
+        "req_type": "regle_metier",
+        "source": "specification",
+        "type": "requirement"
+      },
+      "text": "R3 (regle_metier): Une participation est definie par le couple (ID_ACTIVITE, ID_USER).. Notes: ",
+      "tokens": [
+        "r3",
+        "regle_metier",
+        "une",
+        "participation",
+        "est",
+        "definie",
+        "par",
+        "le",
+        "couple",
+        "id_activite",
+        "id_user",
+        "notes"
+      ]
+    },
+    {
+      "id": "req_R4",
+      "metadata": {
+        "layer": "logic",
+        "req_type": "technique",
+        "source": "specification",
+        "type": "requirement"
+      },
+      "text": "R4 (technique): Toutes les operations BD sont realisees en COBOL embarque SQL PostgreSQL (SQL embarque precompile).. Notes: ",
+      "tokens": [
+        "r4",
+        "technique",
+        "toutes",
+        "les",
+        "operations",
+        "bd",
+        "sont",
+        "realisees",
+        "en",
+        "cobol",
+        "embarque",
+        "sql",
+        "postgresql",
+        "sql",
+        "embarque",
+        "precompile",
+        "notes"
+      ]
+    },
+    {
+      "id": "req_R5",
+      "metadata": {
+        "layer": "logic",
+        "req_type": "validation",
+        "source": "specification",
+        "type": "requirement"
+      },
+      "text": "R5 (validation): Toute erreur SQL doit etre remontee par un code retour negatif.. Notes: ",
+      "tokens": [
+        "r5",
+        "validation",
+        "toute",
+        "erreur",
+        "sql",
+        "doit",
+        "etre",
+        "remontee",
+        "par",
+        "un",
+        "code",
+        "retour",
+        "negatif",
+        "notes"
+      ]
+    },
+    {
+      "id": "entity_UTILISATEUR",
+      "metadata": {
+        "entity": "UTILISATEUR",
+        "layer": "dal",
+        "source": "specification",
+        "type": "entity"
+      },
+      "text": "Entity UTILISATEUR with attributes: USER_ID (INT), USER_NOM (VARCHAR(50)), USER_MAIL (VARCHAR(80)), USER_PASS (VARCHAR(256)), USER_ROLE (VARCHAR(15)), USER_ID_ANTENNE (INT), USER_LAST_LOGIN (BIGINT)",
+      "tokens": [
+        "entity",
+        "utilisateur",
+        "with",
+        "attributes",
+        "user_id",
+        "int",
+        "user_nom",
+        "varchar",
+        "50",
+        "user_mail",
+        "varchar",
+        "80",
+        "user_pass",
+        "varchar",
+        "256",
+        "user_role",
+        "varchar",
+        "15",
+        "user_id_antenne",
+        "int",
+        "user_last_login",
+        "bigint"
+      ]
+    },
+    {
+      "id": "attr_UTILISATEUR_USER_ID",
+      "metadata": {
+        "attribute": "USER_ID",
+        "entity": "UTILISATEUR",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute USER_ID of type INT (Primary Key)",
+      "tokens": [
+        "attribute",
+        "user_id",
+        "of",
+        "type",
+        "int",
+        "primary",
+        "key"
+      ]
+    },
+    {
+      "id": "attr_UTILISATEUR_USER_NOM",
+      "metadata": {
+        "attribute": "USER_NOM",
+        "entity": "UTILISATEUR",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute USER_NOM of type VARCHAR(50)",
+      "tokens": [
+        "attribute",
+        "user_nom",
+        "of",
+        "type",
+        "varchar",
+        "50"
+      ]
+    },
+    {
+      "id": "attr_UTILISATEUR_USER_MAIL",
+      "metadata": {
+        "attribute": "USER_MAIL",
+        "entity": "UTILISATEUR",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute USER_MAIL of type VARCHAR(80)",
+      "tokens": [
+        "attribute",
+        "user_mail",
+        "of",
+        "type",
+        "varchar",
+        "80"
+      ]
+    },
+    {
+      "id": "attr_UTILISATEUR_USER_PASS",
+      "metadata": {
+        "attribute": "USER_PASS",
+        "entity": "UTILISATEUR",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute USER_PASS of type VARCHAR(256)",
+      "tokens": [
+        "attribute",
+        "user_pass",
+        "of",
+        "type",
+        "varchar",
+        "256"
+      ]
+    },
+    {
+      "id": "attr_UTILISATEUR_USER_ROLE",
+      "metadata": {
+        "attribute": "USER_ROLE",
+        "entity": "UTILISATEUR",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute USER_ROLE of type VARCHAR(15)",
+      "tokens": [
+        "attribute",
+        "user_role",
+        "of",
+        "type",
+        "varchar",
+        "15"
+      ]
+    },
+    {
+      "id": "attr_UTILISATEUR_USER_ID_ANTENNE",
+      "metadata": {
+        "attribute": "USER_ID_ANTENNE",
+        "entity": "UTILISATEUR",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute USER_ID_ANTENNE of type INT (Foreign Key to True)",
+      "tokens": [
+        "attribute",
+        "user_id_antenne",
+        "of",
+        "type",
+        "int",
+        "foreign",
+        "key",
+        "to",
+        "true"
+      ]
+    },
+    {
+      "id": "attr_UTILISATEUR_USER_LAST_LOGIN",
+      "metadata": {
+        "attribute": "USER_LAST_LOGIN",
+        "entity": "UTILISATEUR",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute USER_LAST_LOGIN of type BIGINT (Nullable)",
+      "tokens": [
+        "attribute",
+        "user_last_login",
+        "of",
+        "type",
+        "bigint",
+        "nullable"
+      ]
+    },
+    {
+      "id": "entity_ANTENNE",
+      "metadata": {
+        "entity": "ANTENNE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "entity"
+      },
+      "text": "Entity ANTENNE with attributes: ANTENNE_ID (INT), ANTENNE_NOM (VARCHAR(50)), ANTENNE_REGION (VARCHAR(50))",
+      "tokens": [
+        "entity",
+        "antenne",
+        "with",
+        "attributes",
+        "antenne_id",
+        "int",
+        "antenne_nom",
+        "varchar",
+        "50",
+        "antenne_region",
+        "varchar",
+        "50"
+      ]
+    },
+    {
+      "id": "attr_ANTENNE_ANTENNE_ID",
+      "metadata": {
+        "attribute": "ANTENNE_ID",
+        "entity": "ANTENNE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ANTENNE_ID of type INT (Primary Key)",
+      "tokens": [
+        "attribute",
+        "antenne_id",
+        "of",
+        "type",
+        "int",
+        "primary",
+        "key"
+      ]
+    },
+    {
+      "id": "attr_ANTENNE_ANTENNE_NOM",
+      "metadata": {
+        "attribute": "ANTENNE_NOM",
+        "entity": "ANTENNE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ANTENNE_NOM of type VARCHAR(50)",
+      "tokens": [
+        "attribute",
+        "antenne_nom",
+        "of",
+        "type",
+        "varchar",
+        "50"
+      ]
+    },
+    {
+      "id": "attr_ANTENNE_ANTENNE_REGION",
+      "metadata": {
+        "attribute": "ANTENNE_REGION",
+        "entity": "ANTENNE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ANTENNE_REGION of type VARCHAR(50)",
+      "tokens": [
+        "attribute",
+        "antenne_region",
+        "of",
+        "type",
+        "varchar",
+        "50"
+      ]
+    },
+    {
+      "id": "entity_ACTIVITE",
+      "metadata": {
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "entity"
+      },
+      "text": "Entity ACTIVITE with attributes: ACTIVITE_ID (INT), ACTIVITE_NOM (VARCHAR(50)), ACTIVITE_TYPE (VARCHAR(20)), ACTIVITE_IDANTENNE (INT), ACTIVITE_ANIMATEUR (INT), ACTIVITE_NBPARTICIPANTS (INT), ACTIVITE_MODETRANSPORT (INT), ACTIVITE_LIEU (VARCHAR(100)), ACTIVITE_DISTANCE (INT), ACTIVITE_HEBERGEMENT (INT), ACTIVITE_REPASPREVU (INT), ACTIVITE_EMPREINTETOTALE (DECIMAL(13,4))",
+      "tokens": [
+        "entity",
+        "activite",
+        "with",
+        "attributes",
+        "activite_id",
+        "int",
+        "activite_nom",
+        "varchar",
+        "50",
+        "activite_type",
+        "varchar",
+        "20",
+        "activite_idantenne",
+        "int",
+        "activite_animateur",
+        "int",
+        "activite_nbparticipants",
+        "int",
+        "activite_modetransport",
+        "int",
+        "activite_lieu",
+        "varchar",
+        "100",
+        "activite_distance",
+        "int",
+        "activite_hebergement",
+        "int",
+        "activite_repasprevu",
+        "int",
+        "activite_empreintetotale",
+        "decimal",
+        "13",
+        "4"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_ID",
+      "metadata": {
+        "attribute": "ACTIVITE_ID",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_ID of type INT (Primary Key)",
+      "tokens": [
+        "attribute",
+        "activite_id",
+        "of",
+        "type",
+        "int",
+        "primary",
+        "key"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_NOM",
+      "metadata": {
+        "attribute": "ACTIVITE_NOM",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_NOM of type VARCHAR(50)",
+      "tokens": [
+        "attribute",
+        "activite_nom",
+        "of",
+        "type",
+        "varchar",
+        "50"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_TYPE",
+      "metadata": {
+        "attribute": "ACTIVITE_TYPE",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_TYPE of type VARCHAR(20)",
+      "tokens": [
+        "attribute",
+        "activite_type",
+        "of",
+        "type",
+        "varchar",
+        "20"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_IDANTENNE",
+      "metadata": {
+        "attribute": "ACTIVITE_IDANTENNE",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_IDANTENNE of type INT (Foreign Key to True)",
+      "tokens": [
+        "attribute",
+        "activite_idantenne",
+        "of",
+        "type",
+        "int",
+        "foreign",
+        "key",
+        "to",
+        "true"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_ANIMATEUR",
+      "metadata": {
+        "attribute": "ACTIVITE_ANIMATEUR",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_ANIMATEUR of type INT (Foreign Key to True)",
+      "tokens": [
+        "attribute",
+        "activite_animateur",
+        "of",
+        "type",
+        "int",
+        "foreign",
+        "key",
+        "to",
+        "true"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_NBPARTICIPANTS",
+      "metadata": {
+        "attribute": "ACTIVITE_NBPARTICIPANTS",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_NBPARTICIPANTS of type INT",
+      "tokens": [
+        "attribute",
+        "activite_nbparticipants",
+        "of",
+        "type",
+        "int"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_MODETRANSPORT",
+      "metadata": {
+        "attribute": "ACTIVITE_MODETRANSPORT",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_MODETRANSPORT of type INT",
+      "tokens": [
+        "attribute",
+        "activite_modetransport",
+        "of",
+        "type",
+        "int"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_LIEU",
+      "metadata": {
+        "attribute": "ACTIVITE_LIEU",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_LIEU of type VARCHAR(100)",
+      "tokens": [
+        "attribute",
+        "activite_lieu",
+        "of",
+        "type",
+        "varchar",
+        "100"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_DISTANCE",
+      "metadata": {
+        "attribute": "ACTIVITE_DISTANCE",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_DISTANCE of type INT",
+      "tokens": [
+        "attribute",
+        "activite_distance",
+        "of",
+        "type",
+        "int"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_HEBERGEMENT",
+      "metadata": {
+        "attribute": "ACTIVITE_HEBERGEMENT",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_HEBERGEMENT of type INT",
+      "tokens": [
+        "attribute",
+        "activite_hebergement",
+        "of",
+        "type",
+        "int"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_REPASPREVU",
+      "metadata": {
+        "attribute": "ACTIVITE_REPASPREVU",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_REPASPREVU of type INT",
+      "tokens": [
+        "attribute",
+        "activite_repasprevu",
+        "of",
+        "type",
+        "int"
+      ]
+    },
+    {
+      "id": "attr_ACTIVITE_ACTIVITE_EMPREINTETOTALE",
+      "metadata": {
+        "attribute": "ACTIVITE_EMPREINTETOTALE",
+        "entity": "ACTIVITE",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute ACTIVITE_EMPREINTETOTALE of type DECIMAL(13,4) (Nullable)",
+      "tokens": [
+        "attribute",
+        "activite_empreintetotale",
+        "of",
+        "type",
+        "decimal",
+        "13",
+        "4",
+        "nullable"
+      ]
+    },
+    {
+      "id": "entity_REPAS",
+      "metadata": {
+        "entity": "REPAS",
+        "layer": "dal",
+        "source": "specification",
+        "type": "entity"
+      },
+      "text": "Entity REPAS with attributes: REPAS_ID (INT), REPAS_ID_ACTIVITE (INT), REPAS_TYPE (INT), REPAS_NBREPAS (INT)",
+      "tokens": [
+        "entity",
+        "repas",
+        "with",
+        "attributes",
+        "repas_id",
+        "int",
+        "repas_id_activite",
+        "int",
+        "repas_type",
+        "int",
+        "repas_nbrepas",
+        "int"
+      ]
+    },
+    {
+      "id": "attr_REPAS_REPAS_ID",
+      "metadata": {
+        "attribute": "REPAS_ID",
+        "entity": "REPAS",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute REPAS_ID of type INT (Primary Key)",
+      "tokens": [
+        "attribute",
+        "repas_id",
+        "of",
+        "type",
+        "int",
+        "primary",
+        "key"
+      ]
+    },
+    {
+      "id": "attr_REPAS_REPAS_ID_ACTIVITE",
+      "metadata": {
+        "attribute": "REPAS_ID_ACTIVITE",
+        "entity": "REPAS",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute REPAS_ID_ACTIVITE of type INT (Foreign Key to True)",
+      "tokens": [
+        "attribute",
+        "repas_id_activite",
+        "of",
+        "type",
+        "int",
+        "foreign",
+        "key",
+        "to",
+        "true"
+      ]
+    },
+    {
+      "id": "attr_REPAS_REPAS_TYPE",
+      "metadata": {
+        "attribute": "REPAS_TYPE",
+        "entity": "REPAS",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute REPAS_TYPE of type INT",
+      "tokens": [
+        "attribute",
+        "repas_type",
+        "of",
+        "type",
+        "int"
+      ]
+    },
+    {
+      "id": "attr_REPAS_REPAS_NBREPAS",
+      "metadata": {
+        "attribute": "REPAS_NBREPAS",
+        "entity": "REPAS",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute REPAS_NBREPAS of type INT",
+      "tokens": [
+        "attribute",
+        "repas_nbrepas",
+        "of",
+        "type",
+        "int"
+      ]
+    },
+    {
+      "id": "entity_HEBERGEMENT",
+      "metadata": {
+        "entity": "HEBERGEMENT",
+        "layer": "dal",
+        "source": "specification",
+        "type": "entity"
+      },
+      "text": "Entity HEBERGEMENT with attributes: HEBERGEMENT_ID (INT), HEBERGEMENT_ID_ACTIVITE (INT), HEBERGEMENT_TYPE (INT), HEBERGEMENT_NBNUIT (INT)",
+      "tokens": [
+        "entity",
+        "hebergement",
+        "with",
+        "attributes",
+        "hebergement_id",
+        "int",
+        "hebergement_id_activite",
+        "int",
+        "hebergement_type",
+        "int",
+        "hebergement_nbnuit",
+        "int"
+      ]
+    },
+    {
+      "id": "attr_HEBERGEMENT_HEBERGEMENT_ID",
+      "metadata": {
+        "attribute": "HEBERGEMENT_ID",
+        "entity": "HEBERGEMENT",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute HEBERGEMENT_ID of type INT (Primary Key)",
+      "tokens": [
+        "attribute",
+        "hebergement_id",
+        "of",
+        "type",
+        "int",
+        "primary",
+        "key"
+      ]
+    },
+    {
+      "id": "attr_HEBERGEMENT_HEBERGEMENT_ID_ACTIVITE",
+      "metadata": {
+        "attribute": "HEBERGEMENT_ID_ACTIVITE",
+        "entity": "HEBERGEMENT",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute HEBERGEMENT_ID_ACTIVITE of type INT (Foreign Key to True)",
+      "tokens": [
+        "attribute",
+        "hebergement_id_activite",
+        "of",
+        "type",
+        "int",
+        "foreign",
+        "key",
+        "to",
+        "true"
+      ]
+    },
+    {
+      "id": "attr_HEBERGEMENT_HEBERGEMENT_TYPE",
+      "metadata": {
+        "attribute": "HEBERGEMENT_TYPE",
+        "entity": "HEBERGEMENT",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute HEBERGEMENT_TYPE of type INT",
+      "tokens": [
+        "attribute",
+        "hebergement_type",
+        "of",
+        "type",
+        "int"
+      ]
+    },
+    {
+      "id": "attr_HEBERGEMENT_HEBERGEMENT_NBNUIT",
+      "metadata": {
+        "attribute": "HEBERGEMENT_NBNUIT",
+        "entity": "HEBERGEMENT",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute HEBERGEMENT_NBNUIT of type INT",
+      "tokens": [
+        "attribute",
+        "hebergement_nbnuit",
+        "of",
+        "type",
+        "int"
+      ]
+    },
+    {
+      "id": "entity_PARTICIPATION",
+      "metadata": {
+        "entity": "PARTICIPATION",
+        "layer": "dal",
+        "source": "specification",
+        "type": "entity"
+      },
+      "text": "Entity PARTICIPATION with attributes: PARTICIPATION_ID_ACTIVITE (INT), PARTICIPATION_ID_USER (INT), PARTICIPATION_MODE_TRANSPORT (INT)",
+      "tokens": [
+        "entity",
+        "participation",
+        "with",
+        "attributes",
+        "participation_id_activite",
+        "int",
+        "participation_id_user",
+        "int",
+        "participation_mode_transport",
+        "int"
+      ]
+    },
+    {
+      "id": "attr_PARTICIPATION_PARTICIPATION_ID_ACTIVITE",
+      "metadata": {
+        "attribute": "PARTICIPATION_ID_ACTIVITE",
+        "entity": "PARTICIPATION",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute PARTICIPATION_ID_ACTIVITE of type INT (Primary Key) (Foreign Key to True)",
+      "tokens": [
+        "attribute",
+        "participation_id_activite",
+        "of",
+        "type",
+        "int",
+        "primary",
+        "key",
+        "foreign",
+        "key",
+        "to",
+        "true"
+      ]
+    },
+    {
+      "id": "attr_PARTICIPATION_PARTICIPATION_ID_USER",
+      "metadata": {
+        "attribute": "PARTICIPATION_ID_USER",
+        "entity": "PARTICIPATION",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute PARTICIPATION_ID_USER of type INT (Primary Key) (Foreign Key to True)",
+      "tokens": [
+        "attribute",
+        "participation_id_user",
+        "of",
+        "type",
+        "int",
+        "primary",
+        "key",
+        "foreign",
+        "key",
+        "to",
+        "true"
+      ]
+    },
+    {
+      "id": "attr_PARTICIPATION_PARTICIPATION_MODE_TRANSPORT",
+      "metadata": {
+        "attribute": "PARTICIPATION_MODE_TRANSPORT",
+        "entity": "PARTICIPATION",
+        "layer": "dal",
+        "source": "specification",
+        "type": "attribute"
+      },
+      "text": "Attribute PARTICIPATION_MODE_TRANSPORT of type INT",
+      "tokens": [
+        "attribute",
+        "participation_mode_transport",
+        "of",
+        "type",
+        "int"
+      ]
+    },
+    {
+      "id": "rel_UTILISATEUR_ANTENNE",
+      "metadata": {
+        "layer": "dal",
+        "source": "specification",
+        "type": "relation"
+      },
+      "text": "Relationship from UTILISATEUR to ANTENNE (N:1): ",
+      "tokens": [
+        "relationship",
+        "from",
+        "utilisateur",
+        "to",
+        "antenne",
+        "n",
+        "1"
+      ]
+    },
+    {
+      "id": "rel_ACTIVITE_ANTENNE",
+      "metadata": {
+        "layer": "dal",
+        "source": "specification",
+        "type": "relation"
+      },
+      "text": "Relationship from ACTIVITE to ANTENNE (N:1): ",
+      "tokens": [
+        "relationship",
+        "from",
+        "activite",
+        "to",
+        "antenne",
+        "n",
+        "1"
+      ]
+    },
+    {
+      "id": "rel_ACTIVITE_UTILISATEUR",
+      "metadata": {
+        "layer": "dal",
+        "source": "specification",
+        "type": "relation"
+      },
+      "text": "Relationship from ACTIVITE to UTILISATEUR (N:1): ",
+      "tokens": [
+        "relationship",
+        "from",
+        "activite",
+        "to",
+        "utilisateur",
+        "n",
+        "1"
+      ]
+    },
+    {
+      "id": "rel_PARTICIPATION_UTILISATEUR",
+      "metadata": {
+        "layer": "dal",
+        "source": "specification",
+        "type": "relation"
+      },
+      "text": "Relationship from PARTICIPATION to UTILISATEUR (N:1): ",
+      "tokens": [
+        "relationship",
+        "from",
+        "participation",
+        "to",
+        "utilisateur",
+        "n",
+        "1"
+      ]
+    },
+    {
+      "id": "rel_PARTICIPATION_ACTIVITE",
+      "metadata": {
+        "layer": "dal",
+        "source": "specification",
+        "type": "relation"
+      },
+      "text": "Relationship from PARTICIPATION to ACTIVITE (N:1): ",
+      "tokens": [
+        "relationship",
+        "from",
+        "participation",
+        "to",
+        "activite",
+        "n",
+        "1"
+      ]
+    },
+    {
+      "id": "rel_REPAS_ACTIVITE",
+      "metadata": {
+        "layer": "dal",
+        "source": "specification",
+        "type": "relation"
+      },
+      "text": "Relationship from REPAS to ACTIVITE (N:1): ",
+      "tokens": [
+        "relationship",
+        "from",
+        "repas",
+        "to",
+        "activite",
+        "n",
+        "1"
+      ]
+    },
+    {
+      "id": "rel_HEBERGEMENT_ACTIVITE",
+      "metadata": {
+        "layer": "dal",
+        "source": "specification",
+        "type": "relation"
+      },
+      "text": "Relationship from HEBERGEMENT to ACTIVITE (N:1): ",
+      "tokens": [
+        "relationship",
+        "from",
+        "hebergement",
+        "to",
+        "activite",
+        "n",
+        "1"
+      ]
+    },
+    {
+      "id": "config_compiler",
+      "metadata": {
+        "layer": "all",
+        "source": "configuration",
+        "type": "compiler"
+      },
+      "text": "Compiler: cobc. Flags: . Line format: free",
+      "tokens": [
+        "compiler",
+        "cobc",
+        "flags",
+        "line",
+        "format",
+        "free"
+      ]
+    },
+    {
+      "id": "config_naming",
+      "metadata": {
+        "layer": "all",
+        "source": "configuration",
+        "type": "naming"
+      },
+      "text": "Program naming: UPPER-KEBAB. Variable naming: UPPER_SNAKE. Working storage prefix: WS-",
+      "tokens": [
+        "program",
+        "naming",
+        "upper",
+        "kebab",
+        "variable",
+        "naming",
+        "upper_snake",
+        "working",
+        "storage",
+        "prefix",
+        "ws"
+      ]
+    },
+    {
+      "id": "config_llm",
+      "metadata": {
+        "layer": "all",
+        "source": "configuration",
+        "type": "llm"
+      },
+      "text": "LLM provider: ollama. Temperature: 0.7. Max tokens: 4096",
+      "tokens": [
+        "llm",
+        "provider",
+        "ollama",
+        "temperature",
+        "0",
+        "7",
+        "max",
+        "tokens",
+        "4096"
+      ]
+    }
+  ],
+  "k1": 1.5,
+  "term_frequencies": {
+    "0": {
+      "59": 1
+    },
+    "1": {
+      "50": 1,
+      "51": 1,
+      "52": 1,
+      "53": 1,
+      "54": 1,
+      "55": 1,
+      "56": 1
+    },
+    "100": {
+      "23": 1,
+      "31": 1
+    },
+    "13": {
+      "23": 1,
+      "35": 1
+    },
+    "15": {
+      "11": 1,
+      "16": 1
+    },
+    "20": {
+      "23": 1,
+      "26": 1
+    },
+    "256": {
+      "11": 1,
+      "15": 1
+    },
+    "4": {
+      "23": 1,
+      "35": 1
+    },
+    "4096": {
+      "59": 1
+    },
+    "50": {
+      "11": 1,
+      "13": 1,
+      "19": 2,
+      "21": 1,
+      "22": 1,
+      "23": 1,
+      "25": 1
+    },
+    "7": {
+      "59": 1
+    },
+    "80": {
+      "11": 1,
+      "14": 1
+    },
+    "a": {
+      "1": 1,
+      "3": 1,
+      "7": 1
+    },
+    "activite": {
+      "5": 1,
+      "7": 1,
+      "23": 1,
+      "51": 1,
+      "52": 1,
+      "54": 1,
+      "55": 1,
+      "56": 1
+    },
+    "activite_animateur": {
+      "23": 1,
+      "28": 1
+    },
+    "activite_distance": {
+      "23": 1,
+      "32": 1
+    },
+    "activite_empreintetotale": {
+      "23": 1,
+      "35": 1
+    },
+    "activite_hebergement": {
+      "23": 1,
+      "33": 1
+    },
+    "activite_id": {
+      "23": 1,
+      "24": 1
+    },
+    "activite_idantenne": {
+      "23": 1,
+      "27": 1
+    },
+    "activite_lieu": {
+      "23": 1,
+      "31": 1
+    },
+    "activite_modetransport": {
+      "23": 1,
+      "30": 1
+    },
+    "activite_nbparticipants": {
+      "23": 1,
+      "29": 1
+    },
+    "activite_nom": {
+      "23": 1,
+      "25": 1
+    },
+    "activite_repasprevu": {
+      "23": 1,
+      "34": 1
+    },
+    "activite_type": {
+      "23": 1,
+      "26": 1
+    },
+    "activites": {
+      "2": 1,
+      "3": 1,
+      "4": 1
+    },
+    "animateur": {
+      "7": 1
+    },
+    "antenne": {
+      "7": 1,
+      "19": 1,
+      "50": 1,
+      "51": 1
+    },
+    "antenne_id": {
+      "19": 1,
+      "20": 1
+    },
+    "antenne_nom": {
+      "19": 1,
+      "21": 1
+    },
+    "antenne_region": {
+      "19": 1,
+      "22": 1
+    },
+    "antennes": {
+      "2": 1
+    },
+    "appartient": {
+      "7": 1
+    },
+    "application": {
+      "0": 1,
+      "1": 1
+    },
+    "attribute": {
+      "12": 1,
+      "13": 1,
+      "14": 1,
+      "15": 1,
+      "16": 1,
+      "17": 1,
+      "18": 1,
+      "20": 1,
+      "21": 1,
+      "22": 1,
+      "24": 1,
+      "25": 1,
+      "26": 1,
+      "27": 1,
+      "28": 1,
+      "29": 1,
+      "30": 1,
+      "31": 1,
+      "32": 1,
+      "33": 1,
+      "34": 1,
+      "35": 1,
+      "37": 1,
+      "38": 1,
+      "39": 1,
+      "40": 1,
+      "42": 1,
+      "43": 1,
+      "44": 1,
+      "45": 1,
+      "47": 1,
+      "48": 1,
+      "49": 1
+    },
+    "attributes": {
+      "11": 1,
+      "19": 1,
+      "23": 1,
+      "36": 1,
+      "41": 1,
+      "46": 1
+    },
+    "aucun": {
+      "6": 1
+    },
+    "autorise": {
+      "6": 1
+    },
+    "aux": {
+      "2": 1,
+      "4": 1
+    },
+    "base": {
+      "6": 1
+    },
+    "bd": {
+      "0": 1,
+      "9": 1
+    },
+    "bigint": {
+      "11": 1,
+      "18": 1
+    },
+    "carbone": {
+      "3": 1,
+      "5": 1
+    },
+    "carbontrack": {
+      "0": 1,
+      "1": 1
+    },
+    "cobc": {
+      "57": 1
+    },
+    "cobol": {
+      "0": 1,
+      "9": 1
+    },
+    "code": {
+      "10": 1
+    },
+    "compiler": {
+      "57": 1
+    },
+    "couple": {
+      "8": 1
+    },
+    "creation": {
+      "1": 1
+    },
+    "d": {
+      "6": 1
+    },
+    "de": {
+      "1": 1,
+      "5": 1,
+      "6": 1
+    },
+    "decimal": {
+      "23": 1,
+      "35": 1
+    },
+    "definie": {
+      "8": 1
+    },
+    "des": {
+      "4": 1
+    },
+    "dialect": {
+      "0": 1
+    },
+    "doit": {
+      "10": 1
+    },
+    "doublon": {
+      "6": 1
+    },
+    "email": {
+      "6": 2
+    },
+    "embarque": {
+      "9": 2
+    },
+    "empreinte": {
+      "5": 1
+    },
+    "en": {
+      "6": 1,
+      "9": 1
+    },
+    "entity": {
+      "11": 1,
+      "19": 1,
+      "23": 1,
+      "36": 1,
+      "41": 1,
+      "46": 1
+    },
+    "erreur": {
+      "10": 1
+    },
+    "est": {
+      "6": 2,
+      "8": 1
+    },
+    "et": {
+      "2": 2,
+      "7": 1
+    },
+    "etre": {
+      "10": 1
+    },
+    "f1": {
+      "1": 1
+    },
+    "f2": {
+      "2": 1
+    },
+    "f3": {
+      "3": 1
+    },
+    "f4": {
+      "4": 1
+    },
+    "f5": {
+      "5": 1
+    },
+    "flags": {
+      "57": 1
+    },
+    "foreign": {
+      "17": 1,
+      "27": 1,
+      "28": 1,
+      "38": 1,
+      "43": 1,
+      "47": 1,
+      "48": 1
+    },
+    "format": {
+      "57": 1
+    },
+    "free": {
+      "57": 1
+    },
+    "from": {
+      "50": 1,
+      "51": 1,
+      "52": 1,
+      "53": 1,
+      "54": 1,
+      "55": 1,
+      "56": 1
+    },
+    "gerer": {
+      "1": 1,
+      "2": 1,
+      "3": 1,
+      "4": 1
+    },
+    "gnucobol": {
+      "0": 1
+    },
+    "hebergement": {
+      "3": 1,
+      "41": 1,
+      "56": 1
+    },
+    "hebergement_id": {
+      "41": 1,
+      "42": 1
+    },
+    "hebergement_id_activite": {
+      "41": 1,
+      "43": 1
+    },
+    "hebergement_nbnuit": {
+      "41": 1,
+      "45": 1
+    },
+    "hebergement_type": {
+      "41": 1,
+      "44": 1
+    },
+    "id_activite": {
+      "8": 1
+    },
+    "id_user": {
+      "8": 1
+    },
+    "identifie": {
+      "6": 1
+    },
+    "impact": {
+      "3": 1
+    },
+    "int": {
+      "11": 2,
+      "12": 1,
+      "17": 1,
+      "19": 1,
+      "20": 1,
+      "23": 8,
+      "24": 1,
+      "27": 1,
+      "28": 1,
+      "29": 1,
+      "30": 1,
+      "32": 1,
+      "33": 1,
+      "34": 1,
+      "36": 4,
+      "37": 1,
+      "38": 1,
+      "39": 1,
+      "40": 1,
+      "41": 4,
+      "42": 1,
+      "43": 1,
+      "44": 1,
+      "45": 1,
+      "46": 3,
+      "47": 1,
+      "48": 1,
+      "49": 1
+    },
+    "jour": {
+      "1": 1
+    },
+    "kebab": {
+      "58": 1
+    },
+    "key": {
+      "12": 1,
+      "17": 1,
+      "20": 1,
+      "24": 1,
+      "27": 1,
+      "28": 1,
+      "37": 1,
+      "38": 1,
+      "42": 1,
+      "43": 1,
+      "47": 2,
+      "48": 2
+    },
+    "l": {
+      "1": 1,
+      "5": 1
+    },
+    "le": {
+      "5": 1,
+      "8": 1
+    },
+    "lecture": {
+      "1": 1
+    },
+    "les": {
+      "1": 1,
+      "2": 1,
+      "3": 1,
+      "4": 1,
+      "9": 1
+    },
+    "leur": {
+      "2": 1
+    },
+    "line": {
+      "57": 1
+    },
+    "llm": {
+      "59": 1
+    },
+    "maniere": {
+      "6": 1
+    },
+    "max": {
+      "59": 1
+    },
+    "mise": {
+      "1": 1
+    },
+    "n": {
+      "6": 1,
+      "50": 1,
+      "51": 1,
+      "52": 1,
+      "53": 1,
+      "54": 1,
+      "55": 1,
+      "56": 1
+    },
+    "naming": {
+      "58": 2
+    },
+    "negatif": {
+      "10": 1
+    },
+    "notes": {
+      "6": 1,
+      "7": 1,
+      "8": 1,
+      "9": 1,
+      "10": 1
+    },
+    "nullable": {
+      "18": 1,
+      "35": 1
+    },
+    "of": {
+      "12": 1,
+      "13": 1,
+      "14": 1,
+      "15": 1,
+      "16": 1,
+      "17": 1,
+      "18": 1,
+      "20": 1,
+      "21": 1,
+      "22": 1,
+      "24": 1,
+      "25": 1,
+      "26": 1,
+      "27": 1,
+      "28": 1,
+      "29": 1,
+      "30": 1,
+      "31": 1,
+      "32": 1,
+      "33": 1,
+      "34": 1,
+      "35": 1,
+      "37": 1,
+      "38": 1,
+      "39": 1,
+      "40": 1,
+      "42": 1,
+      "43": 1,
+      "44": 1,
+      "45": 1,
+      "47": 1,
+      "48": 1,
+      "49": 1
+    },
+    "ollama": {
+      "59": 1
+    },
+    "operations": {
+      "9": 1
+    },
+    "par": {
+      "5": 1,
+      "6": 1,
+      "8": 1,
+      "10": 1
+    },
+    "part": {
+      "0": 1
+    },
+    "participation": {
+      "8": 1,
+      "46": 1,
+      "53": 1,
+      "54": 1
+    },
+    "participation_id_activite": {
+      "46": 1,
+      "47": 1
+    },
+    "participation_id_user": {
+      "46": 1,
+      "48": 1
+    },
+    "participation_mode_transport": {
+      "46": 1,
+      "49": 1
+    },
+    "participations": {
+      "4": 1
+    },
+    "permettre": {
+      "5": 1
+    },
+    "possede": {
+      "7": 1
+    },
+    "postgres": {
+      "0": 1
+    },
+    "postgresql": {
+      "9": 1
+    },
+    "precompile": {
+      "9": 1
+    },
+    "prefix": {
+      "58": 1
+    },
+    "primary": {
+      "12": 1,
+      "20": 1,
+      "24": 1,
+      "37": 1,
+      "42": 1,
+      "47": 1,
+      "48": 1
+    },
+    "program": {
+      "58": 1
+    },
+    "project": {
+      "0": 1
+    },
+    "provider": {
+      "59": 1
+    },
+    "r1": {
+      "6": 1
+    },
+    "r2": {
+      "7": 1
+    },
+    "r3": {
+      "8": 1
+    },
+    "r4": {
+      "9": 1
+    },
+    "r5": {
+      "10": 1
+    },
+    "rattachement": {
+      "2": 1
+    },
+    "realisees": {
+      "9": 1
+    },
+    "regionales": {
+      "2": 1
+    },
+    "regle_metier": {
+      "6": 1,
+      "7": 1,
+      "8": 1
+    },
+    "relationship": {
+      "50": 1,
+      "51": 1,
+      "52": 1,
+      "53": 1,
+      "54": 1,
+      "55": 1,
+      "56": 1
+    },
+    "remontee": {
+      "10": 1
+    },
+    "repas": {
+      "3": 1,
+      "36": 1,
+      "55": 1
+    },
+    "repas_id": {
+      "36": 1,
+      "37": 1
+    },
+    "repas_id_activite": {
+      "36": 1,
+      "38": 1
+    },
+    "repas_nbrepas": {
+      "36": 1,
+      "40": 1
+    },
+    "repas_type": {
+      "36": 1,
+      "39": 1
+    },
+    "retour": {
+      "10": 1
+    },
+    "seule": {
+      "7": 1
+    },
+    "son": {
+      "6": 1
+    },
+    "sont": {
+      "9": 1
+    },
+    "sql": {
+      "0": 1,
+      "9": 2,
+      "10": 1
+    },
+    "stockage": {
+      "5": 1
+    },
+    "storage": {
+      "58": 1
+    },
+    "suppression": {
+      "1": 1
+    },
+    "target": {
+      "0": 1
+    },
+    "technique": {
+      "9": 1
+    },
+    "temperature": {
+      "59": 1
+    },
+    "to": {
+      "17": 1,
+      "27": 1,
+      "28": 1,
+      "38": 1,
+      "43": 1,
+      "47": 1,
+      "48": 1,
+      "50": 1,
+      "51": 1,
+      "52": 1,
+      "53": 1,
+      "54": 1,
+      "55": 1,
+      "56": 1
+    },
+    "tokens": {
+      "59": 1
+    },
+    "toute": {
+      "10": 1
+    },
+    "toutes": {
+      "9": 1
+    },
+    "transport": {
+      "3": 1
+    },
+    "true": {
+      "17": 1,
+      "27": 1,
+      "28": 1,
+      "38": 1,
+      "43": 1,
+      "47": 1,
+      "48": 1
+    },
+    "type": {
+      "12": 1,
+      "13": 1,
+      "14": 1,
+      "15": 1,
+      "16": 1,
+      "17": 1,
+      "18": 1,
+      "20": 1,
+      "21": 1,
+      "22": 1,
+      "24": 1,
+      "25": 1,
+      "26": 1,
+      "27": 1,
+      "28": 1,
+      "29": 1,
+      "30": 1,
+      "31": 1,
+      "32": 1,
+      "33": 1,
+      "34": 1,
+      "35": 1,
+      "37": 1,
+      "38": 1,
+      "39": 1,
+      "40": 1,
+      "42": 1,
+      "43": 1,
+      "44": 1,
+      "45": 1,
+      "47": 1,
+      "48": 1,
+      "49": 1
+    },
+    "un": {
+      "6": 1,
+      "7": 1,
+      "10": 1
+    },
+    "une": {
+      "7": 2,
+      "8": 1
+    },
+    "unique": {
+      "6": 1
+    },
+    "upper": {
+      "58": 1
+    },
+    "upper_snake": {
+      "58": 1
+    },
+    "user_id": {
+      "11": 1,
+      "12": 1
+    },
+    "user_id_antenne": {
+      "11": 1,
+      "17": 1
+    },
+    "user_last_login": {
+      "11": 1,
+      "18": 1
+    },
+    "user_mail": {
+      "11": 1,
+      "14": 1
+    },
+    "user_nom": {
+      "11": 1,
+      "13": 1
+    },
+    "user_pass": {
+      "11": 1,
+      "15": 1
+    },
+    "user_role": {
+      "11": 1,
+      "16": 1
+    },
+    "utilisateur": {
+      "6": 1,
+      "11": 1,
+      "50": 1,
+      "52": 1,
+      "53": 1
+    },
+    "utilisateurs": {
+      "1": 1,
+      "2": 1,
+      "4": 1
+    },
+    "validation": {
+      "10": 1
+    },
+    "varchar": {
+      "11": 4,
+      "13": 1,
+      "14": 1,
+      "15": 1,
+      "16": 1,
+      "19": 2,
+      "21": 1,
+      "22": 1,
+      "23": 3,
+      "25": 1,
+      "26": 1,
+      "31": 1
+    },
+    "variable": {
+      "58": 1
+    },
+    "with": {
+      "11": 1,
+      "19": 1,
+      "23": 1,
+      "36": 1,
+      "41": 1,
+      "46": 1
+    },
+    "working": {
+      "58": 1
+    },
+    "ws": {
+      "58": 1
+    }
+  }
+}

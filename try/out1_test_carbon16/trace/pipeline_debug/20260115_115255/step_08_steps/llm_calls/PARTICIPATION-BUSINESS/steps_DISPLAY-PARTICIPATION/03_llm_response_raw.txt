@@ -1,0 +1,10 @@
+```json
+[
+"DISPLAY '----------------------------------------'",
+"DISPLAY 'ACTIVITE   : ' LK-PARTICIPATION-ID-ACTIVITE",
+"DISPLAY 'UTILISATEUR: ' LK-PARTICIPATION-ID-USER",
+"DISPLAY 'TRANSPORT  : ' LK-PARTICIPATION-MODE-TRANSPORT",
+"DISPLAY '----------------------------------------'",
+"GOBACK"
+]
+```

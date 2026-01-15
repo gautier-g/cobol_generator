@@ -1,0 +1,372 @@
+Tu generes UNIQUEMENT une liste JSON de lignes de steps (liste de strings).
+Pas de Markdown, pas d'explications, pas de code complet.
+Chaque ligne doit tenir sur 72 colonnes max (format fixed).
+Si une condition est longue, decoupe en IF imbriques ou EVALUATE.
+Utilise END-IF/END-PERFORM/END-EVALUATE.
+
+=== REGLES STRICTES (CRITIQUE) ===
+1. Format JSON uniquement: ["step1", "step2", ...]
+2. Pas d'indentation dans les steps (sera ajoutee plus tard)
+3. Maximum 72 colonnes par ligne
+4. N'invente JAMAIS de variables ou CALL targets
+5. Utilise UNIQUEMENT les mots-cles COBOL minimaux (voir liste ci-dessous)
+
+=== MOTS-CLES COBOL AUTORISES ===
+IF, ELSE, END-IF, END-CALL, MOVE, COMPUTE, ROUNDED, ADD, SUBTRACT, MULTIPLY, DIVIDE,
+DISPLAY, PERFORM, CALL, EVALUATE, WHEN, END-EVALUATE, END-PERFORM, FUNCTION,
+EXEC SQL, END-EXEC, OPEN, FETCH, CLOSE, COMMIT, ROLLBACK,
+IS NUMERIC, IS NOT NUMERIC, EQUAL, NOT EQUAL, GREATER, LESS, ZERO, OF, IN,
+CONTINUE, GOBACK, STOP RUN, INITIALIZE, SET, ACCEPT, FROM, ENVIRONMENT, UPON, SPACE, SPACES
+
+=== IDENTIFIANTS (CRITIQUE) ===
+N'invente JAMAIS de variables: utilise UNIQUEMENT les identifiants de la liste 'IDENTIFIANTS AUTORISES'.
+Chaque identifiant (WS-*, LK-*, nom de champ) doit exister dans cette liste.
+Syntaxe structure: AUTORISE 'FIELD OF STRUCTURE' ou champ direct 'FIELD'.
+INTERDIT: notation pointee (STRUCTURE.FIELD), identifiants non declares.
+NOTE: Si tu vois SALARY-BRUT et EMPLOYEE dans la liste, tu peux utiliser:
+  - 'SALARY-BRUT' seul (prefere)
+  - 'SALARY-BRUT OF EMPLOYEE' (acceptable si necessaire pour clarte)
+
+=== EXEMPLES VALIDES ===
+  MOVE SALARY-BRUT TO WS-BRUT
+  MOVE SALARY-BRUT OF EMPLOYEE TO WS-BRUT
+  COMPUTE SALARY-NET ROUNDED = WS-BRUT * 0.7
+  IF WS-BRUT IS NOT NUMERIC
+  IF WS-TOTAL < 0
+  DISPLAY 'Erreur: salaire invalide'
+  CALL 'PROGRAM-NAME' USING PARAM1 PARAM2 PARAM3  <- Utilise TOUS les params de l'interface
+  PERFORM CALCULATE-TOTAL
+  END-IF
+
+=== EXEMPLES INVALIDES ===
+  MOVE EMPLOYEE.SALARY TO WS-TOTAL  <- INTERDIT (notation pointee)
+  COMPUTE WS-NEW-VAR = 100  <- INTERDIT (WS-NEW-VAR non declare)
+  IF SALARY IS NEGATIVE  <- INTERDIT (n'existe pas, utilise: IF SALARY < 0)
+  IF SALARY IS NOT NULL  <- INTERDIT hors SQL (utilise IS NOT NUMERIC)
+  CALL 'INVENTED-PROGRAM'  <- INTERDIT (pas dans liste CALL TARGETS)
+  CALL 'PROGRAM' USING PARAM1  <- INTERDIT si l'interface definit 3 params (manque PARAM2, PARAM3)
+  PERFORM DAL-SAVE dans LOGIC  <- INTERDIT (CALL le programme DAL, pas PERFORM)
+
+=== INTERDICTIONS (CRITIQUE) ===
+INTERDIT: divisions/sections, PROGRAM-ID, paragraphes (labels avec point), DATA/WS/LINKAGE.
+INTERDIT: ligne avec un seul point.
+INTERDIT: identifiants non declares ou inventes.
+INTERDIT: IS NEGATIVE, IS POSITIVE (n'existent pas en COBOL, utilise < 0, > 0).
+INTERDIT: IS NULL hors EXEC SQL (dans COBOL normal, utilise IS NOT NUMERIC).
+INTERDIT: CALL vers programme non liste dans CALL TARGETS.
+SCOPE: uniquement les instructions du paragraphe courant (pas de nouveaux paragraphes).
+
+=== BONNES PRATIQUES (recommandations) ===
+PREFERE: COMPUTE ROUNDED au lieu de FUNCTION ROUND (plus simple).
+PREFERE: Pas de END-COMPUTE (pas necessaire en COBOL, juste COMPUTE suffit).
+AUTORISE mais moins bien: FUNCTION ROUND(...) est valide mais verbose.
+
+=== FORMAT DE SORTIE ===
+JSON uniquement, pas d'espaces en debut de ligne (l'indentation sera ajoutee plus tard).
+Format: ["instruction 1", "instruction 2", ...]
+Les steps doivent etre exploitables par un generateur COBOL.
+
+=== PRINCIPE DE MINIMALISME ===
+Genere le minimum d'instructions necessaires pour satisfaire les exigences.
+Evite les variables intermediaires inutiles.
+Privilegie les COMPUTE directs plutot que MOVE + ADD + MOVE.
+
+=== FONCTIONS INTRINSÈQUES GNUCOBOL (CRITIQUE) ===
+GnuCOBOL supporte un ensemble LIMITÉ de fonctions intrinsèques.
+
+FONCTIONS DISPONIBLES (utilise UNIQUEMENT ces fonctions):
+- FUNCTION INTEGER(x)      : Partie entière (tronque vers zéro)
+- FUNCTION ANINT(x)        : Arrondi au plus proche
+- FUNCTION MOD(x, y)       : Modulo
+- FUNCTION MAX(x, y, ...)  : Maximum
+- FUNCTION MIN(x, y, ...)  : Minimum
+- FUNCTION ABS(x)          : Valeur absolue
+- FUNCTION LENGTH(x)       : Longueur chaîne
+- FUNCTION UPPER-CASE(x)   : Majuscules
+- FUNCTION LOWER-CASE(x)   : Minuscules
+- FUNCTION TRIM(x)         : Supprimer espaces
+- FUNCTION CURRENT-DATE    : Date/heure système
+- FUNCTION WHEN-COMPILED   : Date compilation
+- FUNCTION NUMVAL(x)       : Convertir string en numérique
+
+FONCTIONS NON DISPONIBLES (N'EXISTENT PAS):
+❌ FUNCTION CEILING(x)  : N'existe pas! Utilise INTEGER(x + 0.999) à la place
+❌ FUNCTION CEIL(x)     : N'existe pas! Utilise INTEGER(x + 0.999) à la place
+❌ FUNCTION FLOOR(x)    : N'existe pas! Utilise INTEGER(x) à la place
+❌ FUNCTION ROUND(x, n) : N'existe pas! Utilise COMPUTE ... ROUNDED à la place
+❌ FUNCTION SQRT(x)     : N'existe pas!
+❌ FUNCTION POW(x, y)   : N'existe pas!
+❌ FUNCTION EXP(x)      : N'existe pas!
+❌ FUNCTION LOG(x)      : N'existe pas!
+❌ IF var NUMERIC = FALSE : N'existe pas! Utilise IF var IS NOT NUMERIC à la place
+
+ARRONDI SUPÉRIEUR (équivalent CEILING):
+Pour arrondir au supérieur, utilise cette technique:
+  COMPUTE result = FUNCTION INTEGER(value + 0.999)
+
+EXEMPLE CEILING:
+  value = 5.2  → FUNCTION INTEGER(5.2 + 0.999) = INTEGER(6.199) = 6  ✓
+  value = 5.0  → FUNCTION INTEGER(5.0 + 0.999) = INTEGER(5.999) = 5  ✓
+  value = -3.5 → FUNCTION INTEGER(-3.5 + 0.999) = INTEGER(-2.501) = -2  ✓
+
+ARRONDI STANDARD:
+Préfère toujours COMPUTE ... ROUNDED au lieu de FUNCTION:
+   CORRECT:   COMPUTE result ROUNDED = value1 * value2
+  ❌ INTERDIT:  COMPUTE result = FUNCTION ROUND(value1 * value2)
+
+VALIDATION NUMERIC:
+Utilise IS NUMERIC ou IS NOT NUMERIC pour tester si un champ alphanumérique contient des chiffres:
+   CORRECT:   IF var IS NUMERIC THEN ...
+   CORRECT:   IF var IS NOT NUMERIC THEN ...
+  ❌ INTERDIT:  IF var NUMERIC = FALSE ...
+
+IMPORTANT: Si tu dois arrondir, utilise COMPUTE ROUNDED, PAS FUNCTION ROUND.
+
+ERREUR DE COMPILATION SI TU UTILISES UNE FONCTION INEXISTANTE:
+Si tu génères FUNCTION CEILING, CEIL, FLOOR, ROUND, SQRT, POW, etc.,
+le compilateur GnuCOBOL retournera: "erreur : FUNCTION « XXX » inconnue"
+et la compilation ÉCHOUERA.
+
+
+
+=== CONTEXTE ===
+Programme: ACTIVITE-DAL-DB
+Couche: dal
+Entite: ACTIVITE
+Fonction: DAL-CONNECT (required=True)
+Description: Connexion paresseuse a la base en SQL embarque (precompilation). Initialise l environnement de connexion a partir de valeurs externes, puis etablit la connexion en utilisant les variables de connexion definies dans WORKING-STORAGE.
+
+=== SEPARATION DES COUCHES (CRITIQUE) ===
+COUCHE DAL: Tu generes du code d'acces aux donnees UNIQUEMENT.
+- AUTORISE: EXEC SQL, OPEN, FETCH, CLOSE, MOVE variables SQL
+- INTERDIT: COMPUTE, calculs metier, logique business
+- SCOPE: Lecture/ecriture base de donnees, pas de traitement
+
+=== MAPPING CONNEXION (CRITIQUE) ===
+Variables de connexion (spec): dbname=WS-DB-NAME, password=WS-DB-PASSWORD, user=WS-DB-USER
+Env vars (spec): PGHOST, PGPORT, PGUSER, PGPASSWORD, PGDATABASE
+Mapping env -> variable: PGUSER -> WS-DB-USER, PGPASSWORD -> WS-DB-PASSWORD, PGDATABASE -> WS-DB-NAME
+INTERDIT: valeurs litterales (ex: 'postgres', 'password123').
+INTERDIT: CALL GETENV/C$GETENV ou usage direct de noms d'env comme identifiants COBOL.
+INTERDIT: variables hote LK-* dans EXEC SQL (utiliser WS-* uniquement).
+Si tu charges l'env: utiliser ACCEPT <var> FROM ENVIRONMENT '<ENV>' selon le mapping.
+Variables alphanumeriques (PIC X/A/N): WS-DB-NAME, WS-DB-PASSWORD, WS-DB-USER -> NE PAS utiliser IS NUMERIC; verifier SPACES uniquement.
+CONNECT attendu: EXEC SQL CONNECT :WS-DB-USER IDENTIFIED BY :WS-DB-PASSWORD USING :WS-DB-NAME END-EXEC.
+INTERDIT: CONNECT TO ... USER ... USING ... (non supporte OCESQL).
+DAL-CONNECT: si deja connecte (flag WS-* = true), NE PAS faire GOBACK/STOP RUN; utiliser EXIT PARAGRAPH ou CONTINUE.
+Valeurs de flag (spec): true='Y', false='N'.
+Utiliser MOVE '<val>' vers *-FLAG (pas de SET ... TO TRUE/FALSE sans 88-level).
+Flags: WS-CONNECTED-FLAG, WS-CURSOR-OPEN-FLAG
+
+=== POLITIQUE COMMIT POUR DAL-CONNECT ===
+  ATTENTION: cursor_commit_policy = no_commit_while_open
+Si cette fonction fait partie d'un traitement avec curseur ouvert,
+N'UTILISE PAS: EXEC SQL COMMIT END-EXEC (sauf si fonction de cloture/fin)
+
+
+=== CALL TARGETS AUTORISES ===
+Programmes COBOL:
+  - ACTIVITE-BUSINESS
+    Parametres USING (dans l'ordre):
+      LK-ACTIVITE [groupe ACTIVITE] (in)
+
+  - ACTIVITE-LOGIC
+  - ANTENNE-BUSINESS
+    Parametres USING (dans l'ordre):
+      LK-ANTENNE [groupe ANTENNE] (in)
+
+  - ANTENNE-DAL-DB
+    Parametres USING (dans l'ordre):
+      LK-OPERATION [X(4)] (in)
+      LK-END-OF-FILE [X] (inout)
+      LK-ANTENNE [groupe ANTENNE] (inout)
+
+  - ANTENNE-LOGIC
+  - HEBERGEMENT-BUSINESS
+    Parametres USING (dans l'ordre):
+      LK-HEBERGEMENT [groupe HEBERGEMENT] (in)
+
+  - HEBERGEMENT-DAL-DB
+    Parametres USING (dans l'ordre):
+      LK-OPERATION [X(4)] (in)
+      LK-END-OF-FILE [X] (inout)
+      LK-HEBERGEMENT [groupe HEBERGEMENT] (inout)
+
+  - HEBERGEMENT-LOGIC
+  - PARTICIPATION-BUSINESS
+    Parametres USING (dans l'ordre):
+      LK-PARTICIPATION [groupe PARTICIPATION] (in)
+
+  - PARTICIPATION-DAL-DB
+    Parametres USING (dans l'ordre):
+      LK-OPERATION [X(4)] (in)
+      LK-END-OF-FILE [X] (inout)
+      LK-PARTICIPATION [groupe PARTICIPATION] (inout)
+
+  - PARTICIPATION-LOGIC
+  - REPAS-BUSINESS
+    Parametres USING (dans l'ordre):
+      LK-REPAS [groupe REPAS] (in)
+
+  - REPAS-DAL-DB
+    Parametres USING (dans l'ordre):
+      LK-OPERATION [X(4)] (in)
+      LK-END-OF-FILE [X] (inout)
+      LK-REPAS [groupe REPAS] (inout)
+
+  - REPAS-LOGIC
+  - UTILISATEUR-BUSINESS
+    Parametres USING (dans l'ordre):
+      LK-UTILISATEUR [groupe UTILISATEUR] (in)
+
+  - UTILISATEUR-DAL-DB
+    Parametres USING (dans l'ordre):
+      LK-OPERATION [X(4)] (in)
+      LK-END-OF-FILE [X] (inout)
+      LK-UTILISATEUR [groupe UTILISATEUR] (inout)
+
+  - UTILISATEUR-LOGIC
+IMPORTANT: N'utilise QUE les programmes listes ci-dessus. Inventer un CALL est INTERDIT.
+
+CRITIQUE: Pour chaque CALL vers un programme, tu DOIS passer TOUS les parametres listes
+dans 'Parametres USING (dans l'ordre)' ci-dessus, dans le MEME ORDRE, a CHAQUE appel.
+Exemple: Si un programme attend 3 parametres (A, B, C), tu dois TOUJOURS faire:
+  CALL 'PROGRAMME' USING A B C
+JAMAIS juste 'CALL PROGRAMME USING A' ou 'CALL PROGRAMME USING A B'.
+Les parametres sont OBLIGATOIRES et definis par la LINKAGE SECTION du programme appele.
+
+=== PARAGRAPHES AUTORISES (PERFORM) ===
+DAL-CONNECT, DAL-SET-ENV, DAL-READ, DAL-SAVE, DAL-END
+IMPORTANT: Utilise PERFORM uniquement vers les paragraphes listes ci-dessus.
+
+=== ENTREES / SORTIES (noms COBOL uniquement) ===
+Inputs: (aucun)
+Outputs: SQLCODE, SQLSTATE
+Modifies: SQLCODE, WS-CONNECTED
+
+=== CHAMPS / STRUCTURE ===
+ACTIVITE-ID [9(9)] (INT, not null)
+ACTIVITE-NOM [X(50)] (VARCHAR(50), not null)
+ACTIVITE-TYPE [X(20)] (VARCHAR(20), not null)
+ACTIVITE-IDANTENNE [9(9)] (INT, not null)
+ACTIVITE-ANIMATEUR [9(9)] (INT, not null)
+ACTIVITE-NBPARTICIPANTS [9(9)] (INT, not null)
+ACTIVITE-MODETRANSPORT [9(2)] (INT, not null)
+ACTIVITE-LIEU [X(100)] (VARCHAR(100), not null)
+ACTIVITE-DISTANCE [9(10)] (INT, not null)
+ACTIVITE-HEBERGEMENT [9(1)] (INT, not null)
+ACTIVITE-REPASPREVU [9(1)] (INT, not null)
+ACTIVITE-EMPREINTETOTALE [S9(9)V9(4)] (DECIMAL(13,4), nullable)
+
+=== WORKING-STORAGE (verbatim) ===
+01  WS-CONNECTED-FLAG      PIC X
+01  WS-CURSOR-OPEN-FLAG    PIC X
+01  WS-ACTIVITE-ID         PIC 9(9).
+01  WS-ACTIVITE-NOM        PIC X(50).
+01  WS-ACTIVITE-TYPE       PIC X(20).
+01  WS-ACTIVITE-IDANTENNE  PIC 9(9).
+01  WS-ACTIVITE-ANIMATEUR  PIC 9(9).
+01  WS-ACTIVITE-NBPART     PIC 9(9).
+01  WS-ACTIVITE-TRANSPORT  PIC 9(2).
+01  WS-ACTIVITE-LIEU       PIC X(100).
+01  WS-ACTIVITE-DISTANCE   PIC 9(10).
+01  WS-ACTIVITE-HEBERG     PIC 9(1).
+01  WS-ACTIVITE-REPAS      PIC 9(1).
+01  WS-ACTIVITE-EMPREINTE  PIC S9(9)V9(4).
+01  WS-ANTENNE-NOM         PIC X(50).
+01  WS-ANTENNE-REGION      PIC X(50).
+01  WS-USER-NOM            PIC X(50).
+01  WS-USER-MAIL           PIC X(80).
+01  WS-DB-NAME            PIC X(64).
+01  WS-DB-USER            PIC X(64).
+01  WS-DB-PASSWORD        PIC X(64).
+
+=== LINKAGE PARAMETERS ===
+LK-OPERATION [X(4)] (in)
+LK-END-OF-FILE [X] (inout)
+LK-ACTIVITE [groupe ACTIVITE] (inout)
+IMPORTANT: Utilise ces noms exacts dans USING et dans les steps.
+
+=== LINKAGE GROUP FIELDS (prefixe requis) ===
+LK-ACTIVITE:
+  - LK-ACTIVITE-ANIMATEUR
+  - LK-ACTIVITE-DISTANCE
+  - LK-ACTIVITE-EMPREINTE
+  - LK-ACTIVITE-HEBERG
+  - LK-ACTIVITE-ID
+  - LK-ACTIVITE-IDANTENNE
+  - LK-ACTIVITE-LIEU
+  - LK-ACTIVITE-NBPART
+  - LK-ACTIVITE-NOM
+  - LK-ACTIVITE-REPAS
+  - LK-ACTIVITE-TRANSPORT
+  - LK-ACTIVITE-TYPE
+  - LK-ANTENNE-NOM
+  - LK-ANTENNE-REGION
+  - LK-USER-MAIL
+  - LK-USER-NOM
+IMPORTANT: Ces noms LK-* doivent etre utilises pour les sous-champs des groupes.
+
+=== SQL ACTIONS (ordre obligatoire) ===
+(aucune)
+
+=== SQL (si applicable) ===
+connection_guidance: Initialiser l environnement de connexion depuis des valeurs externes (ex: variables PG*).
+connection_guidance: Etablir la connexion SQL embarquee en utilisant les variables de connexion deja presentes dans WORKING-STORAGE.
+connection_guidance: Si SQLCODE < 0: journaliser l erreur et interrompre le flux logique.
+connection_method: embedded_sql_precompile (voir sql.connection)
+
+=== DISPLAY SPEC (structure) ===
+(aucune)
+
+=== DISPLAY LINES (verbatim) ===
+(aucune)
+
+=== STATEMENTS OBLIGATOIRES ===
+(aucun)
+
+=== REGLES METIER (calculs et transformations) ===
+[R4] Toutes les operations BD sont realisees en COBOL embarque SQL PostgreSQL (SQL embarque precompile).
+NOTE: Ces regles definissent les calculs a effectuer (ex: SALARY_NET = BRUT * 0.7).
+
+=== REGLES DE VALIDATION (controles) ===
+Aucune
+NOTE: Ces regles definissent les controles a effectuer AVANT calcul.
+Pour tester NULL/invalide en COBOL normal: utilise 'IS NOT NUMERIC' (pas 'IS NULL').
+Exemple: IF SALARY-BRUT IS NOT NUMERIC → traiter comme invalide.
+
+
+=== LOGGING ===
+Connexion DB reussie
+ERREUR CONNECT: SQLCODE=
+SQLSTATE=
+SQLERRMC=
+Curseur C_ACT ouvert
+ERREUR OPEN: SQLCODE=
+ERREUR FETCH: SQLCODE=
+ERREUR UPDATE: SQLCODE=
+ERREUR CLOSE: SQLCODE=
+ERREUR COMMIT: SQLCODE=
+ERREUR DISCONNECT: SQLCODE=
+ERREUR: Operation inconnue: 
+Fermeture connexion
+
+=== FORMAT ===
+Format FIXED: instructions commencent en colonne 8 (prefixe de 7 espaces).
+Commentaires: '*' en colonne 7 (6 espaces + '*'), pas de commentaires '*>'.
+Ne pas utiliser '>>SOURCE FORMAT FREE'.
+PARAGRAPHES: Nom + point sur meme ligne. Format: MAIN-PROCESS. JAMAIS de point seul sur ligne.
+En DATA DIVISION, chaque ligne 01/05/77/88 avec PIC ou VALUE se termine par un point.
+Aucune ligne ne doit depasser 72 colonnes (format FIXED).
+Si une instruction depasse 72 colonnes, la scinder sur plusieurs lignes.
+Pour EXEC SQL FETCH/SELECT/UPDATE: mettre chaque variable hote sur sa propre ligne.
+Ne pas mettre de point en fin de DISPLAY/GOBACK/STOP RUN/CALL/MOVE/IF (sauf EXEC SQL INCLUDE SQLCA END-EXEC.).
+Utiliser des guillemets simples pour les messages DISPLAY.
+Respecter l'ordre: IDENTIFICATION -> ENVIRONMENT -> DATA -> PROCEDURE.
+Dans DATA: WORKING-STORAGE puis LINKAGE (si present).
+
+=== IDENTIFIANTS AUTORISES ===
+ACTIVITE, DAL-CONNECT, DAL-END, DAL-READ, DAL-SAVE, DAL-SET-ENV, LK-ACTIVITE, LK-ACTIVITE-ANIMATEUR, LK-ACTIVITE-DISTANCE, LK-ACTIVITE-EMPREINTE, LK-ACTIVITE-HEBERG, LK-ACTIVITE-ID, LK-ACTIVITE-IDANTENNE, LK-ACTIVITE-LIEU, LK-ACTIVITE-NBPART, LK-ACTIVITE-NOM, LK-ACTIVITE-REPAS, LK-ACTIVITE-TRANSPORT, LK-ACTIVITE-TYPE, LK-ANTENNE-NOM, LK-ANTENNE-REGION, LK-END-OF-FILE, LK-OPERATION, LK-USER-MAIL, LK-USER-NOM, SQLCA, SQLCODE, SQLERRMC, SQLSTATE, WS-ACTIVITE-ANIMATEUR, WS-ACTIVITE-DISTANCE, WS-ACTIVITE-EMPREINTE, WS-ACTIVITE-HEBERG, WS-ACTIVITE-ID, WS-ACTIVITE-IDANTENNE, WS-ACTIVITE-LIEU, WS-ACTIVITE-NBPART, WS-ACTIVITE-NOM, WS-ACTIVITE-REPAS, WS-ACTIVITE-TRANSPORT, WS-ACTIVITE-TYPE, WS-ANTENNE-NOM, WS-ANTENNE-REGION, WS-CONNECTED, WS-CONNECTED-FLAG, WS-CURSOR-OPEN-FLAG, WS-DB-NAME, WS-DB-PASSWORD, WS-DB-USER, WS-USER-MAIL, WS-USER-NOM
+
+=== SORTIE ATTENDUE ===
+Retourne un JSON valide: ["step 1", "step 2", ...]

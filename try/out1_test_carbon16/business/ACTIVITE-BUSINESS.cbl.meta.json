@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-01-15T11:10:12Z",
+  "extra": {
+    "layer": "business",
+    "program_id": "ACTIVITE-BUSINESS"
+  },
+  "kind": "program_full_llm_strict",
+  "mtime_utc": "2026-01-15T11:10:12Z",
+  "name": "ACTIVITE-BUSINESS.cbl",
+  "path": "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/business/ACTIVITE-BUSINESS.cbl",
+  "sha256": "07c91e73abb5ef05f0dec660a2a9f33da2b40e021a99f25492028e1f7c3e16e8",
+  "size": 1843
+}

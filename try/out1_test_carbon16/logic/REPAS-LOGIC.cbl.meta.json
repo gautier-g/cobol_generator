@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-01-15T11:13:22Z",
+  "extra": {
+    "layer": "logic",
+    "program_id": "REPAS-LOGIC"
+  },
+  "kind": "program_full_llm_strict",
+  "mtime_utc": "2026-01-15T11:13:22Z",
+  "name": "REPAS-LOGIC.cbl",
+  "path": "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/logic/REPAS-LOGIC.cbl",
+  "sha256": "4077ab0c3e8587a656b4c665cdb0db3a9f11c06574156a39e9b4438f8c052a43",
+  "size": 1837
+}

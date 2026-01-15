@@ -1,0 +1,24 @@
+{
+  "out_dir": "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16",
+  "generated_files": [
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/dal/UTILISATEUR-DAL-DB.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/logic/UTILISATEUR-LOGIC.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/business/UTILISATEUR-BUSINESS.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/dal/ANTENNE-DAL-DB.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/logic/ANTENNE-LOGIC.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/business/ANTENNE-BUSINESS.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/dal/ACTIVITE-DAL-DB.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/logic/ACTIVITE-LOGIC.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/business/ACTIVITE-BUSINESS.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/dal/REPAS-DAL-DB.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/logic/REPAS-LOGIC.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/business/REPAS-BUSINESS.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/dal/HEBERGEMENT-DAL-DB.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/logic/HEBERGEMENT-LOGIC.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/business/HEBERGEMENT-BUSINESS.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/dal/PARTICIPATION-DAL-DB.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/logic/PARTICIPATION-LOGIC.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/business/PARTICIPATION-BUSINESS.cbl",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/sql/UTILISATEUR.sql"
+  ]
+}

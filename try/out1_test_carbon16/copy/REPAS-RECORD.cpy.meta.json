@@ -1,0 +1,12 @@
+{
+  "created_utc": "2026-01-15T10:52:56Z",
+  "extra": {
+    "entity": "REPAS"
+  },
+  "kind": "copybook",
+  "mtime_utc": "2026-01-15T10:52:56Z",
+  "name": "REPAS-RECORD.cpy",
+  "path": "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/copy/REPAS-RECORD.cpy",
+  "sha256": "e45571f9a9fb1102b590d9e4f349dd712475669c0442a06af8d1320e373bc6ee",
+  "size": 233
+}

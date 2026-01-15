@@ -1,0 +1,107 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CobolSmartGen input spec",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["title", "fonctionnalites", "exigences", "mcd"],
+  "properties": {
+    "title": { "type": "string" },
+    "dialecte_cobol": {
+      "type": "string",
+      "enum": ["gnucobol", "ibm", "microfocus"]
+    },
+    "sql_cible": {
+      "type": "string",
+      "enum": ["postgres", "mysql", "oracle", "sqlserver", "db2", "sqlite"]
+    },
+    "nommage": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "variables_case": {
+          "type": "string",
+          "enum": ["UPPER_SNAKE", "UPPER-KEBAB", "SNAKE", "KEBAB"]
+        },
+        "programmes_case": {
+          "type": "string",
+          "enum": ["UPPER-KEBAB", "UPPER_SNAKE", "KEBAB", "SNAKE"]
+        }
+      }
+    },
+    "fonctionnalites": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "resume"],
+        "additionalProperties": true,
+        "properties": {
+          "id": { "type": "string" },
+          "resume": { "type": "string" }
+        }
+      }
+    },
+    "exigences": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "regle"],
+        "additionalProperties": true,
+        "properties": {
+          "id": { "type": "string" },
+          "type": {
+            "type": "string",
+            "enum": [
+              "regle_metier",
+              "technique",
+              "business",
+              "tech",
+              "fonctionnelle",
+              "non_fonctionnelle"
+            ]
+          },
+          "regle": { "type": "string" },
+          "notes": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "mcd": {
+      "type": "object",
+      "required": ["entites"],
+      "additionalProperties": true,
+      "properties": {
+        "entites": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "attrs"],
+            "additionalProperties": true,
+            "properties": {
+              "name": { "type": "string" },
+              "attrs": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["name", "type"],
+                  "additionalProperties": true,
+                  "properties": {
+                    "name": { "type": "string" },
+                    "type": { "type": "string" },
+                    "pk": { "type": "boolean" },
+                    "fk": { "type": ["string", "boolean", "null"] },
+                    "nullable": { "type": "boolean" },
+                    "default": {}
+                  }
+                }
+              }
+            }
+          }
+        },
+        "relations": {
+          "type": "array",
+          "items": { "type": "object" }
+        }
+      }
+    },
+    "diagramme": { "type": ["string", "object", "null"] }
+  }
+}

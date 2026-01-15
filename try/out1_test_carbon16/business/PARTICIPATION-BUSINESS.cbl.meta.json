@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-01-15T11:19:59Z",
+  "extra": {
+    "layer": "business",
+    "program_id": "PARTICIPATION-BUSINESS"
+  },
+  "kind": "program_full_llm_strict",
+  "mtime_utc": "2026-01-15T11:19:59Z",
+  "name": "PARTICIPATION-BUSINESS.cbl",
+  "path": "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/business/PARTICIPATION-BUSINESS.cbl",
+  "sha256": "74fca0fb20ce3ab5865b953273596da025c720da58c82721d4c5e2b17da8e0b7",
+  "size": 935
+}

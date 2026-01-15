@@ -1,0 +1,2348 @@
+title: APPLICATION-CARBONTRACK-BD-PART
+dialecte_cobol: gnucobol
+sql_cible: postgres
+nommage:
+  variables_case: UPPER_SNAKE
+  programmes_case: UPPER-KEBAB
+fonctionnalites:
+- id: F1
+  resume: Gerer les utilisateurs de l application CarbonTrack (creation, lecture,
+    mise a jour, suppression).
+- id: F2
+  resume: Gerer les antennes regionales et leur rattachement aux utilisateurs et activites.
+- id: F3
+  resume: Gerer les activites a impact carbone (transport, hebergement, repas).
+- id: F4
+  resume: Gerer les participations des utilisateurs aux activites.
+- id: F5
+  resume: Permettre le stockage de l empreinte carbone par activite.
+exigences:
+- id: R1
+  type: regle_metier
+  regle: Un utilisateur est identifie de maniere unique par son email.
+  notes: Aucun doublon d email n est autorise en base.
+- id: R2
+  type: regle_metier
+  regle: Une activite appartient a une seule antenne et possede un animateur.
+- id: R3
+  type: regle_metier
+  regle: Une participation est definie par le couple (ID_ACTIVITE, ID_USER).
+- id: R4
+  type: technique
+  regle: Toutes les operations BD sont realisees en COBOL embarque SQL PostgreSQL
+    (SQL embarque precompile).
+- id: R5
+  type: validation
+  regle: Toute erreur SQL doit etre remontee par un code retour negatif.
+mcd:
+  entites:
+  - name: UTILISATEUR
+    attrs:
+    - name: USER_ID
+      type: INT
+      sql_type: INT
+      cobol_pic: 9(9)
+      pk: true
+      nullable: false
+    - name: USER_NOM
+      type: VARCHAR(50)
+      sql_type: VARCHAR(50)
+      cobol_pic: X(50)
+      nullable: false
+    - name: USER_MAIL
+      type: VARCHAR(80)
+      sql_type: VARCHAR(80)
+      cobol_pic: X(80)
+      nullable: false
+      unique: true
+    - name: USER_PASS
+      type: VARCHAR(256)
+      sql_type: VARCHAR(256)
+      cobol_pic: X(256)
+      nullable: false
+    - name: USER_ROLE
+      type: VARCHAR(15)
+      sql_type: VARCHAR(15)
+      cobol_pic: X(15)
+      nullable: false
+    - name: USER_ID_ANTENNE
+      type: INT
+      sql_type: INT
+      cobol_pic: 9(9)
+      fk: true
+      fk_target: ANTENNE.ANTENNE_ID
+      nullable: false
+    - name: USER_LAST_LOGIN
+      type: BIGINT
+      sql_type: BIGINT
+      cobol_pic: S9(11)
+      nullable: true
+  - name: ANTENNE
+    attrs:
+    - name: ANTENNE_ID
+      type: INT
+      sql_type: INT
+      cobol_pic: 9(9)
+      pk: true
+      nullable: false
+    - name: ANTENNE_NOM
+      type: VARCHAR(50)
+      sql_type: VARCHAR(50)
+      cobol_pic: X(50)
+      nullable: false
+    - name: ANTENNE_REGION
+      type: VARCHAR(50)
+      sql_type: VARCHAR(50)
+      cobol_pic: X(50)
+      nullable: false
+  - name: ACTIVITE
+    attrs:
+    - name: ACTIVITE_ID
+      type: INT
+      sql_type: INT
+      cobol_pic: 9(9)
+      pk: true
+      nullable: false
+    - name: ACTIVITE_NOM
+      type: VARCHAR(50)
+      sql_type: VARCHAR(50)
+      cobol_pic: X(50)
+      nullable: false
+    - name: ACTIVITE_TYPE
+      type: VARCHAR(20)
+      sql_type: VARCHAR(20)
+      cobol_pic: X(20)
+      nullable: false
+    - name: ACTIVITE_IDANTENNE
+      type: INT
+      sql_type: INT
+      cobol_pic: 9(9)
+      fk: true
+      fk_target: ANTENNE.ANTENNE_ID
+      nullable: false
+    - name: ACTIVITE_ANIMATEUR
+      type: INT
+      sql_type: INT
+      cobol_pic: 9(9)
+      fk: true
+      fk_target: UTILISATEUR.USER_ID
+      nullable: false
+    - name: ACTIVITE_NBPARTICIPANTS
+      type: INT
+      sql_type: INT
+      cobol_pic: 9(9)
+      nullable: false
+    - name: ACTIVITE_MODETRANSPORT
+      type: INT
+      sql_type: INT
+      cobol_pic: 9(2)
+      nullable: false
+    - name: ACTIVITE_LIEU
+      type: VARCHAR(100)
+      sql_type: VARCHAR(100)
+      cobol_pic: X(100)
+      nullable: false
+    - name: ACTIVITE_DISTANCE
+      type: INT
+      sql_type: INT
+      cobol_pic: 9(10)
+      nullable: false
+    - name: ACTIVITE_HEBERGEMENT
+      type: INT
+      sql_type: INT
+      cobol_pic: 9(1)
+      nullable: false
+    - name: ACTIVITE_REPASPREVU
+      type: INT
+      sql_type: INT
+      cobol_pic: 9(1)
+      nullable: false
+    - name: ACTIVITE_EMPREINTETOTALE
+      type: DECIMAL(13,4)
+      sql_type: DECIMAL(13,4)
+      cobol_pic: S9(9)V9(4)
+      nullable: true
+  - name: REPAS
+    attrs:
+    - name: REPAS_ID
+      type: INT
+      sql_type: INT
+      cobol_pic: 9(9)
+      pk: true
+      nullable: false
+    - name: REPAS_ID_ACTIVITE
+      type: INT
+      sql_type: INT
+      cobol_pic: 9(9)
+      fk: true
+      fk_target: ACTIVITE.ACTIVITE_ID
+      nullable: false
+    - name: REPAS_TYPE
+      type: INT
+      sql_type: INT
+      cobol_pic: 9(2)
+      nullable: false
+    - name: REPAS_NBREPAS
+      type: INT
+      sql_type: INT
+      cobol_pic: S9(5)
+      nullable: false
+  - name: HEBERGEMENT
+    attrs:
+    - name: HEBERGEMENT_ID
+      type: INT
+      sql_type: INT
+      cobol_pic: 9(9)
+      pk: true
+      nullable: false
+    - name: HEBERGEMENT_ID_ACTIVITE
+      type: INT
+      sql_type: INT
+      cobol_pic: 9(9)
+      fk: true
+      fk_target: ACTIVITE.ACTIVITE_ID
+      nullable: false
+    - name: HEBERGEMENT_TYPE
+      type: INT
+      sql_type: INT
+      cobol_pic: 9(2)
+      nullable: false
+    - name: HEBERGEMENT_NBNUIT
+      type: INT
+      sql_type: INT
+      cobol_pic: S9(3)
+      nullable: false
+  - name: PARTICIPATION
+    attrs:
+    - name: PARTICIPATION_ID_ACTIVITE
+      type: INT
+      sql_type: INT
+      cobol_pic: 9(9)
+      pk: true
+      fk: true
+      fk_target: ACTIVITE.ACTIVITE_ID
+      nullable: false
+    - name: PARTICIPATION_ID_USER
+      type: INT
+      sql_type: INT
+      cobol_pic: 9(9)
+      pk: true
+      fk: true
+      fk_target: UTILISATEUR.USER_ID
+      nullable: false
+    - name: PARTICIPATION_MODE_TRANSPORT
+      type: INT
+      sql_type: INT
+      cobol_pic: S9(2)
+      nullable: false
+  relations:
+  - from: UTILISATEUR
+    to: ANTENNE
+    type: N:1
+    fk_field: USER_ID_ANTENNE
+  - from: ACTIVITE
+    to: ANTENNE
+    type: N:1
+    fk_field: ACTIVITE_IDANTENNE
+  - from: ACTIVITE
+    to: UTILISATEUR
+    type: N:1
+    fk_field: ACTIVITE_ANIMATEUR
+  - from: PARTICIPATION
+    to: UTILISATEUR
+    type: N:1
+    fk_field: PARTICIPATION_ID_USER
+  - from: PARTICIPATION
+    to: ACTIVITE
+    type: N:1
+    fk_field: PARTICIPATION_ID_ACTIVITE
+  - from: REPAS
+    to: ACTIVITE
+    type: N:1
+    fk_field: REPAS_ID_ACTIVITE
+  - from: HEBERGEMENT
+    to: ACTIVITE
+    type: N:1
+    fk_field: HEBERGEMENT_ID_ACTIVITE
+diagramme: "erDiagram\n  ANTENNE {\n    INT ANTENNE_ID PK\n    VARCHAR ANTENNE_NOM\n\
+  \    VARCHAR ANTENNE_REGION\n  }\n  UTILISATEUR {\n    INT USER_ID PK\n    VARCHAR\
+  \ USER_NOM\n    VARCHAR USER_MAIL\n    VARCHAR USER_PASS\n    VARCHAR USER_ROLE\n\
+  \    INT USER_ID_ANTENNE FK\n    BIGINT USER_LAST_LOGIN\n  }\n  ACTIVITE {\n   \
+  \ INT ACTIVITE_ID PK\n    VARCHAR ACTIVITE_NOM\n    VARCHAR ACTIVITE_TYPE\n    INT\
+  \ ACTIVITE_IDANTENNE FK\n    INT ACTIVITE_ANIMATEUR FK\n    INT ACTIVITE_NBPARTICIPANTS\n\
+  \    INT ACTIVITE_MODETRANSPORT\n    VARCHAR ACTIVITE_LIEU\n    INT ACTIVITE_DISTANCE\n\
+  \    INT ACTIVITE_HEBERGEMENT\n    INT ACTIVITE_REPASPREVU\n    DECIMAL ACTIVITE_EMPREINTETOTALE\n\
+  \  }\n  REPAS {\n    INT REPAS_ID PK\n    INT REPAS_ID_ACTIVITE FK\n    INT REPAS_TYPE\n\
+  \    INT REPAS_NBREPAS\n  }\n  HEBERGEMENT {\n    INT HEBERGEMENT_ID PK\n    INT\
+  \ HEBERGEMENT_ID_ACTIVITE FK\n    INT HEBERGEMENT_TYPE\n    INT HEBERGEMENT_NBNUIT\n\
+  \  }\n  PARTICIPATION {\n    INT PARTICIPATION_ID_ACTIVITE PK\n    INT PARTICIPATION_ID_USER\
+  \ PK\n    INT PARTICIPATION_MODE_TRANSPORT\n  }\n  ANTENNE ||--o{ UTILISATEUR :\
+  \ \"rattache\"\n  ANTENNE ||--o{ ACTIVITE : \"organise\"\n  UTILISATEUR ||--o{ ACTIVITE\
+  \ : \"anime\"\n  ACTIVITE ||--o{ REPAS : \"repas\"\n  ACTIVITE ||--o{ HEBERGEMENT\
+  \ : \"hebergement\"\n  UTILISATEUR ||--o{ PARTICIPATION : \"participe\"\n  ACTIVITE\
+  \ ||--o{ PARTICIPATION : \"participe\"\n"
+sql:
+  ddl:
+    ANTENNE: "CREATE TABLE ANTENNE (\n    ANTENNE_ID INT PRIMARY KEY,\n    ANTENNE_NOM\
+      \ VARCHAR(50) NOT NULL,\n    ANTENNE_REGION VARCHAR(50) NOT NULL\n);\n"
+    UTILISATEUR: "CREATE TABLE UTILISATEUR (\n    USER_ID INT PRIMARY KEY,\n    USER_NOM\
+      \ VARCHAR(50) NOT NULL,\n    USER_MAIL VARCHAR(80) NOT NULL UNIQUE,\n    USER_PASS\
+      \ VARCHAR(256) NOT NULL,\n    USER_ROLE VARCHAR(15) NOT NULL,\n    USER_ID_ANTENNE\
+      \ INT NOT NULL REFERENCES ANTENNE(ANTENNE_ID),\n    USER_LAST_LOGIN BIGINT\n\
+      );\n"
+    ACTIVITE: "CREATE TABLE ACTIVITE (\n    ACTIVITE_ID INT PRIMARY KEY,\n    ACTIVITE_NOM\
+      \ VARCHAR(50) NOT NULL,\n    ACTIVITE_TYPE VARCHAR(20) NOT NULL,\n    ACTIVITE_IDANTENNE\
+      \ INT NOT NULL REFERENCES ANTENNE(ANTENNE_ID),\n    ACTIVITE_ANIMATEUR INT NOT\
+      \ NULL REFERENCES UTILISATEUR(USER_ID),\n    ACTIVITE_NBPARTICIPANTS INT NOT\
+      \ NULL,\n    ACTIVITE_MODETRANSPORT INT NOT NULL,\n    ACTIVITE_LIEU VARCHAR(100)\
+      \ NOT NULL,\n    ACTIVITE_DISTANCE INT NOT NULL,\n    ACTIVITE_HEBERGEMENT INT\
+      \ NOT NULL,\n    ACTIVITE_REPASPREVU INT NOT NULL,\n    ACTIVITE_EMPREINTETOTALE\
+      \ DECIMAL(13,4)\n);\n"
+    REPAS: "CREATE TABLE REPAS (\n    REPAS_ID INT PRIMARY KEY,\n    REPAS_ID_ACTIVITE\
+      \ INT NOT NULL REFERENCES ACTIVITE(ACTIVITE_ID),\n    REPAS_TYPE INT NOT NULL,\n\
+      \    REPAS_NBREPAS INT NOT NULL\n);\n"
+    HEBERGEMENT: "CREATE TABLE HEBERGEMENT (\n    HEBERGEMENT_ID INT PRIMARY KEY,\n\
+      \    HEBERGEMENT_ID_ACTIVITE INT NOT NULL REFERENCES ACTIVITE(ACTIVITE_ID),\n\
+      \    HEBERGEMENT_TYPE INT NOT NULL,\n    HEBERGEMENT_NBNUIT INT NOT NULL\n);\n"
+    PARTICIPATION: "CREATE TABLE PARTICIPATION (\n    PARTICIPATION_ID_ACTIVITE INT\
+      \ NOT NULL REFERENCES ACTIVITE(ACTIVITE_ID),\n    PARTICIPATION_ID_USER INT\
+      \ NOT NULL REFERENCES UTILISATEUR(USER_ID),\n    PARTICIPATION_MODE_TRANSPORT\
+      \ INT NOT NULL,\n    PRIMARY KEY (PARTICIPATION_ID_ACTIVITE, PARTICIPATION_ID_USER)\n\
+      );\n"
+  initial_data:
+    ANTENNE:
+    - ANTENNE_ID: 1
+      ANTENNE_NOM: PARIS
+      ANTENNE_REGION: IDF
+    - ANTENNE_ID: 2
+      ANTENNE_NOM: LYON
+      ANTENNE_REGION: ARA
+    UTILISATEUR:
+    - USER_ID: 1001
+      USER_NOM: ALICE MARTIN
+      USER_MAIL: alice@carbontrack.fr
+      USER_PASS: HASHEDPASS1
+      USER_ROLE: ADMIN
+      USER_ID_ANTENNE: 1
+      USER_LAST_LOGIN: 0
+    - USER_ID: 1002
+      USER_NOM: BOB DUPONT
+      USER_MAIL: bob@carbontrack.fr
+      USER_PASS: HASHEDPASS2
+      USER_ROLE: USER
+      USER_ID_ANTENNE: 2
+      USER_LAST_LOGIN: 0
+    ACTIVITE:
+    - ACTIVITE_ID: 2001
+      ACTIVITE_NOM: ATELIER MOBILITE
+      ACTIVITE_TYPE: TRANSPORT
+      ACTIVITE_IDANTENNE: 1
+      ACTIVITE_ANIMATEUR: 1001
+      ACTIVITE_NBPARTICIPANTS: 10
+      ACTIVITE_MODETRANSPORT: 1
+      ACTIVITE_LIEU: PARIS
+      ACTIVITE_DISTANCE: 120
+      ACTIVITE_HEBERGEMENT: 0
+      ACTIVITE_REPASPREVU: 1
+      ACTIVITE_EMPREINTETOTALE: 0.0
+    - ACTIVITE_ID: 2002
+      ACTIVITE_NOM: SEMINAIRE CARBONE
+      ACTIVITE_TYPE: HEBERGEMENT
+      ACTIVITE_IDANTENNE: 2
+      ACTIVITE_ANIMATEUR: 1002
+      ACTIVITE_NBPARTICIPANTS: 5
+      ACTIVITE_MODETRANSPORT: 2
+      ACTIVITE_LIEU: LYON
+      ACTIVITE_DISTANCE: 300
+      ACTIVITE_HEBERGEMENT: 1
+      ACTIVITE_REPASPREVU: 1
+      ACTIVITE_EMPREINTETOTALE: 0.0
+    REPAS:
+    - REPAS_ID: 3001
+      REPAS_ID_ACTIVITE: 2001
+      REPAS_TYPE: 1
+      REPAS_NBREPAS: 10
+    - REPAS_ID: 3002
+      REPAS_ID_ACTIVITE: 2002
+      REPAS_TYPE: 2
+      REPAS_NBREPAS: 5
+    HEBERGEMENT:
+    - HEBERGEMENT_ID: 4001
+      HEBERGEMENT_ID_ACTIVITE: 2002
+      HEBERGEMENT_TYPE: 1
+      HEBERGEMENT_NBNUIT: 2
+    PARTICIPATION:
+    - PARTICIPATION_ID_ACTIVITE: 2001
+      PARTICIPATION_ID_USER: 1001
+      PARTICIPATION_MODE_TRANSPORT: 1
+    - PARTICIPATION_ID_ACTIVITE: 2001
+      PARTICIPATION_ID_USER: 1002
+      PARTICIPATION_MODE_TRANSPORT: 2
+    - PARTICIPATION_ID_ACTIVITE: 2002
+      PARTICIPATION_ID_USER: 1002
+      PARTICIPATION_MODE_TRANSPORT: 2
+  indexes:
+  - entity: UTILISATEUR
+    name: UTILISATEUR_MAIL_UK
+    columns:
+    - USER_MAIL
+  - entity: UTILISATEUR
+    name: UTILISATEUR_ANTENNE_IDX
+    columns:
+    - USER_ID_ANTENNE
+  - entity: ACTIVITE
+    name: ACTIVITE_ANTENNE_IDX
+    columns:
+    - ACTIVITE_IDANTENNE
+  - entity: ACTIVITE
+    name: ACTIVITE_ANIMATEUR_IDX
+    columns:
+    - ACTIVITE_ANIMATEUR
+  - entity: REPAS
+    name: REPAS_ACTIVITE_IDX
+    columns:
+    - REPAS_ID_ACTIVITE
+  - entity: HEBERGEMENT
+    name: HEBERGEMENT_ACTIVITE_IDX
+    columns:
+    - HEBERGEMENT_ID_ACTIVITE
+  - entity: PARTICIPATION
+    name: PARTICIPATION_USER_IDX
+    columns:
+    - PARTICIPATION_ID_USER
+  connection:
+    mode: env
+    method: precompile
+    env_vars:
+    - PGHOST
+    - PGPORT
+    - PGUSER
+    - PGPASSWORD
+    - PGDATABASE
+    vars:
+      dbname: WS-DB-NAME
+      user: WS-DB-USER
+      password: WS-DB-PASSWORD
+    working_storage_lines:
+    - 01  WS-DB-NAME            PIC X(64).
+    - 01  WS-DB-USER            PIC X(64).
+    - 01  WS-DB-PASSWORD        PIC X(64).
+programmes:
+- name: ACTIVITE-DAL-DB
+  layer: dal
+  role: Couche d acces a la base PostgreSQL pour ACTIVITE (lecture via curseur avec
+    jointure ANTENNE/UTILISATEUR, mise a jour de l empreinte).
+  entities:
+  - ACTIVITE
+  - ANTENNE
+  - UTILISATEUR
+  allowed_sql: true
+  allowed_business_logic: false
+  allow_display: true
+  main_cursor: C_ACT
+  internal_paragraphs:
+  - DAL-CONNECT
+  - DAL-SET-ENV
+  working_storage_lines:
+  - 01  WS-CONNECTED-FLAG      PIC X
+  - 01  WS-CURSOR-OPEN-FLAG    PIC X
+  - 01  WS-ACTIVITE-ID         PIC 9(9).
+  - 01  WS-ACTIVITE-NOM        PIC X(50).
+  - 01  WS-ACTIVITE-TYPE       PIC X(20).
+  - 01  WS-ACTIVITE-IDANTENNE  PIC 9(9).
+  - 01  WS-ACTIVITE-ANIMATEUR  PIC 9(9).
+  - 01  WS-ACTIVITE-NBPART     PIC 9(9).
+  - 01  WS-ACTIVITE-TRANSPORT  PIC 9(2).
+  - 01  WS-ACTIVITE-LIEU       PIC X(100).
+  - 01  WS-ACTIVITE-DISTANCE   PIC 9(10).
+  - 01  WS-ACTIVITE-HEBERG     PIC 9(1).
+  - 01  WS-ACTIVITE-REPAS      PIC 9(1).
+  - 01  WS-ACTIVITE-EMPREINTE  PIC S9(9)V9(4).
+  - 01  WS-ANTENNE-NOM         PIC X(50).
+  - 01  WS-ANTENNE-REGION      PIC X(50).
+  - 01  WS-USER-NOM            PIC X(50).
+  - 01  WS-USER-MAIL           PIC X(80).
+  allow_procedure_sections: false
+  require_working_storage_section: true
+  logging_lines:
+  - 'Connexion DB reussie'
+  - 'ERREUR CONNECT: SQLCODE='
+  - SQLSTATE=
+  - SQLERRMC=
+  - Curseur C_ACT ouvert
+  - 'ERREUR OPEN: SQLCODE='
+  - 'ERREUR FETCH: SQLCODE='
+  - 'ERREUR UPDATE: SQLCODE='
+  - 'ERREUR CLOSE: SQLCODE='
+  - 'ERREUR COMMIT: SQLCODE='
+  - 'ERREUR DISCONNECT: SQLCODE='
+  - 'ERREUR: Operation inconnue: '
+  - Fermeture connexion
+  call_interface:
+    type: CALL USING
+    linkage_parameters:
+    - name: LK-OPERATION
+      pic: X(4)
+      direction: in
+    - name: LK-END-OF-FILE
+      pic: X
+      direction: inout
+    - name: LK-ACTIVITE
+      pic: groupe ACTIVITE
+      direction: inout
+    operations:
+      read: READ
+      save: SAVE
+      end: 'END '
+  linkage_structure: "01 LK-ACTIVITE.\n    05 LK-ACTIVITE-ID PIC 9(9).\n    05 LK-ACTIVITE-NOM\
+    \ PIC X(50).\n    05 LK-ACTIVITE-TYPE PIC X(20).\n    05 LK-ACTIVITE-IDANTENNE\
+    \ PIC 9(9).\n    05 LK-ACTIVITE-ANIMATEUR PIC 9(9).\n    05 LK-ACTIVITE-NBPART\
+    \ PIC 9(9).\n    05 LK-ACTIVITE-TRANSPORT PIC 9(2).\n    05 LK-ACTIVITE-LIEU PIC\
+    \ X(100).\n    05 LK-ACTIVITE-DISTANCE PIC 9(10).\n    05 LK-ACTIVITE-HEBERG PIC\
+    \ 9(1).\n    05 LK-ACTIVITE-REPAS PIC 9(1).\n    05 LK-ACTIVITE-EMPREINTE PIC\
+    \ S9(9)V9(4).\n    05 LK-ANTENNE-NOM PIC X(50).\n    05 LK-ANTENNE-REGION PIC\
+    \ X(50).\n    05 LK-USER-NOM PIC X(50).\n    05 LK-USER-MAIL PIC X(80).\n"
+  cobol_sections:
+    identification_division: required
+    environment_division: required
+    data_division:
+      working_storage: required
+      linkage: required
+    procedure_division:
+      using_clause:
+      - LK-OPERATION
+      - LK-END-OF-FILE
+      - LK-ACTIVITE
+      entry_paragraph: MAIN-ENTRY
+- name: ACTIVITE-LOGIC
+  layer: logic
+  role: 'Traitement batch principal : boucle sur les activites, sauvegarde de l empreinte,
+    affichage.'
+  entities:
+  - ACTIVITE
+  - ANTENNE
+  - UTILISATEUR
+  allowed_sql: false
+  allowed_business_logic: true
+  allow_display: true
+  working_storage_lines:
+  - 01  END-OF-FILE            PIC X
+  - 77  OPERATION              PIC X(4).
+  - 77  WS-COUNT-TOTAL         PIC 9(6)
+  - 77  WS-COUNT-ERROR         PIC 9(6)
+  - 01  ACTIVITE.
+  - '    05 ACTIVITE-ID         PIC 9(9).'
+  - '    05 ACTIVITE-NOM        PIC X(50).'
+  - '    05 ACTIVITE-TYPE       PIC X(20).'
+  - '    05 ACTIVITE-IDANTENNE  PIC 9(9).'
+  - '    05 ACTIVITE-ANIMATEUR  PIC 9(9).'
+  - '    05 ACTIVITE-NBPART     PIC 9(9).'
+  - '    05 ACTIVITE-TRANSPORT  PIC 9(2).'
+  - '    05 ACTIVITE-LIEU       PIC X(100).'
+  - '    05 ACTIVITE-DISTANCE   PIC 9(10).'
+  - '    05 ACTIVITE-HEBERG     PIC 9(1).'
+  - '    05 ACTIVITE-REPAS      PIC 9(1).'
+  - '    05 ACTIVITE-EMPREINTE  PIC S9(9)V9(4).'
+  - '    05 ANTENNE-NOM         PIC X(50).'
+  - '    05 ANTENNE-REGION      PIC X(50).'
+  - '    05 USER-NOM            PIC X(50).'
+  - '    05 USER-MAIL           PIC X(80).'
+  logging_lines:
+  - ==========================================
+  - DEBUT TRAITEMENT BATCH ACTIVITES CARBONE
+  - ==========================================
+  - ==========================================
+  - FIN TRAITEMENT BATCH ACTIVITES CARBONE
+  - 'Nombre activites traitees: '
+  - 'Activites en erreur: '
+  - ==========================================
+  - 'ANOMALIE: Empreinte carbone invalide'
+  allow_procedure_sections: false
+  require_working_storage_section: true
+  cobol_sections:
+    identification_division: required
+    environment_division: required
+    data_division:
+      working_storage: required
+      linkage: none
+    procedure_division:
+      entry_paragraph: MAIN-PROCESS
+- name: ACTIVITE-BUSINESS
+  layer: business
+  role: Affichage simple des informations d une activite (antenne, animateur, lieu,
+    empreinte).
+  entities:
+  - ACTIVITE
+  - ANTENNE
+  - UTILISATEUR
+  allowed_sql: false
+  allowed_business_logic: lecture_seule
+  allow_display: true
+  working_storage_lines:
+  - WORKING-STORAGE SECTION.
+  logging_lines:
+  - '----------------------------------------'
+  - 'ACTIVITE : '
+  - 'ID       : '
+  - 'TYPE     : '
+  - 'ANTENNE  : '
+  - 'REGION   : '
+  - 'ANIMATEUR: '
+  - 'EMAIL    : '
+  - 'LIEU     : '
+  - 'DISTANCE : '
+  - 'TRANSPORT: '
+  - 'HEBERG.  : '
+  - 'REPAS    : '
+  - 'EMPREINTE: '
+  allow_procedure_sections: false
+  require_working_storage_section: true
+  call_interface:
+    type: CALL USING
+    linkage_parameters:
+    - name: LK-ACTIVITE
+      pic: groupe ACTIVITE
+      direction: in
+  linkage_structure: "01 LK-ACTIVITE.\n    05 LK-ACTIVITE-ID PIC 9(9).\n    05 LK-ACTIVITE-NOM\
+    \ PIC X(50).\n    05 LK-ACTIVITE-TYPE PIC X(20).\n    05 LK-ACTIVITE-IDANTENNE\
+    \ PIC 9(9).\n    05 LK-ACTIVITE-ANIMATEUR PIC 9(9).\n    05 LK-ACTIVITE-NBPART\
+    \ PIC 9(9).\n    05 LK-ACTIVITE-TRANSPORT PIC 9(2).\n    05 LK-ACTIVITE-LIEU PIC\
+    \ X(100).\n    05 LK-ACTIVITE-DISTANCE PIC 9(10).\n    05 LK-ACTIVITE-HEBERG PIC\
+    \ 9(1).\n    05 LK-ACTIVITE-REPAS PIC 9(1).\n    05 LK-ACTIVITE-EMPREINTE PIC\
+    \ S9(9)V9(4).\n    05 LK-ANTENNE-NOM PIC X(50).\n    05 LK-ANTENNE-REGION PIC\
+    \ X(50).\n    05 LK-USER-NOM PIC X(50).\n    05 LK-USER-MAIL PIC X(80).\n"
+  cobol_sections:
+    identification_division: required
+    environment_division: required
+    data_division:
+      working_storage: required
+      linkage: required
+    procedure_division:
+      using_clause:
+      - LK-ACTIVITE
+      entry_paragraph: DISPLAY-ACTIVITE
+- name: UTILISATEUR-DAL-DB
+  layer: dal
+  role: Couche d acces a la base PostgreSQL pour UTILISATEUR (lecture via curseur
+    et mise a jour du dernier login).
+  entities:
+  - UTILISATEUR
+  allowed_sql: true
+  allowed_business_logic: false
+  allow_display: true
+  main_cursor: C_USER
+  internal_paragraphs:
+  - DAL-CONNECT
+  - DAL-SET-ENV
+  working_storage_lines:
+  - 01  WS-CONNECTED-FLAG      PIC X
+  - 01  WS-CURSOR-OPEN-FLAG    PIC X
+  - 01  WS-USER-ID             PIC 9(9).
+  - 01  WS-USER-NOM            PIC X(50).
+  - 01  WS-USER-MAIL           PIC X(80).
+  - 01  WS-USER-PASS           PIC X(256).
+  - 01  WS-USER-ROLE           PIC X(15).
+  - 01  WS-USER-ID-ANTENNE     PIC 9(9).
+  - 01  WS-USER-LAST-LOGIN     PIC S9(11).
+  allow_procedure_sections: false
+  require_working_storage_section: true
+  logging_lines:
+  - 'Connexion DB reussie'
+  - 'ERREUR CONNECT: SQLCODE='
+  - SQLSTATE=
+  - SQLERRMC=
+  - Curseur C_USER ouvert
+  - 'ERREUR OPEN: SQLCODE='
+  - 'ERREUR FETCH: SQLCODE='
+  - 'ERREUR UPDATE: SQLCODE='
+  - 'ERREUR CLOSE: SQLCODE='
+  - 'ERREUR COMMIT: SQLCODE='
+  - 'ERREUR DISCONNECT: SQLCODE='
+  - 'ERREUR: Operation inconnue: '
+  - Fermeture connexion
+  call_interface:
+    type: CALL USING
+    linkage_parameters:
+    - name: LK-OPERATION
+      pic: X(4)
+      direction: in
+    - name: LK-END-OF-FILE
+      pic: X
+      direction: inout
+    - name: LK-UTILISATEUR
+      pic: groupe UTILISATEUR
+      direction: inout
+    operations:
+      read: READ
+      save: SAVE
+      end: 'END '
+  cobol_sections:
+    identification_division: required
+    environment_division: required
+    data_division:
+      working_storage: required
+      linkage: required
+    procedure_division:
+      using_clause:
+      - LK-OPERATION
+      - LK-END-OF-FILE
+      - LK-UTILISATEUR
+      entry_paragraph: MAIN-ENTRY
+- name: UTILISATEUR-LOGIC
+  layer: logic
+  role: 'Traitement batch principal : boucle sur les utilisateurs, mise a jour du
+    dernier login, sauvegarde, affichage.'
+  entities:
+  - UTILISATEUR
+  allowed_sql: false
+  allowed_business_logic: true
+  allow_display: true
+  working_storage_lines:
+  - 01  END-OF-FILE            PIC X
+  - 77  OPERATION              PIC X(4).
+  - 77  WS-COUNT-TOTAL         PIC 9(6)
+  - 77  WS-COUNT-ERROR         PIC 9(6)
+  - 01  UTILISATEUR.
+  - '    05 USER-ID             PIC 9(9).'
+  - '    05 USER-NOM            PIC X(50).'
+  - '    05 USER-MAIL           PIC X(80).'
+  - '    05 USER-PASS           PIC X(256).'
+  - '    05 USER-ROLE           PIC X(15).'
+  - '    05 USER-ID-ANTENNE     PIC 9(9).'
+  - '    05 USER-LAST-LOGIN     PIC S9(11).'
+  logging_lines:
+  - ==========================================
+  - DEBUT TRAITEMENT BATCH UTILISATEURS
+  - ==========================================
+  - ==========================================
+  - FIN TRAITEMENT BATCH UTILISATEURS
+  - 'Nombre utilisateurs traites: '
+  - 'Utilisateurs en erreur: '
+  - ==========================================
+  - 'ANOMALIE: Dernier login invalide'
+  allow_procedure_sections: false
+  require_working_storage_section: true
+  cobol_sections:
+    identification_division: required
+    environment_division: required
+    data_division:
+      working_storage: required
+      linkage: none
+    procedure_division:
+      entry_paragraph: MAIN-PROCESS
+- name: UTILISATEUR-BUSINESS
+  layer: business
+  role: Affichage simple des informations d un utilisateur (nom, email, role, antenne,
+    dernier login).
+  entities:
+  - UTILISATEUR
+  allowed_sql: false
+  allowed_business_logic: lecture_seule
+  allow_display: true
+  working_storage_lines:
+  - WORKING-STORAGE SECTION.
+  logging_lines:
+  - '----------------------------------------'
+  - 'UTILISATEUR: '
+  - 'ID        : '
+  - 'NOM       : '
+  - 'EMAIL     : '
+  - 'ROLE      : '
+  - 'ANTENNE   : '
+  - 'LASTLOGIN : '
+  allow_procedure_sections: false
+  require_working_storage_section: true
+  call_interface:
+    type: CALL USING
+    linkage_parameters:
+    - name: LK-UTILISATEUR
+      pic: groupe UTILISATEUR
+      direction: in
+  cobol_sections:
+    identification_division: required
+    environment_division: required
+    data_division:
+      working_storage: required
+      linkage: required
+    procedure_division:
+      using_clause:
+      - LK-UTILISATEUR
+      entry_paragraph: DISPLAY-UTILISATEUR
+- name: ANTENNE-DAL-DB
+  layer: dal
+  role: Couche d acces a la base PostgreSQL pour ANTENNE (lecture via curseur et mise
+    a jour de la region).
+  entities:
+  - ANTENNE
+  allowed_sql: true
+  allowed_business_logic: false
+  allow_display: true
+  main_cursor: C_ANT
+  internal_paragraphs:
+  - DAL-CONNECT
+  - DAL-SET-ENV
+  working_storage_lines:
+  - 01  WS-CONNECTED-FLAG      PIC X
+  - 01  WS-CURSOR-OPEN-FLAG    PIC X
+  - 01  WS-ANTENNE-ID          PIC 9(9).
+  - 01  WS-ANTENNE-NOM         PIC X(50).
+  - 01  WS-ANTENNE-REGION      PIC X(50).
+  allow_procedure_sections: false
+  require_working_storage_section: true
+  logging_lines:
+  - 'Connexion DB reussie'
+  - 'ERREUR CONNECT: SQLCODE='
+  - SQLSTATE=
+  - SQLERRMC=
+  - Curseur C_ANT ouvert
+  - 'ERREUR OPEN: SQLCODE='
+  - 'ERREUR FETCH: SQLCODE='
+  - 'ERREUR UPDATE: SQLCODE='
+  - 'ERREUR CLOSE: SQLCODE='
+  - 'ERREUR COMMIT: SQLCODE='
+  - 'ERREUR DISCONNECT: SQLCODE='
+  - 'ERREUR: Operation inconnue: '
+  - Fermeture connexion
+  call_interface:
+    type: CALL USING
+    linkage_parameters:
+    - name: LK-OPERATION
+      pic: X(4)
+      direction: in
+    - name: LK-END-OF-FILE
+      pic: X
+      direction: inout
+    - name: LK-ANTENNE
+      pic: groupe ANTENNE
+      direction: inout
+    operations:
+      read: READ
+      save: SAVE
+      end: 'END '
+  cobol_sections:
+    identification_division: required
+    environment_division: required
+    data_division:
+      working_storage: required
+      linkage: required
+    procedure_division:
+      using_clause:
+      - LK-OPERATION
+      - LK-END-OF-FILE
+      - LK-ANTENNE
+      entry_paragraph: MAIN-ENTRY
+- name: ANTENNE-LOGIC
+  layer: logic
+  role: 'Traitement batch principal : boucle sur les antennes, normalisation de la
+    region, sauvegarde, affichage.'
+  entities:
+  - ANTENNE
+  allowed_sql: false
+  allowed_business_logic: true
+  allow_display: true
+  working_storage_lines:
+  - 01  END-OF-FILE            PIC X
+  - 77  OPERATION              PIC X(4).
+  - 77  WS-COUNT-TOTAL         PIC 9(6)
+  - 77  WS-COUNT-ERROR         PIC 9(6)
+  - 01  ANTENNE.
+  - '    05 ANTENNE-ID          PIC 9(9).'
+  - '    05 ANTENNE-NOM         PIC X(50).'
+  - '    05 ANTENNE-REGION      PIC X(50).'
+  logging_lines:
+  - ==========================================
+  - DEBUT TRAITEMENT BATCH ANTENNES
+  - ==========================================
+  - ==========================================
+  - FIN TRAITEMENT BATCH ANTENNES
+  - 'Nombre antennes traitees: '
+  - 'Antennes en erreur: '
+  - ==========================================
+  - 'ANOMALIE: Region antenne invalide'
+  allow_procedure_sections: false
+  require_working_storage_section: true
+  cobol_sections:
+    identification_division: required
+    environment_division: required
+    data_division:
+      working_storage: required
+      linkage: none
+    procedure_division:
+      entry_paragraph: MAIN-PROCESS
+- name: ANTENNE-BUSINESS
+  layer: business
+  role: Affichage simple des informations d une antenne (nom, region).
+  entities:
+  - ANTENNE
+  allowed_sql: false
+  allowed_business_logic: lecture_seule
+  allow_display: true
+  working_storage_lines:
+  - WORKING-STORAGE SECTION.
+  logging_lines:
+  - '----------------------------------------'
+  - 'ANTENNE   : '
+  - 'ID        : '
+  - 'NOM       : '
+  - 'REGION    : '
+  allow_procedure_sections: false
+  require_working_storage_section: true
+  call_interface:
+    type: CALL USING
+    linkage_parameters:
+    - name: LK-ANTENNE
+      pic: groupe ANTENNE
+      direction: in
+  cobol_sections:
+    identification_division: required
+    environment_division: required
+    data_division:
+      working_storage: required
+      linkage: required
+    procedure_division:
+      using_clause:
+      - LK-ANTENNE
+      entry_paragraph: DISPLAY-ANTENNE
+- name: REPAS-DAL-DB
+  layer: dal
+  role: Couche d acces a la base PostgreSQL pour REPAS (lecture via curseur et mise
+    a jour du nombre de repas).
+  entities:
+  - REPAS
+  allowed_sql: true
+  allowed_business_logic: false
+  allow_display: true
+  main_cursor: C_REP
+  internal_paragraphs:
+  - DAL-CONNECT
+  - DAL-SET-ENV
+  working_storage_lines:
+  - 01  WS-CONNECTED-FLAG      PIC X
+  - 01  WS-CURSOR-OPEN-FLAG    PIC X
+  - 01  WS-REPAS-ID            PIC 9(9).
+  - 01  WS-REPAS-ID-ACTIVITE   PIC 9(9).
+  - 01  WS-REPAS-TYPE          PIC 9(2).
+  - 01  WS-REPAS-NBREPAS       PIC S9(5).
+  allow_procedure_sections: false
+  require_working_storage_section: true
+  logging_lines:
+  - 'Connexion DB reussie'
+  - 'ERREUR CONNECT: SQLCODE='
+  - SQLSTATE=
+  - SQLERRMC=
+  - Curseur C_REP ouvert
+  - 'ERREUR OPEN: SQLCODE='
+  - 'ERREUR FETCH: SQLCODE='
+  - 'ERREUR UPDATE: SQLCODE='
+  - 'ERREUR CLOSE: SQLCODE='
+  - 'ERREUR COMMIT: SQLCODE='
+  - 'ERREUR DISCONNECT: SQLCODE='
+  - 'ERREUR: Operation inconnue: '
+  - Fermeture connexion
+  call_interface:
+    type: CALL USING
+    linkage_parameters:
+    - name: LK-OPERATION
+      pic: X(4)
+      direction: in
+    - name: LK-END-OF-FILE
+      pic: X
+      direction: inout
+    - name: LK-REPAS
+      pic: groupe REPAS
+      direction: inout
+    operations:
+      read: READ
+      save: SAVE
+      end: 'END '
+  cobol_sections:
+    identification_division: required
+    environment_division: required
+    data_division:
+      working_storage: required
+      linkage: required
+    procedure_division:
+      using_clause:
+      - LK-OPERATION
+      - LK-END-OF-FILE
+      - LK-REPAS
+      entry_paragraph: MAIN-ENTRY
+- name: REPAS-LOGIC
+  layer: logic
+  role: 'Traitement batch principal : boucle sur les repas, controle du nombre de
+    repas, sauvegarde, affichage.'
+  entities:
+  - REPAS
+  allowed_sql: false
+  allowed_business_logic: true
+  allow_display: true
+  working_storage_lines:
+  - 01  END-OF-FILE            PIC X
+  - 77  OPERATION              PIC X(4).
+  - 77  WS-COUNT-TOTAL         PIC 9(6)
+  - 77  WS-COUNT-ERROR         PIC 9(6)
+  - 01  REPAS.
+  - '    05 REPAS-ID            PIC 9(9).'
+  - '    05 REPAS-ID-ACTIVITE   PIC 9(9).'
+  - '    05 REPAS-TYPE          PIC 9(2).'
+  - '    05 REPAS-NBREPAS       PIC S9(5).'
+  logging_lines:
+  - ==========================================
+  - DEBUT TRAITEMENT BATCH REPAS
+  - ==========================================
+  - ==========================================
+  - FIN TRAITEMENT BATCH REPAS
+  - 'Nombre repas traites: '
+  - 'Repas en erreur: '
+  - ==========================================
+  - 'ANOMALIE: Nombre repas invalide'
+  allow_procedure_sections: false
+  require_working_storage_section: true
+  cobol_sections:
+    identification_division: required
+    environment_division: required
+    data_division:
+      working_storage: required
+      linkage: none
+    procedure_division:
+      entry_paragraph: MAIN-PROCESS
+- name: REPAS-BUSINESS
+  layer: business
+  role: Affichage simple des informations d un repas (type, nombre).
+  entities:
+  - REPAS
+  allowed_sql: false
+  allowed_business_logic: lecture_seule
+  allow_display: true
+  working_storage_lines:
+  - WORKING-STORAGE SECTION.
+  logging_lines:
+  - '----------------------------------------'
+  - 'REPAS    : '
+  - 'ID       : '
+  - 'ACTIVITE : '
+  - 'TYPE     : '
+  - 'NBREPAS  : '
+  allow_procedure_sections: false
+  require_working_storage_section: true
+  call_interface:
+    type: CALL USING
+    linkage_parameters:
+    - name: LK-REPAS
+      pic: groupe REPAS
+      direction: in
+  cobol_sections:
+    identification_division: required
+    environment_division: required
+    data_division:
+      working_storage: required
+      linkage: required
+    procedure_division:
+      using_clause:
+      - LK-REPAS
+      entry_paragraph: DISPLAY-REPAS
+- name: HEBERGEMENT-DAL-DB
+  layer: dal
+  role: Couche d acces a la base PostgreSQL pour HEBERGEMENT (lecture via curseur
+    et mise a jour du nombre de nuits).
+  entities:
+  - HEBERGEMENT
+  allowed_sql: true
+  allowed_business_logic: false
+  allow_display: true
+  main_cursor: C_HEB
+  internal_paragraphs:
+  - DAL-CONNECT
+  - DAL-SET-ENV
+  working_storage_lines:
+  - 01  WS-CONNECTED-FLAG      PIC X
+  - 01  WS-CURSOR-OPEN-FLAG    PIC X
+  - 01  WS-HEBERGEMENT-ID      PIC 9(9).
+  - 01  WS-HEBERG-ID-ACTIVITE  PIC 9(9).
+  - 01  WS-HEBERGEMENT-TYPE    PIC 9(2).
+  - 01  WS-HEBERGEMENT-NBNUIT  PIC S9(3).
+  allow_procedure_sections: false
+  require_working_storage_section: true
+  logging_lines:
+  - 'Connexion DB reussie'
+  - 'ERREUR CONNECT: SQLCODE='
+  - SQLSTATE=
+  - SQLERRMC=
+  - Curseur C_HEB ouvert
+  - 'ERREUR OPEN: SQLCODE='
+  - 'ERREUR FETCH: SQLCODE='
+  - 'ERREUR UPDATE: SQLCODE='
+  - 'ERREUR CLOSE: SQLCODE='
+  - 'ERREUR COMMIT: SQLCODE='
+  - 'ERREUR DISCONNECT: SQLCODE='
+  - 'ERREUR: Operation inconnue: '
+  - Fermeture connexion
+  call_interface:
+    type: CALL USING
+    linkage_parameters:
+    - name: LK-OPERATION
+      pic: X(4)
+      direction: in
+    - name: LK-END-OF-FILE
+      pic: X
+      direction: inout
+    - name: LK-HEBERGEMENT
+      pic: groupe HEBERGEMENT
+      direction: inout
+    operations:
+      read: READ
+      save: SAVE
+      end: 'END '
+  cobol_sections:
+    identification_division: required
+    environment_division: required
+    data_division:
+      working_storage: required
+      linkage: required
+    procedure_division:
+      using_clause:
+      - LK-OPERATION
+      - LK-END-OF-FILE
+      - LK-HEBERGEMENT
+      entry_paragraph: MAIN-ENTRY
+- name: HEBERGEMENT-LOGIC
+  layer: logic
+  role: 'Traitement batch principal : boucle sur les hebergements, controle du nombre
+    de nuits, sauvegarde, affichage.'
+  entities:
+  - HEBERGEMENT
+  allowed_sql: false
+  allowed_business_logic: true
+  allow_display: true
+  working_storage_lines:
+  - 01  END-OF-FILE            PIC X
+  - 77  OPERATION              PIC X(4).
+  - 77  WS-COUNT-TOTAL         PIC 9(6)
+  - 77  WS-COUNT-ERROR         PIC 9(6)
+  - 01  HEBERGEMENT.
+  - '    05 HEBERGEMENT-ID      PIC 9(9).'
+  - '    05 HEBERG-ID-ACTIVITE  PIC 9(9).'
+  - '    05 HEBERGEMENT-TYPE    PIC 9(2).'
+  - '    05 HEBERGEMENT-NBNUIT  PIC S9(3).'
+  logging_lines:
+  - ==========================================
+  - DEBUT TRAITEMENT BATCH HEBERGEMENTS
+  - ==========================================
+  - ==========================================
+  - FIN TRAITEMENT BATCH HEBERGEMENTS
+  - 'Nombre hebergements traites: '
+  - 'Hebergements en erreur: '
+  - ==========================================
+  - 'ANOMALIE: Nombre nuits invalide'
+  allow_procedure_sections: false
+  require_working_storage_section: true
+  cobol_sections:
+    identification_division: required
+    environment_division: required
+    data_division:
+      working_storage: required
+      linkage: none
+    procedure_division:
+      entry_paragraph: MAIN-PROCESS
+- name: HEBERGEMENT-BUSINESS
+  layer: business
+  role: Affichage simple des informations d un hebergement (type, nombre de nuits).
+  entities:
+  - HEBERGEMENT
+  allowed_sql: false
+  allowed_business_logic: lecture_seule
+  allow_display: true
+  working_storage_lines:
+  - WORKING-STORAGE SECTION.
+  logging_lines:
+  - '----------------------------------------'
+  - 'HEBERG. : '
+  - 'ID      : '
+  - 'ACTIVITE: '
+  - 'TYPE    : '
+  - 'NBNUIT  : '
+  allow_procedure_sections: false
+  require_working_storage_section: true
+  call_interface:
+    type: CALL USING
+    linkage_parameters:
+    - name: LK-HEBERGEMENT
+      pic: groupe HEBERGEMENT
+      direction: in
+  cobol_sections:
+    identification_division: required
+    environment_division: required
+    data_division:
+      working_storage: required
+      linkage: required
+    procedure_division:
+      using_clause:
+      - LK-HEBERGEMENT
+      entry_paragraph: DISPLAY-HEBERGEMENT
+- name: PARTICIPATION-DAL-DB
+  layer: dal
+  role: Couche d acces a la base PostgreSQL pour PARTICIPATION (lecture via curseur
+    et mise a jour du mode transport).
+  entities:
+  - PARTICIPATION
+  allowed_sql: true
+  allowed_business_logic: false
+  allow_display: true
+  main_cursor: C_PAR
+  internal_paragraphs:
+  - DAL-CONNECT
+  - DAL-SET-ENV
+  working_storage_lines:
+  - 01  WS-CONNECTED-FLAG      PIC X
+  - 01  WS-CURSOR-OPEN-FLAG    PIC X
+  - 01  WS-PART-ID-ACTIVITE    PIC 9(9).
+  - 01  WS-PART-ID-USER        PIC 9(9).
+  - 01  WS-PART-MODE-TRANSPORT PIC S9(2).
+  allow_procedure_sections: false
+  require_working_storage_section: true
+  logging_lines:
+  - 'Connexion DB reussie'
+  - 'ERREUR CONNECT: SQLCODE='
+  - SQLSTATE=
+  - SQLERRMC=
+  - Curseur C_PAR ouvert
+  - 'ERREUR OPEN: SQLCODE='
+  - 'ERREUR FETCH: SQLCODE='
+  - 'ERREUR UPDATE: SQLCODE='
+  - 'ERREUR CLOSE: SQLCODE='
+  - 'ERREUR COMMIT: SQLCODE='
+  - 'ERREUR DISCONNECT: SQLCODE='
+  - 'ERREUR: Operation inconnue: '
+  - Fermeture connexion
+  call_interface:
+    type: CALL USING
+    linkage_parameters:
+    - name: LK-OPERATION
+      pic: X(4)
+      direction: in
+    - name: LK-END-OF-FILE
+      pic: X
+      direction: inout
+    - name: LK-PARTICIPATION
+      pic: groupe PARTICIPATION
+      direction: inout
+    operations:
+      read: READ
+      save: SAVE
+      end: 'END '
+  cobol_sections:
+    identification_division: required
+    environment_division: required
+    data_division:
+      working_storage: required
+      linkage: required
+    procedure_division:
+      using_clause:
+      - LK-OPERATION
+      - LK-END-OF-FILE
+      - LK-PARTICIPATION
+      entry_paragraph: MAIN-ENTRY
+- name: PARTICIPATION-LOGIC
+  layer: logic
+  role: 'Traitement batch principal : boucle sur les participations, controle du mode
+    transport, sauvegarde, affichage.'
+  entities:
+  - PARTICIPATION
+  allowed_sql: false
+  allowed_business_logic: true
+  allow_display: true
+  working_storage_lines:
+  - 01  END-OF-FILE            PIC X
+  - 77  OPERATION              PIC X(4).
+  - 77  WS-COUNT-TOTAL         PIC 9(6)
+  - 77  WS-COUNT-ERROR         PIC 9(6)
+  - 01  PARTICIPATION.
+  - '    05 PARTICIPATION-ID-ACTIVITE     PIC 9(9).'
+  - '    05 PARTICIPATION-ID-USER         PIC 9(9).'
+  - '    05 PARTICIPATION-MODE-TRANSPORT  PIC S9(2).'
+  logging_lines:
+  - ==========================================
+  - DEBUT TRAITEMENT BATCH PARTICIPATIONS
+  - ==========================================
+  - ==========================================
+  - FIN TRAITEMENT BATCH PARTICIPATIONS
+  - 'Nombre participations traitees: '
+  - 'Participations en erreur: '
+  - ==========================================
+  - 'ANOMALIE: Mode transport invalide'
+  allow_procedure_sections: false
+  require_working_storage_section: true
+  cobol_sections:
+    identification_division: required
+    environment_division: required
+    data_division:
+      working_storage: required
+      linkage: none
+    procedure_division:
+      entry_paragraph: MAIN-PROCESS
+- name: PARTICIPATION-BUSINESS
+  layer: business
+  role: Affichage simple des informations d une participation (activite, utilisateur,
+    mode transport).
+  entities:
+  - PARTICIPATION
+  allowed_sql: false
+  allowed_business_logic: lecture_seule
+  allow_display: true
+  working_storage_lines:
+  - WORKING-STORAGE SECTION.
+  logging_lines:
+  - '----------------------------------------'
+  - 'PARTICIPATION: '
+  - 'ACTIVITE     : '
+  - 'UTILISATEUR  : '
+  - 'TRANSPORT    : '
+  allow_procedure_sections: false
+  require_working_storage_section: true
+  call_interface:
+    type: CALL USING
+    linkage_parameters:
+    - name: LK-PARTICIPATION
+      pic: groupe PARTICIPATION
+      direction: in
+  cobol_sections:
+    identification_division: required
+    environment_division: required
+    data_division:
+      working_storage: required
+      linkage: required
+    procedure_division:
+      using_clause:
+      - LK-PARTICIPATION
+      entry_paragraph: DISPLAY-PARTICIPATION
+fonctions:
+- id: FN-DAL-CONNECT
+  name: DAL-CONNECT
+  programme: ACTIVITE-DAL-DB
+  layer: dal
+  visibility: internal
+  required: true
+  entity: ACTIVITE
+  description: Connexion paresseuse a la base en SQL embarque (precompilation). Initialise l environnement
+    de connexion a partir de valeurs externes, puis etablit la connexion en utilisant
+    les variables de connexion definies dans WORKING-STORAGE.
+  inputs: []
+  outputs:
+  - SQLCODE
+  - SQLSTATE
+  modifies:
+  - WS-CONNECTED
+  - SQLCODE
+  related_exigences:
+  - R4
+  - R5
+  sql:
+    connection_method: embedded_sql_precompile (voir sql.connection)
+    connection_guidance:
+    - 'Initialiser l environnement de connexion depuis des valeurs externes (ex: variables PG*).'
+    - 'Etablir la connexion SQL embarquee en utilisant les variables de connexion deja presentes dans WORKING-STORAGE.'
+    - 'Si SQLCODE < 0: journaliser l erreur et interrompre le flux logique.'
+- id: FN-DAL-SET-ENV
+  name: DAL-SET-ENV
+  programme: ACTIVITE-DAL-DB
+  layer: dal
+  visibility: internal
+  required: true
+  entity: ACTIVITE
+  description: Initialise les variables d environnement de connexion (fournies en
+    externe).
+  inputs: []
+  outputs: []
+  modifies: []
+  related_exigences:
+  - R4
+- id: FN-DAL-READ
+  name: DAL-READ
+  programme: ACTIVITE-DAL-DB
+  layer: dal
+  visibility: public
+  required: true
+  entity: ACTIVITE
+  description: Ouvre le curseur C_ACT si necessaire, fait un FETCH et remplit la structure
+    ACTIVITE. Met END-OF-FILE a 'Y' en cas de fin de donnees ou d erreur.
+  operation_code: READ
+  inputs:
+  - OPERATION = 'READ'
+  - Connexion deja etablie par MAIN-ENTRY (sauf OPERATION='END ').
+  - Curseur non garanti ouvert (ouverture paresseuse).
+  outputs:
+  - ACTIVITE.ACTIVITE_ID
+  - ACTIVITE.ACTIVITE_NOM
+  - ACTIVITE.ACTIVITE_TYPE
+  - ACTIVITE.ACTIVITE_IDANTENNE
+  - ACTIVITE.ACTIVITE_ANIMATEUR
+  - ACTIVITE.ACTIVITE_NBPARTICIPANTS
+  - ACTIVITE.ACTIVITE_MODETRANSPORT
+  - ACTIVITE.ACTIVITE_LIEU
+  - ACTIVITE.ACTIVITE_DISTANCE
+  - ACTIVITE.ACTIVITE_HEBERGEMENT
+  - ACTIVITE.ACTIVITE_REPASPREVU
+  - ACTIVITE.ACTIVITE_EMPREINTETOTALE
+  - ACTIVITE.ANTENNE_NOM
+  - ACTIVITE.ANTENNE_REGION
+  - ACTIVITE.USER_NOM
+  - ACTIVITE.USER_MAIL
+  - END-OF-FILE
+  - SQLCODE
+  modifies:
+  - ACTIVITE.*
+  - END-OF-FILE
+  - WS-CONNECTED
+  - WS-CURSOR-OPEN
+  - SQLCODE
+  preconditions: []
+  postconditions:
+  - 'Si SQLCODE = 0 : ACTIVITE contient un enregistrement valide et END-OF-FILE =
+    ''N''.'
+  - 'Si SQLCODE = 100 : fin de donnees, END-OF-FILE = ''Y''.'
+  - 'Si SQLCODE != 0 et != 100 : message d erreur affiche et END-OF-FILE = ''Y''.'
+  errors_flags:
+  - 'SQLCODE = 0 : succes, une ligne lue.'
+  - 'SQLCODE = 100 : fin de curseur.'
+  - 'SQLCODE != 0 et != 100 : erreur SQL, le batch s arrete logiquement.'
+  related_exigences:
+  - R4
+  - R5
+  sql:
+    declare_cursor: "DECLARE C_ACT CURSOR FOR\nSELECT a.ACTIVITE_ID, a.ACTIVITE_NOM,\
+      \ a.ACTIVITE_TYPE,\n       a.ACTIVITE_IDANTENNE, a.ACTIVITE_ANIMATEUR,\n   \
+      \    a.ACTIVITE_NBPARTICIPANTS, a.ACTIVITE_MODETRANSPORT,\n       a.ACTIVITE_LIEU,\
+      \ a.ACTIVITE_DISTANCE, a.ACTIVITE_HEBERGEMENT,\n       a.ACTIVITE_REPASPREVU,\
+      \ a.ACTIVITE_EMPREINTETOTALE,\n       an.ANTENNE_NOM, an.ANTENNE_REGION,\n \
+      \      u.USER_NOM, u.USER_MAIL\nFROM ACTIVITE a\nINNER JOIN ANTENNE an ON a.ACTIVITE_IDANTENNE\
+      \ = an.ANTENNE_ID\nINNER JOIN UTILISATEUR u ON a.ACTIVITE_ANIMATEUR = u.USER_ID\n\
+      ORDER BY a.ACTIVITE_ID\n"
+    open_cursor: OPEN C_ACT
+    fetch_into: FETCH C_ACT INTO :WS-ACTIVITE-ID, :WS-ACTIVITE-NOM, :WS-ACTIVITE-TYPE,
+      :WS-ACTIVITE-IDANTENNE, :WS-ACTIVITE-ANIMATEUR, :WS-ACTIVITE-NBPART, :WS-ACTIVITE-TRANSPORT,
+      :WS-ACTIVITE-LIEU, :WS-ACTIVITE-DISTANCE, :WS-ACTIVITE-HEBERG, :WS-ACTIVITE-REPAS,
+      :WS-ACTIVITE-EMPREINTE, :WS-ANTENNE-NOM, :WS-ANTENNE-REGION, :WS-USER-NOM, :WS-USER-MAIL
+  sql_actions:
+  - declare_cursor
+  - open_cursor
+  - fetch_cursor
+  - check_sqlcode
+  - map_to_linkage
+  - set_eof
+  eof_logic:
+    on_sqlcode_100_set_eof: true
+    eof_flag_name: LK-END-OF-FILE
+    eof_true_value: Y
+    eof_false_value: N
+- id: FN-DAL-SAVE
+  name: DAL-SAVE
+  programme: ACTIVITE-DAL-DB
+  layer: dal
+  visibility: public
+  required: true
+  entity: ACTIVITE
+  description: Met a jour en base la colonne ACTIVITE_EMPREINTETOTALE pour l activite
+    courante (ACTIVITE_ID) a partir de la structure ACTIVITE.
+  operation_code: SAVE
+  inputs:
+  - ACTIVITE.ACTIVITE_ID
+  - ACTIVITE.ACTIVITE_EMPREINTETOTALE
+  outputs:
+  - SQLCODE
+  modifies:
+  - SQLCODE
+  preconditions:
+  - ACTIVITE.ACTIVITE_ID contient un identifiant existant en base.
+  postconditions:
+  - 'Si SQLCODE = 0 : la ligne ACTIVITE correspondante en base a ete mise a jour.'
+  errors_flags:
+  - 'SQLCODE = 0 : succes.'
+  - 'SQLCODE != 0 : erreur SQL, message affiche.'
+  related_exigences:
+  - F5
+  - R4
+  - R5
+  sql:
+    update_statement: 'UPDATE ACTIVITE
+
+      SET ACTIVITE_EMPREINTETOTALE = :WS-ACTIVITE-EMPREINTE
+
+      WHERE ACTIVITE_ID = :WS-ACTIVITE-ID
+
+      '
+- id: FN-DAL-END
+  name: DAL-END
+  programme: ACTIVITE-DAL-DB
+  layer: dal
+  visibility: public
+  required: true
+  entity: ACTIVITE
+  description: Ferme le curseur s il est ouvert, commit la transaction et ferme la
+    connexion a la base. Appelee une fois en fin de traitement.
+  operation_code: 'END '
+  inputs: []
+  outputs:
+  - SQLCODE
+  modifies:
+  - WS-CURSOR-OPEN
+  - WS-CONNECTED
+  - SQLCODE
+  preconditions: []
+  postconditions:
+  - Curseur ferme si besoin.
+  - COMMIT effectue.
+  - Connexion base fermee.
+  errors_flags:
+  - Les erreurs de CLOSE/COMMIT/DISCONNECT sont simplement affichees.
+  related_exigences:
+  - R4
+  - R5
+  sql:
+    close_cursor: CLOSE C_ACT
+    commit: COMMIT
+    disconnect: DISCONNECT ALL
+- id: FN-LOGIC-MAIN
+  name: MAIN-PROCESS
+  programme: ACTIVITE-LOGIC
+  layer: logic
+  visibility: public
+  required: true
+  entity: ACTIVITE
+  description: 'Boucle principale du batch: lit les activites via la DAL, conserve
+    l empreinte carbone, sauvegarde le resultat en base et affiche chaque activite.'
+  inputs: []
+  outputs: []
+  modifies:
+  - ACTIVITE.*
+  - END-OF-FILE
+  - WS-COUNT-TOTAL
+  - WS-COUNT-ERROR
+  preconditions: []
+  postconditions:
+  - Toutes les activites de la table ACTIVITE ont une empreinte carbone conservee.
+  calls:
+  - ACTIVITE-DAL-DB avec OPERATION='READ'
+  - CALCULATE-EMPREINTE
+  - ACTIVITE-DAL-DB avec OPERATION='SAVE'
+  - ACTIVITE-BUSINESS.DISPLAY-ACTIVITE
+  - ACTIVITE-DAL-DB avec OPERATION='END '
+  loop_control:
+    eof_flag_name: END-OF-FILE
+    eof_true_value: Y
+    eof_false_value: N
+  related_exigences:
+  - F3
+  - F4
+  - F5
+- id: FN-LOGIC-CALC
+  name: CALCULATE-EMPREINTE
+  programme: ACTIVITE-LOGIC
+  layer: logic
+  visibility: public
+  required: true
+  entity: ACTIVITE
+  description: 'Controle simple: si l empreinte carbone est negative, la remettre
+    a zero.'
+  inputs:
+  - ACTIVITE.ACTIVITE_EMPREINTETOTALE
+  outputs:
+  - ACTIVITE.ACTIVITE_EMPREINTETOTALE
+  modifies:
+  - ACTIVITE.ACTIVITE_EMPREINTETOTALE
+  - WS-COUNT-ERROR
+  preconditions:
+  - ACTIVITE.ACTIVITE_EMPREINTETOTALE contient une valeur numerique.
+  postconditions:
+  - ACTIVITE.ACTIVITE_EMPREINTETOTALE >= 0.
+  errors_flags:
+  - Si ACTIVITE_EMPREINTETOTALE < 0 alors mise a 0 et compteur erreur incremente.
+  related_exigences:
+  - F5
+- id: FN-BIZ-DISPLAY
+  name: DISPLAY-ACTIVITE
+  programme: ACTIVITE-BUSINESS
+  layer: business
+  visibility: public
+  required: true
+  entity: ACTIVITE
+  description: 'Affiche les informations principales de l activite courante sur la
+    console: antenne, animateur, lieu, empreinte.'
+  inputs:
+  - ACTIVITE.ACTIVITE_NOM
+  - ACTIVITE.ACTIVITE_ID
+  - ACTIVITE.ACTIVITE_TYPE
+  - ACTIVITE.ANTENNE_NOM
+  - ACTIVITE.ANTENNE_REGION
+  - ACTIVITE.USER_NOM
+  - ACTIVITE.USER_MAIL
+  - ACTIVITE.ACTIVITE_LIEU
+  - ACTIVITE.ACTIVITE_DISTANCE
+  - ACTIVITE.ACTIVITE_MODETRANSPORT
+  - ACTIVITE.ACTIVITE_HEBERGEMENT
+  - ACTIVITE.ACTIVITE_REPASPREVU
+  - ACTIVITE.ACTIVITE_EMPREINTETOTALE
+  outputs: []
+  modifies: []
+  preconditions:
+  - ACTIVITE contient des valeurs lues/calculees coherentes.
+  postconditions: []
+  errors_flags: []
+  related_exigences:
+  - F3
+  - F5
+  display:
+    separator: '----------------------------------------'
+    lines:
+    - label: 'ACTIVITE : '
+      field: ACTIVITE.ACTIVITE_NOM
+      cobol_name: LK-ACTIVITE-NOM
+    - label: 'ID       : '
+      field: ACTIVITE.ACTIVITE_ID
+      cobol_name: LK-ACTIVITE-ID
+    - label: 'TYPE     : '
+      field: ACTIVITE.ACTIVITE_TYPE
+      cobol_name: LK-ACTIVITE-TYPE
+    - label: 'ANTENNE  : '
+      field: ACTIVITE.ANTENNE_NOM
+      cobol_name: LK-ANTENNE-NOM
+    - label: 'REGION   : '
+      field: ACTIVITE.ANTENNE_REGION
+      cobol_name: LK-ANTENNE-REGION
+    - label: 'ANIMATEUR: '
+      field: ACTIVITE.USER_NOM
+      cobol_name: LK-USER-NOM
+    - label: 'EMAIL    : '
+      field: ACTIVITE.USER_MAIL
+      cobol_name: LK-USER-MAIL
+    - label: 'LIEU     : '
+      field: ACTIVITE.ACTIVITE_LIEU
+      cobol_name: LK-ACTIVITE-LIEU
+    - label: 'DISTANCE : '
+      field: ACTIVITE.ACTIVITE_DISTANCE
+      cobol_name: LK-ACTIVITE-DISTANCE
+    - label: 'TRANSPORT: '
+      field: ACTIVITE.ACTIVITE_MODETRANSPORT
+      cobol_name: LK-ACTIVITE-TRANSPORT
+    - label: 'HEBERG.  : '
+      field: ACTIVITE.ACTIVITE_HEBERGEMENT
+      cobol_name: LK-ACTIVITE-HEBERG
+    - label: 'REPAS    : '
+      field: ACTIVITE.ACTIVITE_REPASPREVU
+      cobol_name: LK-ACTIVITE-REPAS
+    - label: 'EMPREINTE: '
+      field: ACTIVITE.ACTIVITE_EMPREINTETOTALE
+      cobol_name: LK-ACTIVITE-EMPREINTE
+- id: FN-USER-DAL-CONNECT
+  name: DAL-CONNECT
+  programme: UTILISATEUR-DAL-DB
+  layer: dal
+  visibility: internal
+  required: true
+  entity: UTILISATEUR
+  description: Connexion paresseuse a la base en SQL embarque (precompilation). Initialise l environnement
+    de connexion a partir de valeurs externes, puis etablit la connexion en utilisant
+    les variables de connexion definies dans WORKING-STORAGE.
+  inputs: []
+  outputs:
+  - SQLCODE
+  - SQLSTATE
+  modifies:
+  - WS-CONNECTED
+  - SQLCODE
+  related_exigences:
+  - R4
+  - R5
+  sql:
+    connection_method: embedded_sql_precompile (voir sql.connection)
+    connection_guidance:
+    - 'Initialiser l environnement de connexion depuis des valeurs externes (ex: variables PG*).' 
+    - 'Etablir la connexion SQL embarquee en utilisant les variables de connexion deja presentes dans WORKING-STORAGE.'
+    - 'Si SQLCODE < 0: journaliser l erreur et interrompre le flux logique.'
+- id: FN-USER-DAL-SET-ENV
+  name: DAL-SET-ENV
+  programme: UTILISATEUR-DAL-DB
+  layer: dal
+  visibility: internal
+  required: true
+  entity: UTILISATEUR
+  description: Initialise les variables d environnement de connexion (fournies en
+    externe).
+  inputs: []
+  outputs: []
+  modifies: []
+  related_exigences:
+  - R4
+- id: FN-USER-DAL-READ
+  name: DAL-READ
+  programme: UTILISATEUR-DAL-DB
+  layer: dal
+  visibility: public
+  required: true
+  entity: UTILISATEUR
+  description: Ouvre le curseur C_USER si necessaire, fait un FETCH et remplit la
+    structure UTILISATEUR. Met END-OF-FILE a 'Y' en cas de fin de donnees ou d erreur.
+  operation_code: READ
+  inputs:
+  - OPERATION = 'READ'
+  - Connexion deja etablie par MAIN-ENTRY (sauf OPERATION='END ').
+  - Curseur non garanti ouvert (ouverture paresseuse).
+  outputs:
+  - UTILISATEUR.USER_ID
+  - UTILISATEUR.USER_NOM
+  - UTILISATEUR.USER_MAIL
+  - UTILISATEUR.USER_PASS
+  - UTILISATEUR.USER_ROLE
+  - UTILISATEUR.USER_ID_ANTENNE
+  - UTILISATEUR.USER_LAST_LOGIN
+  - END-OF-FILE
+  - SQLCODE
+  modifies:
+  - UTILISATEUR.*
+  - END-OF-FILE
+  - WS-CONNECTED
+  - WS-CURSOR-OPEN
+  - SQLCODE
+  preconditions: []
+  postconditions:
+  - 'Si SQLCODE = 0 : UTILISATEUR contient un enregistrement valide et END-OF-FILE
+    = ''N''.'
+  - 'Si SQLCODE = 100 : fin de donnees, END-OF-FILE = ''Y''.'
+  - 'Si SQLCODE != 0 et != 100 : message d erreur affiche et END-OF-FILE = ''Y''.'
+  errors_flags:
+  - 'SQLCODE = 0 : succes, une ligne lue.'
+  - 'SQLCODE = 100 : fin de curseur.'
+  - 'SQLCODE != 0 et != 100 : erreur SQL, le batch s arrete logiquement.'
+  related_exigences:
+  - R4
+  - R5
+  sql:
+    declare_cursor: "DECLARE C_USER CURSOR FOR\nSELECT USER_ID, USER_NOM, USER_MAIL,\
+      \ USER_PASS, USER_ROLE,\n       USER_ID_ANTENNE, USER_LAST_LOGIN\nFROM UTILISATEUR\n\
+      ORDER BY USER_ID\n"
+    open_cursor: OPEN C_USER
+    fetch_into: FETCH C_USER INTO :WS-USER-ID, :WS-USER-NOM, :WS-USER-MAIL, :WS-USER-PASS,
+      :WS-USER-ROLE, :WS-USER-ID-ANTENNE, :WS-USER-LAST-LOGIN
+  sql_actions:
+  - declare_cursor
+  - open_cursor
+  - fetch_cursor
+  - check_sqlcode
+  - map_to_linkage
+  - set_eof
+  eof_logic:
+    on_sqlcode_100_set_eof: true
+    eof_flag_name: LK-END-OF-FILE
+    eof_true_value: Y
+    eof_false_value: N
+- id: FN-USER-DAL-SAVE
+  name: DAL-SAVE
+  programme: UTILISATEUR-DAL-DB
+  layer: dal
+  visibility: public
+  required: true
+  entity: UTILISATEUR
+  description: Met a jour en base la colonne USER_LAST_LOGIN pour l utilisateur courant
+    (USER_ID).
+  operation_code: SAVE
+  inputs:
+  - UTILISATEUR.USER_ID
+  - UTILISATEUR.USER_LAST_LOGIN
+  outputs:
+  - SQLCODE
+  modifies:
+  - SQLCODE
+  preconditions:
+  - UTILISATEUR.USER_ID contient un identifiant existant en base.
+  postconditions:
+  - 'Si SQLCODE = 0 : la ligne UTILISATEUR correspondante en base a ete mise a jour.'
+  errors_flags:
+  - 'SQLCODE = 0 : succes.'
+  - 'SQLCODE != 0 : erreur SQL, message affiche.'
+  related_exigences:
+  - F1
+  - R4
+  - R5
+  sql:
+    update_statement: 'UPDATE UTILISATEUR
+
+      SET USER_LAST_LOGIN = :WS-USER-LAST-LOGIN
+
+      WHERE USER_ID = :WS-USER-ID
+
+      '
+- id: FN-USER-DAL-END
+  name: DAL-END
+  programme: UTILISATEUR-DAL-DB
+  layer: dal
+  visibility: public
+  required: true
+  entity: UTILISATEUR
+  description: Ferme le curseur s il est ouvert, commit la transaction et ferme la
+    connexion a la base.
+  operation_code: 'END '
+  inputs: []
+  outputs:
+  - SQLCODE
+  modifies:
+  - WS-CURSOR-OPEN
+  - WS-CONNECTED
+  - SQLCODE
+  preconditions: []
+  postconditions:
+  - Curseur ferme si besoin.
+  - COMMIT effectue.
+  - Connexion base fermee.
+  errors_flags:
+  - Les erreurs de CLOSE/COMMIT/DISCONNECT sont simplement affichees.
+  related_exigences:
+  - R4
+  - R5
+  sql:
+    close_cursor: CLOSE C_USER
+    commit: COMMIT
+    disconnect: DISCONNECT ALL
+- id: FN-USER-LOGIC-MAIN
+  name: MAIN-PROCESS
+  programme: UTILISATEUR-LOGIC
+  layer: logic
+  visibility: public
+  required: true
+  entity: UTILISATEUR
+  description: 'Boucle principale du batch: lit les utilisateurs via la DAL, controle
+    le dernier login, sauvegarde et affiche chaque utilisateur.'
+  inputs: []
+  outputs: []
+  modifies:
+  - UTILISATEUR.*
+  - END-OF-FILE
+  - WS-COUNT-TOTAL
+  - WS-COUNT-ERROR
+  preconditions: []
+  postconditions:
+  - Tous les utilisateurs ont un USER_LAST_LOGIN valide (>= 0).
+  calls:
+  - UTILISATEUR-DAL-DB avec OPERATION='READ'
+  - CALCULATE-LOGIN
+  - UTILISATEUR-DAL-DB avec OPERATION='SAVE'
+  - UTILISATEUR-BUSINESS.DISPLAY-UTILISATEUR
+  - UTILISATEUR-DAL-DB avec OPERATION='END '
+  loop_control:
+    eof_flag_name: END-OF-FILE
+    eof_true_value: Y
+    eof_false_value: N
+  related_exigences:
+  - F1
+- id: FN-USER-LOGIC-CALC
+  name: CALCULATE-LOGIN
+  programme: UTILISATEUR-LOGIC
+  layer: logic
+  visibility: public
+  required: true
+  entity: UTILISATEUR
+  description: 'Controle simple: si USER_LAST_LOGIN est negatif, le remettre a zero
+    et compter une anomalie.'
+  inputs:
+  - UTILISATEUR.USER_LAST_LOGIN
+  outputs:
+  - UTILISATEUR.USER_LAST_LOGIN
+  modifies:
+  - UTILISATEUR.USER_LAST_LOGIN
+  - WS-COUNT-ERROR
+  preconditions:
+  - UTILISATEUR.USER_LAST_LOGIN contient une valeur numerique.
+  postconditions:
+  - UTILISATEUR.USER_LAST_LOGIN >= 0.
+  errors_flags:
+  - Si USER_LAST_LOGIN < 0 alors mise a 0 et compteur erreur incremente.
+  related_exigences:
+  - F1
+- id: FN-USER-BIZ-DISPLAY
+  name: DISPLAY-UTILISATEUR
+  programme: UTILISATEUR-BUSINESS
+  layer: business
+  visibility: public
+  required: true
+  entity: UTILISATEUR
+  description: Affiche les informations principales de l utilisateur courant sur la
+    console.
+  inputs:
+  - UTILISATEUR.USER_ID
+  - UTILISATEUR.USER_NOM
+  - UTILISATEUR.USER_MAIL
+  - UTILISATEUR.USER_ROLE
+  - UTILISATEUR.USER_ID_ANTENNE
+  - UTILISATEUR.USER_LAST_LOGIN
+  outputs: []
+  modifies: []
+  preconditions:
+  - UTILISATEUR contient des valeurs lues/calculees coherentes.
+  postconditions: []
+  errors_flags: []
+  related_exigences:
+  - F1
+  display:
+    separator: '----------------------------------------'
+    lines:
+    - label: 'UTILISATEUR: '
+      field: UTILISATEUR.USER_NOM
+      cobol_name: LK-USER-NOM
+    - label: 'ID        : '
+      field: UTILISATEUR.USER_ID
+      cobol_name: LK-USER-ID
+    - label: 'EMAIL     : '
+      field: UTILISATEUR.USER_MAIL
+      cobol_name: LK-USER-MAIL
+    - label: 'ROLE      : '
+      field: UTILISATEUR.USER_ROLE
+      cobol_name: LK-USER-ROLE
+    - label: 'ANTENNE   : '
+      field: UTILISATEUR.USER_ID_ANTENNE
+      cobol_name: LK-USER-ID-ANTENNE
+    - label: 'LASTLOGIN : '
+      field: UTILISATEUR.USER_LAST_LOGIN
+      cobol_name: LK-USER-LAST-LOGIN
+- id: FN-ANT-DAL-CONNECT
+  name: DAL-CONNECT
+  programme: ANTENNE-DAL-DB
+  layer: dal
+  visibility: internal
+  required: true
+  entity: ANTENNE
+  description: Connexion paresseuse a la base en SQL embarque (precompilation). Initialise l environnement
+    de connexion a partir de valeurs externes, puis etablit la connexion en utilisant
+    les variables de connexion definies dans WORKING-STORAGE.
+  errors_flags:
+  - Les erreurs de CLOSE/COMMIT/DISCONNECT sont simplement affichees.
+  related_exigences:
+  - R4
+  - R5
+  sql:
+    connection_method: embedded_sql_precompile (voir sql.connection)
+    connection_guidance:
+    - 'Initialiser l environnement de connexion depuis des valeurs externes (ex: variables PG*).'
+    - 'Etablir la connexion SQL embarquee en utilisant les variables de connexion deja presentes dans WORKING-STORAGE.'
+    - 'Si SQLCODE < 0: journaliser l erreur et interrompre le flux logique.'
+- id: FN-ANT-LOGIC-MAIN
+  name: MAIN-PROCESS
+  programme: ANTENNE-LOGIC
+  layer: logic
+  visibility: public
+  required: true
+  entity: ANTENNE
+  description: 'Boucle principale du batch: lit les antennes via la DAL, normalise
+    la region, sauvegarde et affiche chaque antenne.'
+  inputs: []
+  outputs: []
+  modifies:
+  - ANTENNE.*
+  - END-OF-FILE
+  - WS-COUNT-TOTAL
+  - WS-COUNT-ERROR
+  preconditions: []
+  postconditions:
+  - Toutes les antennes ont une region non vide.
+  calls:
+  - ANTENNE-DAL-DB avec OPERATION='READ'
+  - NORMALIZE-REGION
+  - ANTENNE-DAL-DB avec OPERATION='SAVE'
+  - ANTENNE-BUSINESS.DISPLAY-ANTENNE
+  - ANTENNE-DAL-DB avec OPERATION='END '
+  loop_control:
+    eof_flag_name: END-OF-FILE
+    eof_true_value: Y
+    eof_false_value: N
+  related_exigences:
+  - F2
+- id: FN-ANT-LOGIC-CALC
+  name: NORMALIZE-REGION
+  programme: ANTENNE-LOGIC
+  layer: logic
+  visibility: public
+  required: true
+  entity: ANTENNE
+  description: 'Controle simple: si ANTENNE_REGION est vide, la mettre a ''INCONNUE''
+    et compter une anomalie.'
+  inputs:
+  - ANTENNE.ANTENNE_REGION
+  outputs:
+  - ANTENNE.ANTENNE_REGION
+  modifies:
+  - ANTENNE.ANTENNE_REGION
+  - WS-COUNT-ERROR
+  preconditions:
+  - ANTENNE.ANTENNE_REGION contient une valeur texte.
+  postconditions:
+  - ANTENNE.ANTENNE_REGION n est pas vide.
+  errors_flags:
+  - Si ANTENNE_REGION est vide alors mise a 'INCONNUE' et compteur erreur incremente.
+  related_exigences:
+  - F2
+- id: FN-ANT-BIZ-DISPLAY
+  name: DISPLAY-ANTENNE
+  programme: ANTENNE-BUSINESS
+  layer: business
+  visibility: public
+  required: true
+  entity: ANTENNE
+  description: Affiche les informations principales de l antenne courante sur la console.
+  inputs:
+  - ANTENNE.ANTENNE_ID
+  - ANTENNE.ANTENNE_NOM
+  - ANTENNE.ANTENNE_REGION
+  outputs: []
+  modifies: []
+  preconditions:
+  - ANTENNE contient des valeurs lues/calculees coherentes.
+  postconditions: []
+  errors_flags: []
+  related_exigences:
+  - F2
+  display:
+    separator: '----------------------------------------'
+    lines:
+    - label: 'ANTENNE   : '
+      field: ANTENNE.ANTENNE_NOM
+      cobol_name: LK-ANTENNE-NOM
+    - label: 'ID        : '
+      field: ANTENNE.ANTENNE_ID
+      cobol_name: LK-ANTENNE-ID
+    - label: 'REGION    : '
+      field: ANTENNE.ANTENNE_REGION
+      cobol_name: LK-ANTENNE-REGION
+- id: FN-REP-DAL-CONNECT
+  name: DAL-CONNECT
+  programme: REPAS-DAL-DB
+  layer: dal
+  visibility: internal
+  required: true
+  entity: REPAS
+  description: Connexion paresseuse a la base en SQL embarque (precompilation). Initialise l environnement
+    de connexion a partir de valeurs externes, puis etablit la connexion en utilisant
+    les variables de connexion definies dans WORKING-STORAGE.
+  errors_flags:
+  - Les erreurs de CLOSE/COMMIT/DISCONNECT sont simplement affichees.
+  related_exigences:
+  - R4
+  - R5
+  sql:
+    connection_method: embedded_sql_precompile (voir sql.connection)
+    connection_guidance:
+    - 'Initialiser l environnement de connexion depuis des valeurs externes (ex: variables PG*).'
+    - 'Etablir la connexion SQL embarquee en utilisant les variables de connexion deja presentes dans WORKING-STORAGE.'
+    - 'Si SQLCODE < 0: journaliser l erreur et interrompre le flux logique.'
+- id: FN-REP-LOGIC-MAIN
+  name: MAIN-PROCESS
+  programme: REPAS-LOGIC
+  layer: logic
+  visibility: public
+  required: true
+  entity: REPAS
+  description: 'Boucle principale du batch: lit les repas via la DAL, controle le
+    nombre de repas, sauvegarde et affiche chaque repas.'
+  inputs: []
+  outputs: []
+  modifies:
+  - REPAS.*
+  - END-OF-FILE
+  - WS-COUNT-TOTAL
+  - WS-COUNT-ERROR
+  preconditions: []
+  postconditions:
+  - Tous les repas ont un nombre valide (>= 0).
+  calls:
+  - REPAS-DAL-DB avec OPERATION='READ'
+  - CALCULATE-REPAS
+  - REPAS-DAL-DB avec OPERATION='SAVE'
+  - REPAS-BUSINESS.DISPLAY-REPAS
+  - REPAS-DAL-DB avec OPERATION='END '
+  loop_control:
+    eof_flag_name: END-OF-FILE
+    eof_true_value: Y
+    eof_false_value: N
+  related_exigences:
+  - F3
+- id: FN-REP-LOGIC-CALC
+  name: CALCULATE-REPAS
+  programme: REPAS-LOGIC
+  layer: logic
+  visibility: public
+  required: true
+  entity: REPAS
+  description: 'Controle simple: si REPAS_NBREPAS est negatif, le remettre a zero
+    et compter une anomalie.'
+  inputs:
+  - REPAS.REPAS_NBREPAS
+  outputs:
+  - REPAS.REPAS_NBREPAS
+  modifies:
+  - REPAS.REPAS_NBREPAS
+  - WS-COUNT-ERROR
+  preconditions:
+  - REPAS.REPAS_NBREPAS contient une valeur numerique.
+  postconditions:
+  - REPAS.REPAS_NBREPAS >= 0.
+  errors_flags:
+  - Si REPAS_NBREPAS < 0 alors mise a 0 et compteur erreur incremente.
+  related_exigences:
+  - F3
+- id: FN-REP-BIZ-DISPLAY
+  name: DISPLAY-REPAS
+  programme: REPAS-BUSINESS
+  layer: business
+  visibility: public
+  required: true
+  entity: REPAS
+  description: Affiche les informations principales du repas courant sur la console.
+  inputs:
+  - REPAS.REPAS_ID
+  - REPAS.REPAS_ID_ACTIVITE
+  - REPAS.REPAS_TYPE
+  - REPAS.REPAS_NBREPAS
+  outputs: []
+  modifies: []
+  preconditions:
+  - REPAS contient des valeurs lues/calculees coherentes.
+  postconditions: []
+  errors_flags: []
+  related_exigences:
+  - F3
+  display:
+    separator: '----------------------------------------'
+    lines:
+    - label: 'REPAS    : '
+      field: REPAS.REPAS_ID
+      cobol_name: LK-REPAS-ID
+    - label: 'ACTIVITE : '
+      field: REPAS.REPAS_ID_ACTIVITE
+      cobol_name: LK-REPAS-ID-ACTIVITE
+    - label: 'TYPE     : '
+      field: REPAS.REPAS_TYPE
+      cobol_name: LK-REPAS-TYPE
+    - label: 'NBREPAS  : '
+      field: REPAS.REPAS_NBREPAS
+      cobol_name: LK-REPAS-NBREPAS
+- id: FN-HEB-DAL-CONNECT
+  name: DAL-CONNECT
+  programme: HEBERGEMENT-DAL-DB
+  layer: dal
+  visibility: internal
+  required: true
+  entity: HEBERGEMENT
+  description: Connexion paresseuse a la base en SQL embarque (precompilation). Initialise l environnement
+    de connexion a partir de valeurs externes, puis etablit la connexion en utilisant
+    les variables de connexion definies dans WORKING-STORAGE.
+  errors_flags:
+  - Les erreurs de CLOSE/COMMIT/DISCONNECT sont simplement affichees.
+  related_exigences:
+  - R4
+  - R5
+  sql:
+    connection_method: embedded_sql_precompile (voir sql.connection)
+    connection_guidance:
+    - 'Initialiser l environnement de connexion depuis des valeurs externes (ex: variables PG*).'
+    - 'Etablir la connexion SQL embarquee en utilisant les variables de connexion deja presentes dans WORKING-STORAGE.'
+    - 'Si SQLCODE < 0: journaliser l erreur et interrompre le flux logique.'
+- id: FN-HEB-LOGIC-MAIN
+  name: MAIN-PROCESS
+  programme: HEBERGEMENT-LOGIC
+  layer: logic
+  visibility: public
+  required: true
+  entity: HEBERGEMENT
+  description: 'Boucle principale du batch: lit les hebergements via la DAL, controle
+    le nombre de nuits, sauvegarde et affiche chaque hebergement.'
+  inputs: []
+  outputs: []
+  modifies:
+  - HEBERGEMENT.*
+  - END-OF-FILE
+  - WS-COUNT-TOTAL
+  - WS-COUNT-ERROR
+  preconditions: []
+  postconditions:
+  - Tous les hebergements ont un nombre de nuits valide (>= 0).
+  calls:
+  - HEBERGEMENT-DAL-DB avec OPERATION='READ'
+  - CALCULATE-HEBERGEMENT
+  - HEBERGEMENT-DAL-DB avec OPERATION='SAVE'
+  - HEBERGEMENT-BUSINESS.DISPLAY-HEBERGEMENT
+  - HEBERGEMENT-DAL-DB avec OPERATION='END '
+  loop_control:
+    eof_flag_name: END-OF-FILE
+    eof_true_value: Y
+    eof_false_value: N
+  related_exigences:
+  - F3
+- id: FN-HEB-LOGIC-CALC
+  name: CALCULATE-HEBERGEMENT
+  programme: HEBERGEMENT-LOGIC
+  layer: logic
+  visibility: public
+  required: true
+  entity: HEBERGEMENT
+  description: 'Controle simple: si HEBERGEMENT_NBNUIT est negatif, le remettre a
+    zero et compter une anomalie.'
+  inputs:
+  - HEBERGEMENT.HEBERGEMENT_NBNUIT
+  outputs:
+  - HEBERGEMENT.HEBERGEMENT_NBNUIT
+  modifies:
+  - HEBERGEMENT.HEBERGEMENT_NBNUIT
+  - WS-COUNT-ERROR
+  preconditions:
+  - HEBERGEMENT.HEBERGEMENT_NBNUIT contient une valeur numerique.
+  postconditions:
+  - HEBERGEMENT.HEBERGEMENT_NBNUIT >= 0.
+  errors_flags:
+  - Si HEBERGEMENT_NBNUIT < 0 alors mise a 0 et compteur erreur incremente.
+  related_exigences:
+  - F3
+- id: FN-HEB-BIZ-DISPLAY
+  name: DISPLAY-HEBERGEMENT
+  programme: HEBERGEMENT-BUSINESS
+  layer: business
+  visibility: public
+  required: true
+  entity: HEBERGEMENT
+  description: Affiche les informations principales de l hebergement courant sur la
+    console.
+  inputs:
+  - HEBERGEMENT.HEBERGEMENT_ID
+  - HEBERGEMENT.HEBERGEMENT_ID_ACTIVITE
+  - HEBERGEMENT.HEBERGEMENT_TYPE
+  - HEBERGEMENT.HEBERGEMENT_NBNUIT
+  outputs: []
+  modifies: []
+  preconditions:
+  - HEBERGEMENT contient des valeurs lues/calculees coherentes.
+  postconditions: []
+  errors_flags: []
+  related_exigences:
+  - F3
+  display:
+    separator: '----------------------------------------'
+    lines:
+    - label: 'HEBERG. : '
+      field: HEBERGEMENT.HEBERGEMENT_ID
+      cobol_name: LK-HEBERGEMENT-ID
+    - label: 'ACTIVITE: '
+      field: HEBERGEMENT.HEBERGEMENT_ID_ACTIVITE
+      cobol_name: LK-HEBERG-ID-ACTIVITE
+    - label: 'TYPE    : '
+      field: HEBERGEMENT.HEBERGEMENT_TYPE
+      cobol_name: LK-HEBERGEMENT-TYPE
+    - label: 'NBNUIT  : '
+      field: HEBERGEMENT.HEBERGEMENT_NBNUIT
+      cobol_name: LK-HEBERGEMENT-NBNUIT
+- id: FN-PAR-DAL-CONNECT
+  name: DAL-CONNECT
+  programme: PARTICIPATION-DAL-DB
+  layer: dal
+  visibility: internal
+  required: true
+  entity: PARTICIPATION
+  description: Connexion paresseuse a la base en SQL embarque (precompilation). Initialise l environnement
+    de connexion a partir de valeurs externes, puis etablit la connexion en utilisant
+    les variables de connexion definies dans WORKING-STORAGE.
+  errors_flags:
+  - Les erreurs de CLOSE/COMMIT/DISCONNECT sont simplement affichees.
+  related_exigences:
+  - R4
+  - R5
+  sql:
+    connection_method: embedded_sql_precompile (voir sql.connection)
+    connection_guidance:
+    - 'Initialiser l environnement de connexion depuis des valeurs externes (ex: variables PG*).'
+    - 'Etablir la connexion SQL embarquee en utilisant les variables de connexion deja presentes dans WORKING-STORAGE.'
+    - 'Si SQLCODE < 0: journaliser l erreur et interrompre le flux logique.'
+- id: FN-PAR-LOGIC-MAIN
+  name: MAIN-PROCESS
+  programme: PARTICIPATION-LOGIC
+  layer: logic
+  visibility: public
+  required: true
+  entity: PARTICIPATION
+  description: 'Boucle principale du batch: lit les participations via la DAL, controle
+    le mode transport, sauvegarde et affiche chaque participation.'
+  inputs: []
+  outputs: []
+  modifies:
+  - PARTICIPATION.*
+  - END-OF-FILE
+  - WS-COUNT-TOTAL
+  - WS-COUNT-ERROR
+  preconditions: []
+  postconditions:
+  - Toutes les participations ont un mode transport valide (>= 0).
+  calls:
+  - PARTICIPATION-DAL-DB avec OPERATION='READ'
+  - CALCULATE-TRANSPORT
+  - PARTICIPATION-DAL-DB avec OPERATION='SAVE'
+  - PARTICIPATION-BUSINESS.DISPLAY-PARTICIPATION
+  - PARTICIPATION-DAL-DB avec OPERATION='END '
+  loop_control:
+    eof_flag_name: END-OF-FILE
+    eof_true_value: Y
+    eof_false_value: N
+  related_exigences:
+  - F4
+- id: FN-PAR-LOGIC-CALC
+  name: CALCULATE-TRANSPORT
+  programme: PARTICIPATION-LOGIC
+  layer: logic
+  visibility: public
+  required: true
+  entity: PARTICIPATION
+  description: 'Controle simple: si PARTICIPATION_MODE_TRANSPORT est negatif, le remettre
+    a zero et compter une anomalie.'
+  inputs:
+  - PARTICIPATION.PARTICIPATION_MODE_TRANSPORT
+  outputs:
+  - PARTICIPATION.PARTICIPATION_MODE_TRANSPORT
+  modifies:
+  - PARTICIPATION.PARTICIPATION_MODE_TRANSPORT
+  - WS-COUNT-ERROR
+  preconditions:
+  - PARTICIPATION.PARTICIPATION_MODE_TRANSPORT contient une valeur numerique.
+  postconditions:
+  - PARTICIPATION.PARTICIPATION_MODE_TRANSPORT >= 0.
+  errors_flags:
+  - Si PARTICIPATION_MODE_TRANSPORT < 0 alors mise a 0 et compteur erreur incremente.
+  related_exigences:
+  - F4
+- id: FN-PAR-BIZ-DISPLAY
+  name: DISPLAY-PARTICIPATION
+  programme: PARTICIPATION-BUSINESS
+  layer: business
+  visibility: public
+  required: true
+  entity: PARTICIPATION
+  description: Affiche les informations principales de la participation courante sur
+    la console.
+  inputs:
+  - PARTICIPATION.PARTICIPATION_ID_ACTIVITE
+  - PARTICIPATION.PARTICIPATION_ID_USER
+  - PARTICIPATION.PARTICIPATION_MODE_TRANSPORT
+  outputs: []
+  modifies: []
+  preconditions:
+  - PARTICIPATION contient des valeurs lues/calculees coherentes.
+  postconditions: []
+  errors_flags: []
+  related_exigences:
+  - F4
+  display:
+    separator: '----------------------------------------'
+    lines:
+    - label: 'ACTIVITE   : '
+      field: PARTICIPATION.PARTICIPATION_ID_ACTIVITE
+      cobol_name: LK-PARTICIPATION-ID-ACTIVITE
+    - label: 'UTILISATEUR: '
+      field: PARTICIPATION.PARTICIPATION_ID_USER
+      cobol_name: LK-PARTICIPATION-ID-USER
+    - label: 'TRANSPORT  : '
+      field: PARTICIPATION.PARTICIPATION_MODE_TRANSPORT
+      cobol_name: LK-PARTICIPATION-MODE-TRANSPORT
+# declare_cursor
+# calls
+# update_statement

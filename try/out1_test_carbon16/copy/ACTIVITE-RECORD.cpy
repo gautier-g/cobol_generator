@@ -1,0 +1,14 @@
+      *> Record structure for ACTIVITE
+       01 ACTIVITE.
+           05 ACTIVITE-ID          PIC 9(9).
+           05 ACTIVITE-NOM         PIC X(50).
+           05 ACTIVITE-TYPE        PIC X(20).
+           05 ACTIVITE-IDANTENNE   PIC 9(9).
+           05 ACTIVITE-ANIMATEUR   PIC 9(9).
+           05 ACTIVITE-NBPARTICIPANTS PIC 9(9).
+           05 ACTIVITE-MODETRANSPORT PIC 9(2).
+           05 ACTIVITE-LIEU        PIC X(100).
+           05 ACTIVITE-DISTANCE    PIC 9(10).
+           05 ACTIVITE-HEBERGEMENT PIC 9(1).
+           05 ACTIVITE-REPASPREVU  PIC 9(1).
+           05 ACTIVITE-EMPREINTETOTALE PIC S9(9)V9(4).

@@ -1,0 +1,12 @@
+{
+  "created_utc": "2026-01-15T10:59:51Z",
+  "extra": {
+    "generated_functions": 32
+  },
+  "kind": "normalized_spec_steps",
+  "mtime_utc": "2026-01-15T10:59:51Z",
+  "name": "normalized_spec.json",
+  "path": "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/normalized_spec.json",
+  "sha256": "31940f496a36e57173b7897b0d37eec0aa471715388ad8679e71e44e30ce8dcd",
+  "size": 137933
+}
