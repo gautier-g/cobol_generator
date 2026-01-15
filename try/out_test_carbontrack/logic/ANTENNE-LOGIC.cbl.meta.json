@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-01-15T11:05:13Z",
+  "extra": {
+    "layer": "logic",
+    "program_id": "ANTENNE-LOGIC"
+  },
+  "kind": "program_full_llm_strict",
+  "mtime_utc": "2026-01-15T11:05:13Z",
+  "name": "ANTENNE-LOGIC.cbl",
+  "path": "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/logic/ANTENNE-LOGIC.cbl",
+  "sha256": "89cd08f12a6cb170589d783142ca5717b7ab093c20f111b6173a1a553524ef31",
+  "size": 1768
+}

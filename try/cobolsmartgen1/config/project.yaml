@@ -1,0 +1,32 @@
+defaults:
+  dialecte_cobol: gnucobol
+  sql_cible: postgres
+  nommage:
+    variables_case: UPPER_SNAKE
+    programmes_case: UPPER-KEBAB
+compiler:
+  name: cobc
+  line_format: free
+  flags:
+    base: -x -Wall
+    debug: -g
+    optimize: -O2
+  copy_dirs:
+  - out/copy
+  - copy
+llm:
+  provider: groq
+  base_url: http://127.0.0.1:8081/v1
+  model: mAInframer-34b-Q4_K_M
+  temperature: 0.2
+  timeout_s: 3000
+logging:
+  level: INFO
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  file: null
+paths:
+  out: out
+  prompts_dir: prompts
+autofix:
+  enabled: false
+  max_iterations: 2

@@ -1,0 +1,460 @@
+{
+  "allowed_procedures": {
+    "ACTIVITE-BUSINESS": [
+      "MAIN-PROCEDURE",
+      "PRESENT-ACTIVITE-MENU",
+      "PROCESS-ACTIVITE-OPTION",
+      "ADD-ACTIVITE",
+      "VIEW-ACTIVITE",
+      "UPDATE-ACTIVITE",
+      "DELETE-ACTIVITE",
+      "GENERATE-ACTIVITE-REPORT",
+      "FORMAT-ACTIVITE-REPORT",
+      "PRINT-ACTIVITE-REPORT"
+    ],
+    "ACTIVITE-DAL-DB": [
+      "OPEN-DATABASE",
+      "CLOSE-DATABASE",
+      "SELECT-ACTIVITE",
+      "INSERT-ACTIVITE",
+      "UPDATE-ACTIVITE",
+      "DELETE-ACTIVITE",
+      "OPEN-ACTIVITE-CURSOR",
+      "FETCH-ACTIVITE-CURSOR",
+      "CLOSE-ACTIVITE-CURSOR"
+    ],
+    "ACTIVITE-LOGIC": [
+      "PROCESS-ACTIVITE",
+      "READ-ACTIVITE",
+      "VALIDATE-ACTIVITE",
+      "CALCULATE-ACTIVITE",
+      "WRITE-ACTIVITE",
+      "TRANSFORM-ACTIVITE"
+    ],
+    "ANTENNE-BUSINESS": [
+      "MAIN-PROCEDURE",
+      "PRESENT-ANTENNE-MENU",
+      "PROCESS-ANTENNE-OPTION",
+      "ADD-ANTENNE",
+      "VIEW-ANTENNE",
+      "UPDATE-ANTENNE",
+      "DELETE-ANTENNE",
+      "GENERATE-ANTENNE-REPORT",
+      "FORMAT-ANTENNE-REPORT",
+      "PRINT-ANTENNE-REPORT"
+    ],
+    "ANTENNE-DAL-DB": [
+      "OPEN-DATABASE",
+      "CLOSE-DATABASE",
+      "SELECT-ANTENNE",
+      "INSERT-ANTENNE",
+      "UPDATE-ANTENNE",
+      "DELETE-ANTENNE",
+      "OPEN-ANTENNE-CURSOR",
+      "FETCH-ANTENNE-CURSOR",
+      "CLOSE-ANTENNE-CURSOR"
+    ],
+    "ANTENNE-LOGIC": [
+      "PROCESS-ANTENNE",
+      "READ-ANTENNE",
+      "VALIDATE-ANTENNE",
+      "CALCULATE-ANTENNE",
+      "WRITE-ANTENNE",
+      "TRANSFORM-ANTENNE"
+    ],
+    "HEBERGEMENT-BUSINESS": [
+      "MAIN-PROCEDURE",
+      "PRESENT-HEBERGEMENT-MENU",
+      "PROCESS-HEBERGEMENT-OPTION",
+      "ADD-HEBERGEMENT",
+      "VIEW-HEBERGEMENT",
+      "UPDATE-HEBERGEMENT",
+      "DELETE-HEBERGEMENT",
+      "GENERATE-HEBERGEMENT-REPORT",
+      "FORMAT-HEBERGEMENT-REPORT",
+      "PRINT-HEBERGEMENT-REPORT"
+    ],
+    "HEBERGEMENT-DAL-DB": [
+      "OPEN-DATABASE",
+      "CLOSE-DATABASE",
+      "SELECT-HEBERGEMENT",
+      "INSERT-HEBERGEMENT",
+      "UPDATE-HEBERGEMENT",
+      "DELETE-HEBERGEMENT",
+      "OPEN-HEBERGEMENT-CURSOR",
+      "FETCH-HEBERGEMENT-CURSOR",
+      "CLOSE-HEBERGEMENT-CURSOR"
+    ],
+    "HEBERGEMENT-LOGIC": [
+      "PROCESS-HEBERGEMENT",
+      "READ-HEBERGEMENT",
+      "VALIDATE-HEBERGEMENT",
+      "CALCULATE-HEBERGEMENT",
+      "WRITE-HEBERGEMENT",
+      "TRANSFORM-HEBERGEMENT"
+    ],
+    "PARTICIPATION-BUSINESS": [
+      "MAIN-PROCEDURE",
+      "PRESENT-PARTICIPATION-MENU",
+      "PROCESS-PARTICIPATION-OPTION",
+      "ADD-PARTICIPATION",
+      "VIEW-PARTICIPATION",
+      "UPDATE-PARTICIPATION",
+      "DELETE-PARTICIPATION",
+      "GENERATE-PARTICIPATION-REPORT",
+      "FORMAT-PARTICIPATION-REPORT",
+      "PRINT-PARTICIPATION-REPORT"
+    ],
+    "PARTICIPATION-DAL-DB": [
+      "OPEN-DATABASE",
+      "CLOSE-DATABASE",
+      "SELECT-PARTICIPATION",
+      "INSERT-PARTICIPATION",
+      "UPDATE-PARTICIPATION",
+      "DELETE-PARTICIPATION",
+      "OPEN-PARTICIPATION-CURSOR",
+      "FETCH-PARTICIPATION-CURSOR",
+      "CLOSE-PARTICIPATION-CURSOR"
+    ],
+    "PARTICIPATION-LOGIC": [
+      "PROCESS-PARTICIPATION",
+      "READ-PARTICIPATION",
+      "VALIDATE-PARTICIPATION",
+      "CALCULATE-PARTICIPATION",
+      "WRITE-PARTICIPATION",
+      "TRANSFORM-PARTICIPATION"
+    ],
+    "REPAS-BUSINESS": [
+      "MAIN-PROCEDURE",
+      "PRESENT-REPAS-MENU",
+      "PROCESS-REPAS-OPTION",
+      "ADD-REPAS",
+      "VIEW-REPAS",
+      "UPDATE-REPAS",
+      "DELETE-REPAS",
+      "GENERATE-REPAS-REPORT",
+      "FORMAT-REPAS-REPORT",
+      "PRINT-REPAS-REPORT"
+    ],
+    "REPAS-DAL-DB": [
+      "OPEN-DATABASE",
+      "CLOSE-DATABASE",
+      "SELECT-REPAS",
+      "INSERT-REPAS",
+      "UPDATE-REPAS",
+      "DELETE-REPAS",
+      "OPEN-REPAS-CURSOR",
+      "FETCH-REPAS-CURSOR",
+      "CLOSE-REPAS-CURSOR"
+    ],
+    "REPAS-LOGIC": [
+      "PROCESS-REPAS",
+      "READ-REPAS",
+      "VALIDATE-REPAS",
+      "CALCULATE-REPAS",
+      "WRITE-REPAS",
+      "TRANSFORM-REPAS"
+    ],
+    "UTILISATEUR-BUSINESS": [
+      "MAIN-PROCEDURE",
+      "PRESENT-UTILISATEUR-MENU",
+      "PROCESS-UTILISATEUR-OPTION",
+      "ADD-UTILISATEUR",
+      "VIEW-UTILISATEUR",
+      "UPDATE-UTILISATEUR",
+      "DELETE-UTILISATEUR",
+      "GENERATE-UTILISATEUR-REPORT",
+      "FORMAT-UTILISATEUR-REPORT",
+      "PRINT-UTILISATEUR-REPORT"
+    ],
+    "UTILISATEUR-DAL-DB": [
+      "OPEN-DATABASE",
+      "CLOSE-DATABASE",
+      "SELECT-UTILISATEUR",
+      "INSERT-UTILISATEUR",
+      "UPDATE-UTILISATEUR",
+      "DELETE-UTILISATEUR",
+      "OPEN-UTILISATEUR-CURSOR",
+      "FETCH-UTILISATEUR-CURSOR",
+      "CLOSE-UTILISATEUR-CURSOR"
+    ],
+    "UTILISATEUR-LOGIC": [
+      "PROCESS-UTILISATEUR",
+      "READ-UTILISATEUR",
+      "VALIDATE-UTILISATEUR",
+      "CALCULATE-UTILISATEUR",
+      "WRITE-UTILISATEUR",
+      "TRANSFORM-UTILISATEUR"
+    ]
+  },
+  "allowed_variables": {
+    "ACTIVITE-BUSINESS": [
+      "ACTIVITE-ANIMATEUR",
+      "ACTIVITE-DISTANCE",
+      "ACTIVITE-EMPREINTETOTALE",
+      "ACTIVITE-HEBERGEMENT",
+      "ACTIVITE-ID",
+      "ACTIVITE-IDANTENNE",
+      "ACTIVITE-LIEU",
+      "ACTIVITE-MODETRANSPORT",
+      "ACTIVITE-NBPARTICIPANTS",
+      "ACTIVITE-NOM",
+      "ACTIVITE-REPASPREVU",
+      "ACTIVITE-TYPE",
+      "WS-CONFIRM-FLAG",
+      "WS-EMPLOYEE-COUNT",
+      "WS-USER-OPTION"
+    ],
+    "ACTIVITE-DAL-DB": [
+      "ACTIVITE-ANIMATEUR",
+      "ACTIVITE-DISTANCE",
+      "ACTIVITE-EMPREINTETOTALE",
+      "ACTIVITE-HEBERGEMENT",
+      "ACTIVITE-ID",
+      "ACTIVITE-IDANTENNE",
+      "ACTIVITE-LIEU",
+      "ACTIVITE-MODETRANSPORT",
+      "ACTIVITE-NBPARTICIPANTS",
+      "ACTIVITE-NOM",
+      "ACTIVITE-REPASPREVU",
+      "ACTIVITE-TYPE",
+      "WS-EOF-FLAG",
+      "WS-RETURN-CODE"
+    ],
+    "ACTIVITE-LOGIC": [
+      "ACTIVITE-ANIMATEUR",
+      "ACTIVITE-DISTANCE",
+      "ACTIVITE-EMPREINTETOTALE",
+      "ACTIVITE-HEBERGEMENT",
+      "ACTIVITE-ID",
+      "ACTIVITE-IDANTENNE",
+      "ACTIVITE-LIEU",
+      "ACTIVITE-MODETRANSPORT",
+      "ACTIVITE-NBPARTICIPANTS",
+      "ACTIVITE-NOM",
+      "ACTIVITE-REPASPREVU",
+      "ACTIVITE-TYPE"
+    ],
+    "ANTENNE-BUSINESS": [
+      "ANTENNE-ID",
+      "ANTENNE-NOM",
+      "ANTENNE-REGION",
+      "WS-CONFIRM-FLAG",
+      "WS-EMPLOYEE-COUNT",
+      "WS-USER-OPTION"
+    ],
+    "ANTENNE-DAL-DB": [
+      "ANTENNE-ID",
+      "ANTENNE-NOM",
+      "ANTENNE-REGION",
+      "WS-EOF-FLAG",
+      "WS-RETURN-CODE"
+    ],
+    "ANTENNE-LOGIC": [
+      "ANTENNE-ID",
+      "ANTENNE-NOM",
+      "ANTENNE-REGION"
+    ],
+    "HEBERGEMENT-BUSINESS": [
+      "HEBERGEMENT-ID",
+      "HEBERGEMENT-ID-ACTIVITE",
+      "HEBERGEMENT-NBNUIT",
+      "HEBERGEMENT-TYPE",
+      "WS-CONFIRM-FLAG",
+      "WS-EMPLOYEE-COUNT",
+      "WS-USER-OPTION"
+    ],
+    "HEBERGEMENT-DAL-DB": [
+      "HEBERGEMENT-ID",
+      "HEBERGEMENT-ID-ACTIVITE",
+      "HEBERGEMENT-NBNUIT",
+      "HEBERGEMENT-TYPE",
+      "WS-EOF-FLAG",
+      "WS-RETURN-CODE"
+    ],
+    "HEBERGEMENT-LOGIC": [
+      "HEBERGEMENT-ID",
+      "HEBERGEMENT-ID-ACTIVITE",
+      "HEBERGEMENT-NBNUIT",
+      "HEBERGEMENT-TYPE"
+    ],
+    "PARTICIPATION-BUSINESS": [
+      "PARTICIPATION-ID-ACTIVITE",
+      "PARTICIPATION-ID-USER",
+      "PARTICIPATION-MODE-TRANSPORT",
+      "WS-CONFIRM-FLAG",
+      "WS-EMPLOYEE-COUNT",
+      "WS-USER-OPTION"
+    ],
+    "PARTICIPATION-DAL-DB": [
+      "PARTICIPATION-ID-ACTIVITE",
+      "PARTICIPATION-ID-USER",
+      "PARTICIPATION-MODE-TRANSPORT",
+      "WS-EOF-FLAG",
+      "WS-RETURN-CODE"
+    ],
+    "PARTICIPATION-LOGIC": [
+      "PARTICIPATION-ID-ACTIVITE",
+      "PARTICIPATION-ID-USER",
+      "PARTICIPATION-MODE-TRANSPORT"
+    ],
+    "REPAS-BUSINESS": [
+      "REPAS-ID",
+      "REPAS-ID-ACTIVITE",
+      "REPAS-NBREPAS",
+      "REPAS-TYPE",
+      "WS-CONFIRM-FLAG",
+      "WS-EMPLOYEE-COUNT",
+      "WS-USER-OPTION"
+    ],
+    "REPAS-DAL-DB": [
+      "REPAS-ID",
+      "REPAS-ID-ACTIVITE",
+      "REPAS-NBREPAS",
+      "REPAS-TYPE",
+      "WS-EOF-FLAG",
+      "WS-RETURN-CODE"
+    ],
+    "REPAS-LOGIC": [
+      "REPAS-ID",
+      "REPAS-ID-ACTIVITE",
+      "REPAS-NBREPAS",
+      "REPAS-TYPE"
+    ],
+    "UTILISATEUR-BUSINESS": [
+      "USER-ID",
+      "USER-ID-ANTENNE",
+      "USER-LAST-LOGIN",
+      "USER-MAIL",
+      "USER-NOM",
+      "USER-PASS",
+      "USER-ROLE",
+      "WS-CONFIRM-FLAG",
+      "WS-EMPLOYEE-COUNT",
+      "WS-USER-OPTION"
+    ],
+    "UTILISATEUR-DAL-DB": [
+      "USER-ID",
+      "USER-ID-ANTENNE",
+      "USER-LAST-LOGIN",
+      "USER-MAIL",
+      "USER-NOM",
+      "USER-PASS",
+      "USER-ROLE",
+      "WS-EOF-FLAG",
+      "WS-RETURN-CODE"
+    ],
+    "UTILISATEUR-LOGIC": [
+      "USER-ID",
+      "USER-ID-ANTENNE",
+      "USER-LAST-LOGIN",
+      "USER-MAIL",
+      "USER-NOM",
+      "USER-PASS",
+      "USER-ROLE"
+    ],
+    "global": [
+      "END-OF-FILE",
+      "EOF",
+      "RETURN-CODE",
+      "SQLCA",
+      "SQLCODE",
+      "SQLERRD",
+      "SQLERRD-1",
+      "SQLERRD-2",
+      "SQLERRD-3",
+      "SQLERRM",
+      "SQLERRMC",
+      "SQLERRML",
+      "SQLERRP",
+      "SQLSTATE",
+      "SQLWARN",
+      "STATUS-CODE",
+      "WS-EOF-FLAG",
+      "WS-RETURN-CODE"
+    ]
+  },
+  "compilation_rules": {
+    "dialect": "gnucobol",
+    "fail_fast": true,
+    "format": "free",
+    "max_compilation_attempts": 3,
+    "max_llm_corrections_per_file": 1
+  },
+  "forbidden_patterns": [
+    "LINKAGE SECTION (unless explicitly needed for CALL parameters)",
+    "FILE SECTION (unless file I/O explicitly required)",
+    "REPORT SECTION",
+    "ENVIRONMENT DIVISION (unless file I/O explicitly required)",
+    "INDEXED files (use LINE SEQUENTIAL instead)"
+  ],
+  "layers": {
+    "business": {
+      "forbidden": [
+        "database_access",
+        "sql_operations",
+        "business_calculations"
+      ],
+      "programs": [
+        "UTILISATEUR-BUSINESS",
+        "ANTENNE-BUSINESS",
+        "ACTIVITE-BUSINESS",
+        "REPAS-BUSINESS",
+        "HEBERGEMENT-BUSINESS",
+        "PARTICIPATION-BUSINESS"
+      ],
+      "responsibilities": [
+        "orchestration",
+        "user_interface",
+        "menu_display",
+        "process_coordination"
+      ]
+    },
+    "dal": {
+      "forbidden": [
+        "business_logic",
+        "calculations",
+        "user_interface",
+        "orchestration"
+      ],
+      "programs": [
+        "UTILISATEUR-DAL-DB",
+        "ANTENNE-DAL-DB",
+        "ACTIVITE-DAL-DB",
+        "REPAS-DAL-DB",
+        "HEBERGEMENT-DAL-DB",
+        "PARTICIPATION-DAL-DB"
+      ],
+      "responsibilities": [
+        "database_access",
+        "sql_operations",
+        "cursor_management",
+        "connection_management"
+      ]
+    },
+    "logic": {
+      "forbidden": [
+        "database_access",
+        "sql_operations",
+        "user_interface",
+        "menu_display"
+      ],
+      "programs": [
+        "UTILISATEUR-LOGIC",
+        "ANTENNE-LOGIC",
+        "ACTIVITE-LOGIC",
+        "REPAS-LOGIC",
+        "HEBERGEMENT-LOGIC",
+        "PARTICIPATION-LOGIC"
+      ],
+      "responsibilities": [
+        "business_rules",
+        "calculations",
+        "validations",
+        "data_transformations"
+      ]
+    }
+  },
+  "project": "UNKNOWN",
+  "version": "1.0"
+}

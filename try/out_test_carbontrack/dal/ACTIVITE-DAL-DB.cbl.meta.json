@@ -1,0 +1,13 @@
+{
+  "created_utc": "2026-01-15T11:07:55Z",
+  "extra": {
+    "layer": "dal",
+    "program_id": "ACTIVITE-DAL-DB"
+  },
+  "kind": "program_full_llm_strict",
+  "mtime_utc": "2026-01-15T11:07:55Z",
+  "name": "ACTIVITE-DAL-DB.cbl",
+  "path": "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/dal/ACTIVITE-DAL-DB.cbl",
+  "sha256": "8dc5c0964d10b057f4883dd1c04628eb189a56983bb4a127aad40f344bf47cb7",
+  "size": 7283
+}

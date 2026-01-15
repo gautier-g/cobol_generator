@@ -1,0 +1,15 @@
+{
+  "created_dirs": [
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/business",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/logic",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/dal",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/copy",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/sql/ddl",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/sql/dml",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/tests",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/reports",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/trace",
+    "/home/mfabre/pi/cobol_generator/try/out1_test_carbon16/bin"
+  ],
+  "tests": []
+}

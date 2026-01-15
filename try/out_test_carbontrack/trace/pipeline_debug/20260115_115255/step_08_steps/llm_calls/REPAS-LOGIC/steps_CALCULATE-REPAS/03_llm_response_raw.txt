@@ -1,0 +1,9 @@
+```json
+[
+"IF REPAS-NBREPAS OF REPAS < ZERO",
+"DISPLAY 'ANOMALIE: Nombre repas invalide'",
+"MOVE ZERO TO REPAS-NBREPAS OF REPAS",
+"ADD 1 TO WS-COUNT-ERROR",
+"END-IF"
+]
+```

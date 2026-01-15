@@ -1,0 +1,161 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. UTILISATEUR-DAL-DB.
+       ENVIRONMENT DIVISION.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+           EXEC SQL INCLUDE SQLCA END-EXEC.
+       01  WS-CONNECTED-FLAG      PIC X.
+       01  WS-CURSOR-OPEN-FLAG    PIC X.
+       01  WS-USER-ID             PIC 9(9).
+       01  WS-USER-NOM            PIC X(50).
+       01  WS-USER-MAIL           PIC X(80).
+       01  WS-USER-PASS           PIC X(256).
+       01  WS-USER-ROLE           PIC X(15).
+       01  WS-USER-ID-ANTENNE     PIC 9(9).
+       01  WS-USER-LAST-LOGIN     PIC S9(11).
+       01  WS-DB-NAME             PIC X(64).
+       01  WS-DB-USER             PIC X(64).
+       01  WS-DB-PASSWORD         PIC X(64).
+       LINKAGE SECTION.
+       01  LK-OPERATION           PIC X(4).
+       01  LK-END-OF-FILE         PIC X.
+       01  LK-UTILISATEUR.
+           05 LK-USER-ID           PIC 9(9).
+           05 LK-USER-NOM          PIC X(50).
+           05 LK-USER-MAIL         PIC X(80).
+           05 LK-USER-PASS         PIC X(256).
+           05 LK-USER-ROLE         PIC X(15).
+           05 LK-USER-ID-ANTENNE   PIC 9(9).
+           05 LK-USER-LAST-LOGIN   PIC S9(11).
+       PROCEDURE DIVISION USING LK-OPERATION LK-END-OF-FILE 
+       LK-UTILISATEUR.
+       MAIN-ENTRY.
+           EVALUATE LK-OPERATION
+               WHEN 'READ'
+                   PERFORM DAL-CONNECT
+                   PERFORM DAL-READ
+               WHEN 'SAVE'
+                   PERFORM DAL-CONNECT
+                   PERFORM DAL-SAVE
+               WHEN 'END '
+                   PERFORM DAL-END
+               WHEN OTHER
+                   DISPLAY 'ERREUR: Operation inconnue: ' LK-OPERATION
+           END-EVALUATE
+           GOBACK.
+       
+       DAL-CONNECT.
+           IF WS-CONNECTED-FLAG = 'Y'
+               CONTINUE
+           ELSE
+               PERFORM DAL-SET-ENV
+               EXEC SQL
+                   CONNECT :WS-DB-USER IDENTIFIED BY :WS-DB-PASSWORD
+                   USING :WS-DB-NAME
+               END-EXEC
+               IF SQLCODE < 0
+                   DISPLAY 'ERREUR CONNECT: SQLCODE=' SQLCODE
+                   DISPLAY 'SQLSTATE=' SQLSTATE
+                   DISPLAY 'SQLERRMC=' SQLERRMC
+                   STOP RUN
+               ELSE
+                   MOVE 'Y' TO WS-CONNECTED-FLAG
+                   DISPLAY 'Connexion DB reussie'
+               END-IF
+           END-IF.
+       
+       DAL-SET-ENV.
+           MOVE SPACES TO WS-DB-NAME
+           MOVE SPACES TO WS-DB-USER
+           MOVE SPACES TO WS-DB-PASSWORD
+           ACCEPT WS-DB-NAME FROM ENVIRONMENT 'PGDATABASE'
+           ACCEPT WS-DB-USER FROM ENVIRONMENT 'PGUSER'
+           ACCEPT WS-DB-PASSWORD FROM ENVIRONMENT 'PGPASSWORD'
+           MOVE 'N' TO WS-CONNECTED-FLAG
+           MOVE 'N' TO WS-CURSOR-OPEN-FLAG.
+       
+       DAL-READ.
+           MOVE 'N' TO LK-END-OF-FILE
+           IF WS-CURSOR-OPEN-FLAG NOT EQUAL 'Y'
+               EXEC SQL
+                   DECLARE C_USER CURSOR FOR
+                   SELECT USER_ID, USER_NOM, USER_MAIL, USER_PASS, 
+                          USER_ROLE,
+                          USER_ID_ANTENNE, USER_LAST_LOGIN
+                   FROM UTILISATEUR
+                   ORDER BY USER_ID
+               END-EXEC
+               EXEC SQL OPEN C_USER END-EXEC
+               IF SQLCODE NOT EQUAL ZERO
+                   DISPLAY 'ERREUR OPEN: SQLCODE=' SQLCODE
+                   MOVE 'Y' TO LK-END-OF-FILE
+                   GOBACK
+               ELSE
+                   MOVE 'Y' TO WS-CURSOR-OPEN-FLAG
+                   DISPLAY 'Curseur C_USER ouvert'
+               END-IF
+           END-IF
+           INITIALIZE LK-UTILISATEUR
+           EXEC SQL
+               FETCH C_USER INTO
+                   :WS-USER-ID,
+                   :WS-USER-NOM,
+                   :WS-USER-MAIL,
+                   :WS-USER-PASS,
+                   :WS-USER-ROLE,
+                   :WS-USER-ID-ANTENNE,
+                   :WS-USER-LAST-LOGIN
+           END-EXEC
+           EVALUATE SQLCODE
+               WHEN ZERO
+                   MOVE WS-USER-ID TO LK-USER-ID OF LK-UTILISATEUR
+                   MOVE WS-USER-NOM TO LK-USER-NOM OF LK-UTILISATEUR
+                   MOVE WS-USER-MAIL TO LK-USER-MAIL OF LK-UTILISATEUR
+                   MOVE WS-USER-PASS TO LK-USER-PASS OF LK-UTILISATEUR
+                   MOVE WS-USER-ROLE TO LK-USER-ROLE OF LK-UTILISATEUR
+                   MOVE WS-USER-ID-ANTENNE TO
+                       LK-USER-ID-ANTENNE OF LK-UTILISATEUR
+                   MOVE WS-USER-LAST-LOGIN TO
+                       LK-USER-LAST-LOGIN OF LK-UTILISATEUR
+               WHEN 100
+                   MOVE 'Y' TO LK-END-OF-FILE
+               WHEN OTHER
+                   DISPLAY 'ERREUR FETCH: SQLCODE=' SQLCODE
+                   MOVE 'Y' TO LK-END-OF-FILE
+           END-EVALUATE.
+       
+       DAL-SAVE.
+           MOVE LK-USER-ID OF LK-UTILISATEUR TO WS-USER-ID
+           MOVE LK-USER-LAST-LOGIN OF LK-UTILISATEUR TO 
+           WS-USER-LAST-LOGIN
+           EXEC SQL
+               UPDATE UTILISATEUR
+               SET USER_LAST_LOGIN = :WS-USER-LAST-LOGIN
+               WHERE USER_ID = :WS-USER-ID
+           END-EXEC
+           IF SQLCODE NOT EQUAL ZERO
+               DISPLAY 'ERREUR UPDATE: SQLCODE=' SQLCODE
+               EXEC SQL ROLLBACK END-EXEC
+           END-IF.
+       
+       DAL-END.
+           IF WS-CURSOR-OPEN-FLAG EQUAL 'Y'
+               EXEC SQL CLOSE C_USER END-EXEC
+               IF SQLCODE NOT EQUAL ZERO
+                   DISPLAY 'ERREUR CLOSE: SQLCODE=' SQLCODE
+               END-IF
+               MOVE 'N' TO WS-CURSOR-OPEN-FLAG
+           END-IF
+           IF WS-CONNECTED-FLAG EQUAL 'Y'
+               EXEC SQL COMMIT END-EXEC
+               IF SQLCODE NOT EQUAL ZERO
+                   DISPLAY 'ERREUR COMMIT: SQLCODE=' SQLCODE
+               END-IF
+               DISPLAY 'Fermeture connexion'
+               EXEC SQL DISCONNECT ALL END-EXEC
+               IF SQLCODE NOT EQUAL ZERO
+                   DISPLAY 'ERREUR DISCONNECT: SQLCODE=' SQLCODE
+               END-IF
+               MOVE 'N' TO WS-CONNECTED-FLAG
+           END-IF
+           GOBACK.

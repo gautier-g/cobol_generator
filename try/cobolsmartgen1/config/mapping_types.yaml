@@ -1,0 +1,113 @@
+# SQL → COBOL type mappings for CobolSmartGen
+# Structure supports both per-dialect overrides and top-level fallbacks.
+# NOTE: DECIMAL/NUMERIC are computed dynamically by the engine to respect bounds.
+#       Max bounds (informational):
+settings:
+  decimal:
+    max_precision: 18
+    max_scale: 6
+
+# Fallbacks used when a dialect-specific override is not present
+SMALLINT: "9(5)"
+INT: "9(9)"
+BIGINT: "9(18)"
+CHAR:
+  pic: "X({length})"
+VARCHAR:
+  pic: "X({length})"
+DATE: "X(10)"        # YYYY-MM-DD
+TIME: "X(8)"         # HH:MM:SS
+TIMESTAMP: "X(26)"   # ISO-like with subseconds
+BOOLEAN:
+  pic: "X(1)"
+  comment: "boolean (Y/N)"
+
+dialects:
+  gnucobol:
+    # Direct keys are read by utils.typing_map; the 'types:' block mirrors them for humans.
+    SMALLINT: "9(5)"
+    INT: "9(9)"
+    BIGINT: "9(18)"
+    CHAR:
+      pic: "X({length})"
+    VARCHAR:
+      pic: "X({length})"
+    DATE: "X(10)"
+    TIME: "X(8)"
+    TIMESTAMP: "X(26)"
+    BOOLEAN:
+      pic: "X(1)"
+      comment: "boolean (Y/N)"
+    types:
+      SMALLINT: "9(5)"
+      INT: "9(9)"
+      BIGINT: "9(18)"
+      CHAR:
+        pic: "X({length})"
+      VARCHAR:
+        pic: "X({length})"
+      DATE: "X(10)"
+      TIME: "X(8)"
+      TIMESTAMP: "X(26)"
+      BOOLEAN:
+        pic: "X(1)"
+        comment: "boolean (Y/N)"
+
+  ibm:
+    # IBM Enterprise COBOL environments sometimes prefer numeric booleans.
+    SMALLINT: "9(5)"
+    INT: "9(9)"
+    BIGINT: "9(18)"
+    CHAR:
+      pic: "X({length})"
+    VARCHAR:
+      pic: "X({length})"
+    DATE: "X(10)"
+    TIME: "X(8)"
+    TIMESTAMP: "X(26)"
+    BOOLEAN:
+      pic: "9(1)"
+      comment: "boolean (0/1)"
+    types:
+      SMALLINT: "9(5)"
+      INT: "9(9)"
+      BIGINT: "9(18)"
+      CHAR:
+        pic: "X({length})"
+      VARCHAR:
+        pic: "X({length})"
+      DATE: "X(10)"
+      TIME: "X(8)"
+      TIMESTAMP: "X(26)"
+      BOOLEAN:
+        pic: "9(1)"
+        comment: "boolean (0/1)"
+
+  microfocus:
+    SMALLINT: "9(5)"
+    INT: "9(9)"
+    BIGINT: "9(18)"
+    CHAR:
+      pic: "X({length})"
+    VARCHAR:
+      pic: "X({length})"
+    DATE: "X(10)"
+    TIME: "X(8)"
+    TIMESTAMP: "X(26)"
+    BOOLEAN:
+      pic: "X(1)"
+      comment: "boolean (Y/N)"
+    types:
+      SMALLINT: "9(5)"
+      INT: "9(9)"
+      BIGINT: "9(18)"
+      CHAR:
+        pic: "X({length})"
+      VARCHAR:
+        pic: "X({length})"
+      DATE: "X(10)"
+      TIME: "X(8)"
+      TIMESTAMP: "X(26)"
+      BOOLEAN:
+        pic: "X(1)"
+        comment: "boolean (Y/N)"
