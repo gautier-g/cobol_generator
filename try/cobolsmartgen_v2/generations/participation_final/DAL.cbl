@@ -226,6 +226,9 @@
                AND P.PARTICIPATION_ID_USER = :WSPARTUSERID
            END-EXEC.
 
+           DISPLAY " SQLSTATE: " SQLSTATE.
+           DISPLAY " SQLERRMC: " SQLERRMC.
+
            IF SQLCODE = 0
                MOVE WSJOINTACTIVITEID TO LKJOINTACTIVITEID
                MOVE WSJOINTACTIVITENOM TO LKJOINTACTIVITENOM
@@ -292,6 +295,7 @@
                MOVE WSJOINMODETRANS TO LKJOINMODETRANS
            ELSE
                MOVE 'Y' TO LK-END-OF-FILE
+               MOVE 'N' TO WS-CURSOR-OPEN
            END-IF.
 
        LISTACTBYUSER.
@@ -314,12 +318,13 @@
                        A.ACTIVITE_ID
                    JOIN UTILISATEUR U ON 
                    P.PARTICIPATION_ID_USER = U.USER_ID
-                   WHERE P.PARTICIPATION_ID_USER = :WSUSERID.
+                   WHERE P.PARTICIPATION_ID_USER = :WSUSERID
       *        CORRECTION: WSUSERID
                END-EXEC
                EXEC SQL
                    OPEN CACTBYUSER
                END-EXEC
+               
                IF SQLCODE NOT = 0
                    MOVE 'Y' TO LK-END-OF-FILE
                    EXIT PARAGRAPH
@@ -362,7 +367,7 @@
                WHERE PARTICIPATION_ID_ACTIVITE = :WSPARTACTIVITEID
                AND PARTICIPATION_ID_USER = :WSPARTUSERID
            END-EXEC.
-
+           
        DELETEPARTICIPATION.
            PERFORM CONNECTDB.
            IF LK-END-OF-FILE = 'Y' EXIT PARAGRAPH.

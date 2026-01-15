@@ -24,11 +24,13 @@ puml_diagram: |
     ACTIVITE_EMPREINTETOTALE : numeric(13,4) (optional)
   }
 
-  Herbergement "1" -- "1" Activite
+  Hebergement "1" -- "1" Activite
   @enduml
 
 database_operations_string: |
   Donne moi un programme COBOL DB2 permettant :
+  - de créer un hébergement,
+  - de créer une activité,
   - d'ajouter un hébergement à une activité,
   - de lire un hébergement par identifiant,
   - de lister les hébergements d'une activité,
