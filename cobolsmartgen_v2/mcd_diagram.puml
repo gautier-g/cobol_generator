@@ -1,0 +1,26 @@
+@startuml
+  class Repas {
+    REPAS_ID : integer (needed)
+    REPAS_ID_ACTIVITE : integer (needed)
+    REPAS_TYPE : integer (needed)
+    REPAS_NBREPAS : integer (needed)
+  }
+
+  class Activite {
+    ACTIVITE_ID : integer (needed)
+    ACTIVITE_NOM : varchar(50) (needed)
+    ACTIVITE_TYPE : varchar(20) (needed)
+    ACTIVITE_IDANTENNE : integer (needed)
+    ACTIVITE_ANIMATEUR : integer (needed)
+    ACTIVITE_NBPARTICIPANTS : integer (needed)
+    ACTIVITE_MODETRANSPORT : integer (needed)
+    ACTIVITE_LIEU : varchar(100) (needed)
+    ACTIVITE_DISTANCE : integer (needed)
+    ACTIVITE_HEBERGEMENT : integer (needed)
+    ACTIVITE_REPASPREVU : integer (needed)
+    ACTIVITE_EMPREINTETOTALE : numeric(13,4) (optional)
+  }
+
+  Activite "1" -- "1" Repas
+
+  @enduml

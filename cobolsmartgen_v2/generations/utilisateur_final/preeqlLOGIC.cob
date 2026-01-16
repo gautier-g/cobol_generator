@@ -1,0 +1,128 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. TESTUSERDAL.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-USER.
+           05 WS-USERID           PIC 9(9) VALUE 123456789.
+           05 WS-USERNOM          PIC X(50) VALUE "TEST USER".
+           05 WS-USERMAIL         PIC X(80) VALUE "test@test.com".
+           05 WS-USERPASS         PIC X(256) VALUE "password123".
+           05 WS-USERROLE         PIC X(15) VALUE "ADMIN".
+           05 WS-USERIDANTENNE    PIC 9(9) VALUE 987654321.
+           05 WS-USERLASTLOGIN    PIC 9(18) VALUE 202301010000000000.
+       01 WS-RETURNCODE          PIC S9(9) COMP-5.
+       01 WS-OPERATION           PIC X(6).
+       01 WS-TEST-CASE           PIC X(30).
+       01 WS-EXPECTED            PIC S9(9) COMP-5.
+       01 WS-RESULT              PIC X(30).
+
+OCESQL*
+       PROCEDURE DIVISION.
+       MAIN-PARAGRAPH.
+           DISPLAY "DEBUT DES TESTS USERDAL".
+
+      * TEST CREATE
+           MOVE "CREATE" TO WS-OPERATION.
+           MOVE "TEST CREATE USER" TO WS-TEST-CASE.
+           MOVE 0 TO WS-EXPECTED.
+
+           CALL "USERDAL" USING WS-OPERATION WS-RETURNCODE WS-USER.
+
+           IF WS-RETURNCODE = WS-EXPECTED
+               MOVE "SUCCESS" TO WS-RESULT
+           ELSE
+               MOVE "FAILURE" TO WS-RESULT
+           END-IF.
+
+           DISPLAY WS-TEST-CASE " - " WS-RESULT
+                   " (CODE: " WS-RETURNCODE ")".
+
+      * TEST READ
+           MOVE "READ  " TO WS-OPERATION.
+           MOVE "TEST READ USER" TO WS-TEST-CASE.
+           MOVE 0 TO WS-EXPECTED.
+
+           CALL "USERDAL" USING WS-OPERATION WS-RETURNCODE WS-USER.
+
+           IF WS-RETURNCODE = WS-EXPECTED
+               MOVE "SUCCESS" TO WS-RESULT
+           ELSE
+               MOVE "FAILURE" TO WS-RESULT
+           END-IF.
+
+           DISPLAY WS-TEST-CASE " - " WS-RESULT
+                   " (CODE: " WS-RETURNCODE ")".
+
+      * TEST UPDATE
+           MOVE "UPDATE" TO WS-OPERATION.
+           MOVE "TEST UPDATE USER" TO WS-TEST-CASE.
+           MOVE 0 TO WS-EXPECTED.
+           MOVE "UPDATED USER" TO WS-USERNOM.
+           MOVE 202301020000000000 TO WS-USERLASTLOGIN.
+
+           CALL "USERDAL" USING WS-OPERATION WS-RETURNCODE WS-USER.
+
+           IF WS-RETURNCODE = WS-EXPECTED
+               MOVE "SUCCESS" TO WS-RESULT
+           ELSE
+               MOVE "FAILURE" TO WS-RESULT
+           END-IF.
+
+           DISPLAY WS-TEST-CASE " - " WS-RESULT
+                   " (CODE: " WS-RETURNCODE ")".
+
+      * TEST READ AFTER UPDATE
+           MOVE "READ  " TO WS-OPERATION.
+           MOVE "TEST READ AFTER UPDATE" TO WS-TEST-CASE.
+           MOVE 0 TO WS-EXPECTED.
+
+           CALL "USERDAL" USING WS-OPERATION WS-RETURNCODE WS-USER.
+
+           IF WS-RETURNCODE = WS-EXPECTED AND
+              WS-USERNOM = "UPDATED USER"
+               MOVE "SUCCESS" TO WS-RESULT
+           ELSE
+               MOVE "FAILURE" TO WS-RESULT
+           END-IF.
+
+           DISPLAY WS-TEST-CASE " - " WS-RESULT
+                   " (CODE: " WS-RETURNCODE ")".
+
+      * TEST DELETE
+           MOVE "DELETE" TO WS-OPERATION.
+           MOVE "TEST DELETE USER" TO WS-TEST-CASE.
+           MOVE 0 TO WS-EXPECTED.
+
+           CALL "USERDAL" USING WS-OPERATION WS-RETURNCODE WS-USER.
+
+           IF WS-RETURNCODE = WS-EXPECTED
+               MOVE "SUCCESS" TO WS-RESULT
+           ELSE
+               MOVE "FAILURE" TO WS-RESULT
+           END-IF.
+
+           DISPLAY WS-TEST-CASE " - " WS-RESULT
+                   " (CODE: " WS-RETURNCODE ")".
+
+      * TEST READ AFTER DELETE
+           MOVE "READ  " TO WS-OPERATION.
+           MOVE "TEST READ AFTER DELETE" TO WS-TEST-CASE.
+           MOVE 100 TO WS-EXPECTED.
+
+           CALL "USERDAL" USING WS-OPERATION WS-RETURNCODE WS-USER.
+
+           IF WS-RETURNCODE = WS-EXPECTED
+               MOVE "SUCCESS" TO WS-RESULT
+           ELSE
+               MOVE "FAILURE" TO WS-RESULT
+           END-IF.
+
+           DISPLAY WS-TEST-CASE " - " WS-RESULT
+                   " (CODE: " WS-RETURNCODE ")".
+
+      * END PROGRAM
+           MOVE "END   " TO WS-OPERATION.
+           CALL "USERDAL" USING WS-OPERATION WS-RETURNCODE WS-USER.
+
+           DISPLAY "FIN DES TESTS USERDAL".
+           STOP RUN.

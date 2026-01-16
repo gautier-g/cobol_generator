@@ -1,0 +1,5 @@
+[
+  { "prod_id": 1, "prod_name": "Clavier", "price_ht": 25.00, "price_ttc": null },
+  { "prod_id": 2, "prod_name": "Souris",  "price_ht": 15.00, "price_ttc": null },
+  { "prod_id": 3, "prod_name": "Écran",   "price_ht": 180.00, "price_ttc": null }
+]

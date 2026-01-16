@@ -1,0 +1,25 @@
+generation_name: invoice
+
+puml_diagram: |
+  @startuml
+  class Invoice {
+    INV_ID : integer (needed)
+    INV_DATE : date (needed)
+    TOTAL_HT : numeric(9,2) (needed)
+    TOTAL_TTC : numeric(9,2) (optional)
+  }
+  @enduml
+
+database_operations_string: |
+  Donne moi un programme COBOL qui permet de parcourir une telle table
+  et qui fournit des procédures pour sauvegarder un élément
+  ou lire un élément.
+
+layer_operations_string: |
+  Donne moi un programme COBOL qui affiche une facture.
+
+basic_functionality_string: |
+  Donne moi un programme COBOL qui parcours les éléments de la table invoice
+  et qui calculent le total TTC pour chaque
+  puis sauvegarde dans la base de données
+  (avec un affichage pour chaque invoice itéré)

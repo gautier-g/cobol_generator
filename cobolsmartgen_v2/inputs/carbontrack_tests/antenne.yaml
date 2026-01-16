@@ -1,0 +1,25 @@
+generation_name: antenne
+
+puml_diagram: |
+  @startuml
+  class Antenne {
+    ANTENNE_ID : integer (needed)
+    ANTENNE_NOM : varchar(50) (needed)
+    ANTENNE_REGION : varchar(50) (needed)
+  }
+  @enduml
+
+database_operations_string: |
+  Donne moi un programme COBOL DB2 permettant :
+  - de créer une antenne,
+  - de lire une antenne par identifiant,
+  - de lister toutes les antennes,
+  - de mettre à jour le nom et la région,
+  - de supprimer une antenne.
+
+layer_operations_string: |
+  Donne moi un programme COBOL qui affiche
+  les informations d'une antenne (id, nom, région).
+
+basic_functionality_string: |
+  Donne moi un programme COBOL qui teste chaque fonction de la couche physique.

@@ -1,0 +1,34 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. AFFICHE-ANTENNE.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-DISPLAY.
+           05 FILLER PIC X(20) VALUE "ID de l'antenne: ".
+           05 WS-ID-DISPLAY PIC 9(9).
+           05 FILLER PIC X(20) VALUE SPACES.
+       01 WS-DISPLAY2.
+           05 FILLER PIC X(20) VALUE "Nom de l'antenne: ".
+           05 WS-NOM-DISPLAY PIC X(50).
+           05 FILLER PIC X(20) VALUE SPACES.
+       01 WS-DISPLAY3.
+           05 FILLER PIC X(20) VALUE "Region de l'antenne: ".
+           05 WS-REGION-DISPLAY PIC X(50).
+           05 FILLER PIC X(20) VALUE SPACES.
+
+       LINKAGE SECTION.
+       01 LK-ANTENNE.
+           05 LK-ANTENNE-ID      PIC 9(9).
+           05 LK-ANTENNE-NOM     PIC X(50).
+           05 LK-ANTENNE-REGION  PIC X(50).
+
+       PROCEDURE DIVISION USING LK-ANTENNE.
+       MAIN-LOGIC.
+           MOVE LK-ANTENNE-ID TO WS-ID-DISPLAY.
+           MOVE LK-ANTENNE-NOM TO WS-NOM-DISPLAY.
+           MOVE LK-ANTENNE-REGION TO WS-REGION-DISPLAY.
+
+           DISPLAY WS-DISPLAY.
+           DISPLAY WS-DISPLAY2.
+           DISPLAY WS-DISPLAY3.
+
+           EXIT PROGRAM.

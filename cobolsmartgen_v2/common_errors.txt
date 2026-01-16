@@ -1,0 +1,3 @@
+dépassement de la colonne 72.
+stack overflow.
+boucle infinie.

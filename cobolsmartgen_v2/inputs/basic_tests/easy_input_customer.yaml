@@ -1,0 +1,21 @@
+generation_name: customer
+
+puml_diagram: |
+  @startuml
+  class Customer {
+    CUST_ID : integer (needed)
+    CUST_NAME : varchar(40) (needed)
+    CUST_CITY : varchar(30) (optional)
+  }
+  @enduml
+
+database_operations_string: |
+  Donne moi un programme COBOL qui permet de lire un customer
+  et sauvegarder un customer dans la table customer.
+
+layer_operations_string: |
+  Donne moi un programme COBOL qui affiche les informations d'un client.
+
+basic_functionality_string: |
+  Donne moi un programme COBOL qui parcours tous les clients
+  et affiche leurs informations.

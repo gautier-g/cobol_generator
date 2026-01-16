@@ -1,0 +1,20 @@
+generation_name: supplier
+
+puml_diagram: |
+  @startuml
+  class Supplier {
+    SUP_ID : integer (needed)
+    SUP_NAME : varchar(50) (needed)
+  }
+  @enduml
+
+database_operations_string: |
+  Donne moi un programme COBOL pour lire et sauvegarder
+  un fournisseur.
+
+layer_operations_string: |
+  Donne moi un programme COBOL qui affiche un fournisseur.
+
+basic_functionality_string: |
+  Donne moi un programme COBOL qui parcours les fournisseurs
+  et affiche leurs noms.

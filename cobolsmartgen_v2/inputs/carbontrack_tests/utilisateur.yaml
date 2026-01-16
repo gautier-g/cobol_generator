@@ -1,0 +1,29 @@
+generation_name: utilisateur
+
+puml_diagram: |
+  @startuml
+  class Utilisateur {
+    USER_ID : integer (needed)
+    USER_NOM : varchar(50) (needed)
+    USER_MAIL : varchar(80) (needed, unique)
+    USER_PASS : varchar(256) (needed)
+    USER_ROLE : varchar(15) (needed)
+    USER_ID_ANTENNE : integer (needed)
+    USER_LAST_LOGIN : bigint (optional)
+  }
+  @enduml
+
+database_operations_string: |
+  Donne moi un programme COBOL (DB2) permettant :
+  - de créer un utilisateur (INSERT avec contrôle unicité email),
+  - de lire un utilisateur par email,
+  - de mettre à jour le mot de passe, le nom, l'email et la date de dernière connexion,
+  - de supprimer un utilisateur par email.
+  Les erreurs SQL doivent être remontées par un code retour négatif.
+
+layer_operations_string: |
+  Donne moi un programme COBOL permettant d'afficher
+  les informations complètes d'un utilisateur à partir de son email.
+
+basic_functionality_string: |
+  Donne moi un programme COBOL qui teste chaque fonction de la couche physique.

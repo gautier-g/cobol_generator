@@ -1,0 +1,280 @@
+Je vais te demander un code écrit en COBOL.
+Je ne veux aucun caractère en plus du code COBOL dans ta réponse.
+N'ajoute aucune fonctionnalité qui n'est pas demandée.
+
+Explication du code à rédiger:
+    Voici un diagramme de classes plantuml:
+puml_diagram
+
+database_operations
+Ce programme est destiné à être appelé par un fichier parent.
+Ce programme doit utiliser OCESQL pour manipuler SQL.
+La base de données est nommée 'postgres', et il faut s'y connecter avec l'utilisateur 'postgres' et le mot de passe 'postgres'.
+
+Voici des exemples de code fonctionnel pour que tu comprennes la syntaxe d'OCESQL:
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. EMPLOYEE-DAL-DB.
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER. IBM-PC.
+       OBJECT-COMPUTER. IBM-PC.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-CONNECTED           PIC X VALUE 'N'.
+       01 WS-CURSOR-OPEN         PIC X VALUE 'N'.
+       01 WS-SQLCODE             PIC S9(9) COMP-5.
+       
+       EXEC SQL BEGIN DECLARE SECTION END-EXEC.
+       01 DBNAME                 PIC X(30) VALUE 'postgres'.
+       01 USERNAME               PIC X(30) VALUE 'postgres'.
+       01 PASSWD                 PIC X(30) VALUE 'postgres'.
+       01 WS-EMP-ID              PIC 9(4).
+       01 WS-EMP-NAME            PIC X(30).
+       01 WS-SALARY-BRUT         PIC 9(6)V99.
+       01 WS-SALARY-NET          PIC 9(6)V99.
+       EXEC SQL END DECLARE SECTION END-EXEC.
+       
+       EXEC SQL INCLUDE SQLCA END-EXEC.
+       
+       LINKAGE SECTION.
+       01 LK-OPERATION           PIC X(4).
+       01 LK-END-OF-FILE         PIC X.
+       01 LK-EMPLOYEE.
+           05 LK-EMP-ID          PIC 9(4).
+           05 LK-EMP-NAME        PIC A(30).
+           05 LK-SALARY-BRUT     PIC 9(6)V99.
+           05 LK-SALARY-NET      PIC 9(6)V99.
+           
+       PROCEDURE DIVISION USING LK-OPERATION LK-END-OF-FILE 
+           LK-EMPLOYEE.
+       MAIN-LOGIC.
+           EVALUATE LK-OPERATION
+               WHEN 'READ'
+                   PERFORM DAL-READ
+               WHEN 'SAVE'
+                   PERFORM DAL-SAVE
+               WHEN 'END '
+                   PERFORM DAL-END
+           END-EVALUATE.
+           EXIT PROGRAM.
+           
+       DAL-READ.
+           IF WS-CONNECTED = 'N'
+               EXEC SQL
+                   CONNECT :USERNAME IDENTIFIED BY :PASSWD USING :DBNAME
+               END-EXEC
+               EXEC SQL
+                   SET client_encoding TO 'LATIN1'
+               END-EXEC
+               IF SQLCODE NOT = 0
+                   MOVE 'Y' TO LK-END-OF-FILE
+                   EXIT PARAGRAPH
+               END-IF
+               MOVE 'Y' TO WS-CONNECTED
+           END-IF.
+           
+           IF WS-CURSOR-OPEN = 'N'
+               EXEC SQL
+                   DECLARE C_EMP CURSOR FOR
+                   SELECT EMP_ID, EMP_NAME, SALARY_BRUT, SALARY_NET
+                   FROM EMPLOYEE
+               END-EXEC
+               EXEC SQL
+                   OPEN C_EMP
+               END-EXEC
+               IF SQLCODE NOT = 0
+                   DISPLAY "[DAL-READ] ERREUR ouverture curseur!"
+                   MOVE 'Y' TO LK-END-OF-FILE
+                   EXIT PARAGRAPH
+               END-IF
+               MOVE 'Y' TO WS-CURSOR-OPEN
+           END-IF.
+           
+           EXEC SQL
+               FETCH C_EMP INTO
+                   :WS-EMP-ID,
+                   :WS-EMP-NAME,
+                   :WS-SALARY-BRUT,
+                   :WS-SALARY-NET
+           END-EXEC.
+           
+           IF SQLCODE NOT = 0
+               MOVE 'Y' TO LK-END-OF-FILE
+           ELSE
+               MOVE WS-EMP-ID        TO LK-EMP-ID
+               MOVE WS-EMP-NAME      TO LK-EMP-NAME
+               MOVE WS-SALARY-BRUT   TO LK-SALARY-BRUT
+               MOVE WS-SALARY-NET    TO LK-SALARY-NET
+           END-IF.
+           
+       DAL-SAVE.
+           MOVE LK-EMP-ID        TO WS-EMP-ID.
+           MOVE LK-SALARY-NET    TO WS-SALARY-NET.
+           
+           EXEC SQL
+               UPDATE EMPLOYEE
+               SET SALARY_NET = :WS-SALARY-NET
+               WHERE EMP_ID = :WS-EMP-ID
+           END-EXEC.
+           
+       DAL-END.
+           IF WS-CURSOR-OPEN = 'Y'
+               EXEC SQL
+                   CLOSE C_EMP
+               END-EXEC
+               MOVE 'N' TO WS-CURSOR-OPEN
+           END-IF.
+           
+           EXEC SQL
+               COMMIT
+           END-EXEC.
+           
+           IF WS-CONNECTED = 'Y'
+               EXEC SQL
+                   DISCONNECT ALL
+               END-EXEC
+               MOVE 'N' TO WS-CONNECTED
+           END-IF.
+
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. INVOICE-DAL-DB.
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER. IBM-PC.
+       OBJECT-COMPUTER. IBM-PC.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-CONNECTED           PIC X VALUE 'N'.
+       01 WS-CURSOR-OPEN         PIC X VALUE 'N'.
+       01 WS-SQLCODE             PIC S9(9) COMP-5.
+
+       EXEC SQL BEGIN DECLARE SECTION END-EXEC.
+       01 DBNAME                 PIC X(30) VALUE 'postgres'.
+       01 USERNAME               PIC X(30) VALUE 'postgres'.
+       01 PASSWD                 PIC X(30) VALUE 'postgres'.
+       01 WS-INV-ID              PIC 9(9).
+       01 WS-INV-DATE            PIC X(10).
+       01 WS-TOTAL-HT            PIC 9(7)V99.
+       01 WS-TOTAL-TTC           PIC 9(7)V99.
+       EXEC SQL END DECLARE SECTION END-EXEC.
+
+       EXEC SQL INCLUDE SQLCA END-EXEC.
+
+       LINKAGE SECTION.
+       01 LK-OPERATION           PIC X(4).
+       01 LK-END-OF-FILE         PIC X.
+       01 LK-INVOICE.
+           05 LK-INV-ID          PIC 9(9).
+           05 LK-INV-DATE        PIC X(10).
+           05 LK-TOTAL-HT        PIC 9(7)V99.
+           05 LK-TOTAL-TTC       PIC 9(7)V99.
+
+       PROCEDURE DIVISION USING LK-OPERATION LK-END-OF-FILE
+           LK-INVOICE.
+       MAIN-LOGIC.
+           EVALUATE LK-OPERATION
+               WHEN 'READ'
+                   PERFORM DALREAD
+               WHEN 'SAVE'
+                   PERFORM DALSAVE
+               WHEN 'END '
+                   PERFORM DALEND
+           END-EVALUATE.
+           EXIT PROGRAM.
+
+       DALREAD.
+           IF WS-CONNECTED = 'N'
+               EXEC SQL
+                   CONNECT :USERNAME IDENTIFIED BY :PASSWD USING :DBNAME
+               END-EXEC
+               EXEC SQL
+                   SET client_encoding TO 'LATIN1'
+               END-EXEC
+               IF SQLCODE NOT = 0
+                   MOVE 'Y' TO LK-END-OF-FILE
+                   EXIT PARAGRAPH
+               END-IF
+               MOVE 'Y' TO WS-CONNECTED
+           END-IF.
+
+           IF WS-CURSOR-OPEN = 'N'
+               EXEC SQL
+                   DECLARE CINV CURSOR FOR
+                   SELECT INV_ID, INV_DATE, TOTAL_HT, TOTAL_TTC
+                   FROM INVOICE
+               END-EXEC
+               EXEC SQL
+                   OPEN CINV
+               END-EXEC
+               IF SQLCODE NOT = 0
+                   MOVE 'Y' TO LK-END-OF-FILE
+                   EXIT PARAGRAPH
+               END-IF
+               MOVE 'Y' TO WS-CURSOR-OPEN
+           END-IF.
+
+           EXEC SQL
+               FETCH CINV INTO
+                   :WS-INV-ID,
+                   :WS-INV-DATE,
+                   :WS-TOTAL-HT,
+                   :WS-TOTAL-TTC
+           END-EXEC.
+
+           IF SQLCODE NOT = 0
+               MOVE 'Y' TO LK-END-OF-FILE
+           ELSE
+               MOVE WS-INV-ID        TO LK-INV-ID
+               MOVE WS-INV-DATE      TO LK-INV-DATE
+               MOVE WS-TOTAL-HT      TO LK-TOTAL-HT
+               MOVE WS-TOTAL-TTC     TO LK-TOTAL-TTC
+           END-IF.
+
+       DALSAVE.
+           MOVE LK-INV-ID        TO WS-INV-ID.
+           MOVE LK-INV-DATE      TO WS-INV-DATE.
+           MOVE LK-TOTAL-HT      TO WS-TOTAL-HT.
+           MOVE LK-TOTAL-TTC     TO WS-TOTAL-TTC.
+
+           EXEC SQL
+               UPDATE INVOICE
+               SET INV_DATE = :WS-INV-DATE,
+                   TOTAL_HT = :WS-TOTAL-HT,
+                   TOTAL_TTC = :WS-TOTAL-TTC
+               WHERE INV_ID = :WS-INV-ID
+           END-EXEC.
+
+           IF SQLCODE NOT = 0
+               EXEC SQL
+                   INSERT INTO INVOICE
+                   (INV_ID, INV_DATE, TOTAL_HT, TOTAL_TTC)
+                   VALUES
+                   (:WS-INV-ID, :WS-INV-DATE, :WS-TOTAL-HT,
+                    :WS-TOTAL-TTC)
+               END-EXEC
+           END-IF.
+
+       DALEND.
+           IF WS-CURSOR-OPEN = 'Y'
+               EXEC SQL
+                   CLOSE CINV
+               END-EXEC
+               MOVE 'N' TO WS-CURSOR-OPEN
+           END-IF.
+
+           EXEC SQL
+               COMMIT
+           END-EXEC.
+
+           IF WS-CONNECTED = 'Y'
+               EXEC SQL
+                   DISCONNECT ALL
+               END-EXEC
+               MOVE 'N' TO WS-CONNECTED
+           END-IF.
+
+Ne dépasse jamais la colonne 72!
+Ne mets pas de tiret dans le nom du curseur OCESQL.
+Connecte toi toujours à la base de données avant d'utiliser un curseur!
+Ne fais pas de procédure qui permet uniquement la connexion à la base de données!
+Ce programme est destiné à être appelé par un fichier parent.

@@ -1,0 +1,20 @@
+Je vais te demander un code écrit en COBOL.
+Je ne veux aucun caractère en plus du code COBOL dans ta réponse.
+N'ajoute aucune fonctionnalité qui n'est pas demandée.
+
+Explication du code à rédiger:
+    Voici deux codes COBOL:
+        Couche business:
+business_layer
+
+        Couche physique:
+physical_layer
+
+basic_functionality 
+
+Ce programme ne doit surtout pas dépasser la colonne 72!
+Ce programme ne doit pas avoir de LINKAGE SECTION ni de variables liées à LINKAGE SECTION!
+Ce programme ne doit pas faire directement du SQL!
+
+
+Ce programme doit utiliser les deux autres programmes donnés!

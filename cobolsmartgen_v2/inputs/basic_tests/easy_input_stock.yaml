@@ -1,0 +1,21 @@
+generation_name: stock
+
+puml_diagram: |
+  @startuml
+  class Stock {
+    STOCK_ID : integer (needed)
+    PROD_ID : integer (needed)
+    QUANTITY : integer (needed)
+  }
+  @enduml
+
+database_operations_string: |
+  Donne moi un programme COBOL pour lire et sauvegarder
+  un stock.
+
+layer_operations_string: |
+  Donne moi un programme COBOL qui affiche un stock.
+
+basic_functionality_string: |
+  Donne moi un programme COBOL qui parcours les stocks
+  et affiche les quantités disponibles.

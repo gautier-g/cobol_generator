@@ -1,0 +1,32 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. DISPLAYEMP.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 WS-DISPLAY-LINE.
+           05 FILLER              PIC X(10) VALUE "EMP ID: ".
+           05 WS-DISP-EMPID       PIC 9(4).
+           05 FILLER              PIC X(10) VALUE " | NAME: ".
+           05 WS-DISP-EMPNAME     PIC X(30).
+       01 WS-DISPLAY-LINE2.
+           05 FILLER              PIC X(10) VALUE "BRUT: ".
+           05 WS-DISP-SALARYBRUT  PIC ZZZZZ9.99.
+           05 FILLER              PIC X(10) VALUE " | NET: ".
+           05 WS-DISP-SALARYNET   PIC ZZZZZ9.99.
+
+       LINKAGE SECTION.
+       01 LK-EMPLOYEE.
+           05 LK-EMPID            PIC 9(4).
+           05 LK-EMPNAME          PIC X(30).
+           05 LK-SALARYBRUT       PIC 9(6)V99.
+           05 LK-SALARYNET        PIC 9(6)V99.
+
+       PROCEDURE DIVISION USING LK-EMPLOYEE.
+       MAIN-PARAGRAPH.
+           MOVE LK-EMPID          TO WS-DISP-EMPID
+           MOVE LK-EMPNAME        TO WS-DISP-EMPNAME
+           MOVE LK-SALARYBRUT     TO WS-DISP-SALARYBRUT
+           MOVE LK-SALARYNET      TO WS-DISP-SALARYNET
+
+           DISPLAY WS-DISPLAY-LINE
+           DISPLAY WS-DISPLAY-LINE2
+           EXIT PROGRAM.

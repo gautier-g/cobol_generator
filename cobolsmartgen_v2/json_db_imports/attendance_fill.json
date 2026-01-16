@@ -1,0 +1,5 @@
+[
+  { "att_id": 1, "emp_id": 1, "days_worked": 20 },
+  { "att_id": 2, "emp_id": 2, "days_worked": 18 },
+  { "att_id": 3, "emp_id": 3, "days_worked": 22 }
+]

@@ -1,0 +1,21 @@
+generation_name: order
+
+puml_diagram: |
+  @startuml
+  class Order {
+    ORDER_ID : integer (needed)
+    CUST_ID : integer (needed)
+    AMOUNT : numeric(9,2) (needed)
+  }
+  @enduml
+
+database_operations_string: |
+  Donne moi un programme COBOL pour lire et sauvegarder
+  une commande.
+
+layer_operations_string: |
+  Donne moi un programme COBOL qui affiche une commande.
+
+basic_functionality_string: |
+  Donne moi un programme COBOL qui parcours les commandes
+  et affiche le montant de chacune.
