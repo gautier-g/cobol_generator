@@ -1,10 +1,3 @@
-# CobolSmartGen
-
-**Development of an Intelligent COBOL Code Generator**  
-*Développement d'un Générateur de Code COBOL intelligent*
-
----
-
 ## 📋 Project Overview
 
 CobolSmartGen is a project aimed at integrating artificial intelligence into the development cycle to automate the generation of structured COBOL code and database scripts from functional specifications.
