@@ -6,7 +6,7 @@ import yaml
 from mistralai import Mistral
 
 def generate_cobol(yaml_filename):
-    api_key = 'Y4rxXqqWMv6m5haItVW1IpagkcHoyYdb' # next we'll use Mixtral 8x22B locally
+    api_key = os.getenv('MISTRAL_API_KEY') # next we'll use Mixtral 8x22B locally
     
     if not api_key:
         raise ValueError("La clé API MISTRAL n'est pas valide.")
