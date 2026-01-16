@@ -1,2 +1,0 @@
-[system] Expert COBOL. Génère uniquement le code COBOL demandé.
-[user] renvoie: 'bonjour'

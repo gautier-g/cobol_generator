@@ -1,5 +1,0 @@
-renvoie: 'bonjour'
-
-Les erreurs suivantes ont été détectées, corrige-les strictement sans ajouter de texte explicatif:
-- Paragraphes en trop: END-EXEC, END-EXEC, END-EXEC, END-IF, END-EXEC, END-EXEC, EXIT.
-- Variables WORKING-STORAGE en trop: EMP-RECORD.
